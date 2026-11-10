@@ -1,0 +1,15 @@
+[package]
+name = "lipi"
+version = "0.1.0"
+edition = "2021"
+description = "Type Singlish in any app and get Sinhala (Unicode or FM Abhaya)."
+repository = "https://github.com/sanjaya3d/LIPI"
+readme = "README.md"
+
+[dependencies]
+# None. LIPI uses only what Windows already has.
+
+[profile.release]
+opt-level = "s"
+lto = true
+strip = true

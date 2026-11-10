@@ -1,0 +1,219 @@
+# LIPI: Unicode to FM Abhaya legacy codes.
+#
+# One entry per line:   <hex code point>[+<hex code point>...]  <legacy code>   // note
+# The legacy code is everything after the first space, up to an optional " //" note.
+# Lines starting with # are comments. A code point can appear only once.
+#
+# HOW THE CONVERTER USES THIS FILE
+#   1. A syllable is read as: letter, optional conjunct (rakaransaya, yansaya, ...), vowel sign.
+#   2. If the whole thing has its own entry (letter+sign, or letter+conjunct+sign), that code
+#      is used as it is. This is how the special FM Abhaya glyphs work (ඩ් = â, ඩි = ä, ...).
+#   3. Otherwise the syllable is built from the pieces: kombuva signs are written in front
+#      of the letter, the rest after it.
+#   4. Longest entry wins. Nothing depends on the order of the lines.
+#
+# SOURCE: the codes come from the FM Abhaya conversion script you sent me, after removing its
+# bugs (see the audit list). They are NOT checked against the real font here.
+# Check with:  cargo run -- --chart   and paste the last lines into a document set to FM Abhaya.
+# To fix a glyph, change or add the line here. Put the file next to the program as
+# legacy_map.txt and it is used instead of this one.
+
+# Independent vowels
+0D85                     w    // අ
+0D86                     wd   // ආ
+0D87                     we   // ඇ
+0D88                     wE   // ඈ
+0D89                     b    // ඉ
+0D8A                     B    // ඊ
+0D8B                     W    // උ
+0D8C                     W!   // ඌ u + gayanukitta tail
+0D8D                     R    // ඍ
+0D90                     Ï    // ඐ rare, one source only
+0D91                     t    // එ
+0D92                     ta   // ඒ එ + hal
+0D93                     ft   // ඓ kombuva + එ
+0D94                     T    // ඔ
+0D95                     ´    // ඕ one glyph
+0D96                     T!   // ඖ ඔ + gayanukitta
+# 0D8E ඎ   no code known. Left as Unicode and reported.
+# 0D8F ඏ   the script gives Ì, which is also ක්ෂ. Not mapped, because two letters cannot share one code.
+
+# Consonants
+0D9A                     l    // ක
+0D9B                     L    // ඛ
+0D9C                     .    // ග
+0D9D                     >    // ඝ
+0D9F                     Õ    // ඟ
+0DA0                     p    // ච
+0DA1                     P    // ඡ
+0DA2                     c    // ජ
+0DA3                     CO   // ඣ
+0DA4                     [    // ඤ
+0DA5                     {    // ඥ
+0DA6                     `c   // ඦ
+0DA7                     g    // ට
+0DA8                     G    // ඨ
+0DA9                     v    // ඩ
+0DAA                     V    // ඪ
+0DAB                     K    // ණ
+0DAC                     ~    // ඬ
+0DAD                     ;    // ත
+0DAE                     :    // ථ
+0DAF                     o    // ද
+0DB0                     O    // ධ
+0DB1                     k    // න
+0DB3                     |    // ඳ
+0DB4                     m    // ප
+0DB5                     M    // ඵ
+0DB6                     n    // බ
+0DB7                     N    // භ
+0DB8                     u    // ම
+0DB9                     U    // ඹ
+0DBA                     h    // ය
+0DBB                     r    // ර
+0DBD                     ,    // ල
+0DC0                     j    // ව
+0DC1                     Y    // ශ
+0DC2                     I    // ෂ
+0DC3                     i    // ස
+0DC4                     y    // හ
+0DC5                     <    // ළ
+0DC6                     *    // ෆ
+0D9E                     X    // ඞ  layout based, the script has no plain ඞ
+
+# Vowel signs, anusvara, visarga
+0DCA                     a    // ක්  hal kirima
+0DCF                     d    // කා  aela-pilla
+0DD0                     e    // කැ  ae-pilla
+0DD1                     E    // කෑ  diga ae-pilla
+0DD2                     s    // කි  is-pilla
+0DD3                     S    // කී  diga is-pilla
+0DD4                     q    // කු  papilla
+0DD6                     Q    // කූ  diga papilla
+0DD8                     D    // කෘ  gaetta-pilla
+0DF2                     DD   // කෲ  diga gaetta-pilla
+0DDF                     !    // කෟ  gayanukitta
+0DD9                     f    // කෙ  kombuva, written before the letter
+0D82                     x    // කං  anusvara
+0D83                     #    // කඃ  visarga
+# ේ ෛ ො ෝ ෞ are built from the kombuva (0DD9), aela (0DCF), hal (0DCA) and gayanukitta (0DDF) lines above.
+# 0DF3 ෳ   no code known. Left as Unicode and reported.
+
+# Special glyphs: letter + hal kirima
+0D9B+0DCA                Ä    // ඛ්
+0D9E+0DCA                Ù    // ඞ්
+0DA0+0DCA                É    // ච්
+0DA1+0DCA                þ    // ඡ්
+0DA2+0DCA                Ê    // ජ්
+0DA6+0DCA                `Ê   // ඦ්
+0DA7+0DCA                Ü    // ට්
+0DA9+0DCA                â    // ඩ්
+0DAC+0DCA                å    // ඬ්
+0DB0+0DCA                è    // ධ්
+0DB6+0DCA                í    // බ්
+0DB8+0DCA                ï    // ම්
+0DB9+0DCA                ò    // ඹ්
+0DBB+0DCA                ¾    // ර්
+0DC0+0DCA                õ    // ව්
+
+# Special glyphs: letter + is-pilla
+0D9B+0DD2                Å    // ඛි
+0DA0+0DD2                Ñ    // චි
+0DA1+0DD2                ý    // ඡි
+0DA2+0DD2                ð    // ජි
+0DA6+0DD2                `ð   // ඦි
+0DA7+0DD2                á    // ටි
+0DA8+0DD2                À    // ඨි
+0DA9+0DD2                ä    // ඩි
+0DAB+0DD2                ‚    // ණි
+0DAC+0DD2                ç    // ඬි
+0DAE+0DD2                Ó    // ථි
+0DAF+0DD2                È    // දි
+0DB0+0DD2                ê    // ධි
+0DB3+0DD2                ¢    // ඳි
+0DB5+0DD2                Ý    // ඵි
+0DB6+0DD2                ì    // බි
+0DB8+0DD2                ñ    // මි
+0DB9+0DD2                ô    // ඹි
+0DBB+0DD2                ß    // රි
+0DC0+0DD2                ú    // වි
+
+# Special glyphs: letter + diga is-pilla
+0D9B+0DD3                Ç    // ඛී
+0D9E+0DD3                ü    // ඞී
+0DA0+0DD3                Ö    // චී
+0DA1+0DD3                Â    // ඡී
+0DA2+0DD3                Ô    // ජී
+0DA7+0DD3                à    // ටී
+0DA8+0DD3                Á    // ඨී
+0DA9+0DD3                ã    // ඩී
+0DAA+0DD3                Î    // ඪී
+0DAB+0DD3                Œ    // ණී
+0DAC+0DD3                é    // ඬී
+0DAE+0DD3                Ò    // ථී
+0DAF+0DD3                §    // දී
+0DB0+0DD3                ë    // ධී
+0DB3+0DD3                £    // ඳී
+0DB5+0DD3                Ú    // ඵී
+0DB6+0DD3                î    // බී
+0DB8+0DD3                ó    // මී
+0DB9+0DD3                ö    // ඹී
+0DBB+0DD3                Í    // රී
+0DC0+0DD3                ù    // වී
+
+# Special glyphs: letter + papilla
+0D9A+0DD4                l=   // කු
+0D9C+0DD4                .=   // ගු
+0D9F+0DD4                Õ=   // ඟු
+0DAD+0DD4                ;=   // තු
+0DAF+0DD4                ÿ    // දු
+0DB3+0DD4                ÷    // ඳු
+0DB7+0DD4                N=   // භු
+0DBB+0DD4                re   // රු
+0DBD+0DD4                ¨    // ලු
+0DC1+0DD4                Y=   // ශු
+0DC5+0DD4                ¿    // ළු
+
+# Special glyphs: letter + diga papilla
+0D9A+0DD6                l+   // කූ
+0D9C+0DD6                .+   // ගූ
+0DAD+0DD6                ;+   // තූ
+0DAF+0DD6                ¥    // දූ
+0DB3+0DD6                ª    // ඳූ
+0DB7+0DD6                N+   // භූ
+0DBB+0DD6                rE   // රූ
+0DBD+0DD6                Æ    // ලූ
+0DC1+0DD6                Y+   // ශූ
+
+# Special glyphs: ර + ae-pilla
+0DBB+0DD0                /    // රැ
+0DBB+0DD1                ?    // රෑ
+
+# Conjuncts and ligatures
+0DCA+200D+0DBB           %    // ්ර  rakaransaya
+0DCA+200D+0DBA           H    // ්ය  yansaya
+0DAF+0DCA+200D+0DBB      ø    // ද්ර  one glyph
+0D9A+0DCA+200D+0DC2      Ì    // ක්ෂ  one glyph, with joiner
+0D9A+0DCA+0DC2           Ì    // ක්ෂ  the same, without joiner
+0DBB+0DCA+200D+0DBA      ©    // ර්ය  repaya over ය
+0DBB+0DCA+200D+0DAB      “    // ර්ණ  repaya over ණ
+0DB6+0DCA+200D+0DBB+0DD2 ì%   // බ්රි  is-pilla glyph, then rakaransaya
+
+# Punctuation (what the legacy font needs at these codes)
+002C                     "    // ,  comma. The font has ල at the comma key
+002E                     '    // .  full stop. The font has ග at the full stop key
+0027                     z    // '  apostrophe
+0028                     ^    // (
+0029                     &    // )
+0025                     ]    // %
+002F                     $    // /
+003F                     @    // ?
+0021                     æ    // !
+003D                     }    // =
+002B                     ¬    // +
+003A                     (    // :  the font has ථ at the colon key
+003B                     ¦    // ;  the font has ත at the semicolon key
+2013                     -    // –  en dash becomes a hyphen
+201C                     —    // “  opening double quote
+201D                     ˜    // ”  closing double quote
+0022                     ˜    // "  straight double quote
