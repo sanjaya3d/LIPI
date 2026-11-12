@@ -1,4 +1,4 @@
-//! The name and the contact details shown in the window.
+//! The name and the contact links shown in the window.
 //! Plain text only, no Windows calls, so it is tested on any system.
 
 pub const NAME: &str = "LIPI";
@@ -6,14 +6,11 @@ pub const NAME_SINHALA: &str = "ලිපි";
 pub const TAGLINE: &str = "Type Singlish in any app and get Sinhala";
 pub const DEVELOPER: &str = "SANJAYA3D";
 
-/// What the window shows, and the address the click opens.
-pub const FACEBOOK_LABEL: &str = "Contact me on: ";
-pub const FACEBOOK_SHOWN: &str = "facebook.com/sanjaya3d";
-pub const FACEBOOK_URL: &str = "https://facebook.com/sanjaya3d";
-
-pub const GITHUB_LABEL: &str = "GitHub: ";
-pub const GITHUB_SHOWN: &str = "github.com/sanjaya3d/LIPI";
+/// The three round icon buttons under the developer name.
+/// Clicking one opens its address in the browser.
 pub const GITHUB_URL: &str = "https://github.com/sanjaya3d/LIPI";
+pub const FACEBOOK_URL: &str = "https://facebook.com/sanjaya3d";
+pub const YOUTUBE_URL: &str = "https://www.youtube.com/@SANJAYA3D/";
 
 #[cfg(test)]
 mod tests {
@@ -21,11 +18,17 @@ mod tests {
 
     #[test]
     fn links_are_safe_web_addresses() {
-        for (shown, url) in [(FACEBOOK_SHOWN, FACEBOOK_URL), (GITHUB_SHOWN, GITHUB_URL)] {
+        for url in [GITHUB_URL, FACEBOOK_URL, YOUTUBE_URL] {
             assert!(url.starts_with("https://"), "{url}");
-            assert!(url.ends_with(shown), "{url} should end with {shown}");
             assert!(!url.contains(' ') && url.is_ascii(), "{url}");
         }
+    }
+
+    #[test]
+    fn each_link_goes_to_the_right_place() {
+        assert!(GITHUB_URL.starts_with("https://github.com/sanjaya3d/"));
+        assert!(FACEBOOK_URL.starts_with("https://facebook.com/sanjaya3d"));
+        assert!(YOUTUBE_URL.starts_with("https://www.youtube.com/@SANJAYA3D"));
     }
 
     #[test]

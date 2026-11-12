@@ -503,7 +503,7 @@ mod tests {
         // Two spellings of the same text may share a code. Nothing else may.
         let expected = vec![
             ("Ì".to_string(), vec!["0D9A+0DCA+0DC2".to_string(), "0D9A+0DCA+200D+0DC2".to_string()]), // ක්ෂ, with and without joiner
-            ("˜".to_string(), vec!["0022".to_string(), "201D".to_string()]), // " and ” (the reference does the same)
+            ("—".to_string(), vec!["0022".to_string(), "201C".to_string()]), // " and “ (the table you sent gives " the same code as “)
         ];
         assert_eq!(LegacyMap::builtin().conflicts(), expected);
     }
@@ -792,9 +792,29 @@ mod tests {
     fn punctuation_has_its_own_codes() {
         check(&[
             (",", "\""), (".", "'"), ("'", "z"), ("(", "^"), (")", "&"), ("%", "]"), ("/", "$"), ("?", "@"),
-            ("!", "æ"), ("=", "}"), ("+", "¬"), (":", "("), (";", "¦"), ("–", "-"), ("“", "—"), ("”", "˜"),
-            ("\"", "˜"),
+            ("!", "æ"), ("=", "}"), ("+", "¬"), (":", "("), (";", "¦"), ("~", "~&"), ("–", "-"), ("“", "—"),
+            ("”", "˜"), ("\"", "—"),
         ]);
+    }
+
+    /// The table the user sent, every ASCII mark and its legacy code.
+    #[test]
+    fn every_ascii_mark_follows_the_users_table() {
+        let table = [
+            ("!", "æ"), ("\"", "—"), ("#", "#"), ("$", "$"), ("%", "]"), ("&", "&"), ("'", "z"), ("(", "^"),
+            (")", "&"), ("*", "*"), ("+", "¬"), (",", "\""), ("-", "-"), (".", "'"), ("/", "$"), (":", "("),
+            (";", "¦"), ("<", "<"), ("=", "}"), (">", ">"), ("?", "@"), ("@", "@"), ("[", "["), ("\\", "\\"),
+            ("]", "]"), ("^", "^"), ("_", "_"), ("`", "`"), ("{", "{"), ("|", "|"), ("}", "}"), ("~", "~&"),
+        ];
+        assert_eq!(table.len(), 32); // all the ASCII punctuation marks
+        check(&table);
+    }
+
+    #[test]
+    fn marks_in_a_sentence_are_converted_one_by_one() {
+        assert_eq!(conv("ක?"), "l@");
+        assert_eq!(conv("ක. ක: 5%"), "l' l( 5]");
+        assert_eq!(conv("ක!"), "læ");
     }
 
     #[test]

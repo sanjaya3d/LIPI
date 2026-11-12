@@ -200,6 +200,8 @@
 0DB6+0DCA+200D+0DBB+0DD2 ì%   // බ්රි  is-pilla glyph, then rakaransaya
 
 # Punctuation (what the legacy font needs at these codes)
+# The ASCII marks follow the table you sent. A mark that is not listed here keeps its own
+# code, so these need no line: # $ & * - < > @ [ \ ] ^ _ ` { | }
 002C                     "    // ,  comma. The font has ල at the comma key
 002E                     '    // .  full stop. The font has ග at the full stop key
 0027                     z    // '  apostrophe
@@ -208,12 +210,13 @@
 0025                     ]    // %
 002F                     $    // /
 003F                     @    // ?
-0021                     æ    // !
+0021                     æ    // !  exclamation mark
 003D                     }    // =
 002B                     ¬    // +
 003A                     (    // :  the font has ථ at the colon key
 003B                     ¦    // ;  the font has ත at the semicolon key
+007E                     ~&   // ~  two codes
 2013                     -    // –  en dash becomes a hyphen
 201C                     —    // “  opening double quote
 201D                     ˜    // ”  closing double quote
-0022                     ˜    // "  straight double quote
+0022                     —    // "  straight double quote, the same code as “

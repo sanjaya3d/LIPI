@@ -22,6 +22,8 @@ pub enum Piece {
     Panel { x: i32, y: i32, w: i32, h: i32, r: i32, ink: Ink },
     /// A solid circle. `x` and `y` are the top left of the box around it, `d` is the diameter.
     Disc { x: i32, y: i32, d: i32, ink: Ink },
+    /// A solid shape with straight sides, through the points (three or more).
+    Poly { points: &'static [(i32, i32)], ink: Ink },
 }
 
 impl Piece {
@@ -43,6 +45,16 @@ impl Piece {
                 (x, y, x + w, y + h)
             }
             Piece::Disc { x, y, d, .. } => (x, y, x + d, y + d),
+            Piece::Poly { points, .. } => {
+                let xs = points.iter().map(|p| p.0);
+                let ys = points.iter().map(|p| p.1);
+                (
+                    xs.clone().min().unwrap_or(0),
+                    ys.clone().min().unwrap_or(0),
+                    xs.max().unwrap_or(0),
+                    ys.max().unwrap_or(0),
+                )
+            }
         }
     }
 }
@@ -162,11 +174,45 @@ pub const CUBE: Icon = Icon {
     ],
 };
 
+/// GitHub: a round head with two ears, and two gaps at the bottom for the legs.
+pub const GITHUB: Icon = Icon {
+    w: 28,
+    h: 28,
+    pieces: &[
+        Piece::Disc { x: 1, y: 2, d: 26, ink: Main },
+        Piece::Poly { points: &[(3, 11), (4, 0), (13, 4)], ink: Main },
+        Piece::Poly { points: &[(25, 11), (24, 0), (15, 4)], ink: Main },
+        Piece::Lines { points: &[(11, 27), (11, 22)], width: 2, ink: Back },
+        Piece::Lines { points: &[(17, 27), (17, 22)], width: 2, ink: Back },
+    ],
+};
+
+/// Facebook: a disc with an "f" cut out of it.
+pub const FACEBOOK: Icon = Icon {
+    w: 28,
+    h: 28,
+    pieces: &[
+        Piece::Disc { x: 0, y: 0, d: 28, ink: Main },
+        Piece::Lines { points: &[(21, 8), (19, 8), (17, 10), (17, 24)], width: 4, ink: Back },
+        Piece::Lines { points: &[(13, 15), (22, 15)], width: 3, ink: Back },
+    ],
+};
+
+/// YouTube: a rounded box with a play triangle cut out of it.
+pub const YOUTUBE: Icon = Icon {
+    w: 32,
+    h: 22,
+    pieces: &[
+        Piece::Panel { x: 0, y: 0, w: 32, h: 22, r: 7, ink: Main },
+        Piece::Poly { points: &[(13, 6), (13, 16), (22, 11)], ink: Back },
+    ],
+};
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    const ALL: [(&str, &Icon); 9] = [
+    const ALL: [(&str, &Icon); 12] = [
         ("minimise", &MINIMISE),
         ("close", &CLOSE),
         ("keyboard", &KEYBOARD),
@@ -176,6 +222,9 @@ mod tests {
         ("document", &DOCUMENT),
         ("back", &BACK),
         ("cube", &CUBE),
+        ("github", &GITHUB),
+        ("facebook", &FACEBOOK),
+        ("youtube", &YOUTUBE),
     ];
 
     #[test]
@@ -220,6 +269,44 @@ mod tests {
         let Piece::Lines { points, .. } = BACK.pieces[0] else { panic!("expected a line") };
         let tip = points.iter().map(|p| p.0).min().unwrap();
         assert_eq!(points[1].0, tip); // the middle point is the leftmost one
+    }
+
+    #[test]
+    fn solid_shapes_have_three_or_more_corners() {
+        for (name, icon) in ALL {
+            for piece in icon.pieces {
+                if let Piece::Poly { points, .. } = piece {
+                    assert!(points.len() >= 3, "{name}");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn the_play_triangle_is_cut_out_and_stays_inside_the_youtube_box() {
+        let Piece::Panel { x, y, w, h, .. } = YOUTUBE.pieces[0] else {
+            panic!("the first piece must be the box");
+        };
+        let Piece::Poly { ink, .. } = YOUTUBE.pieces[1] else { panic!("the second piece must be the triangle") };
+        assert_eq!(ink, Ink::Back);
+        let (l, t, r, b) = YOUTUBE.pieces[1].bounds();
+        assert!(l > x + 4 && t > y + 2 && r < x + w - 4 && b < y + h - 2, "the triangle is too close to the edge");
+    }
+
+    #[test]
+    fn the_f_is_cut_out_of_the_facebook_disc() {
+        assert!(matches!(FACEBOOK.pieces[0], Piece::Disc { ink: Ink::Main, .. }));
+        assert!(FACEBOOK.pieces[1..].iter().all(|p| matches!(p, Piece::Lines { ink: Ink::Back, .. })));
+        assert_eq!(FACEBOOK.pieces.len(), 3); // the disc, the stem and the bar
+    }
+
+    #[test]
+    fn the_social_icons_are_big_enough_to_read_and_small_enough_for_their_buttons() {
+        // The footer buttons are 36 wide and 36 high at 96 DPI.
+        for (name, icon) in [("github", &GITHUB), ("facebook", &FACEBOOK), ("youtube", &YOUTUBE)] {
+            assert!(icon.w >= 24 && icon.h >= 20, "{name} is too small to read");
+            assert!(icon.w <= 32 && icon.h <= 32, "{name} does not fit its button");
+        }
     }
 
     #[test]

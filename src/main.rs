@@ -10,8 +10,11 @@
 //                                 (lipi --convert < unicode.txt > legacy.txt)
 //   cargo run -- --map my.txt     use your own legacy map file (works with all of the above)
 //
-// Files next to the program (both optional):
-//   settings.txt      toggle keys, starting state, start in tray. Created on first run.
+// Settings file (made on first run, in a folder Explorer hides):
+//   %APPDATA%\LIPI\settings.txt   toggle keys, starting state, start in tray.
+//                     An old settings.txt next to the program is moved there the first time.
+//
+// File next to the program (optional):
 //   legacy_map.txt    your own legacy map. Used instead of the built-in one if it is there.
 //                     (--map beats it.) Copy src/legacy_map.txt next to the program to start.
 //
@@ -129,10 +132,15 @@ fn convert_stdin(map: &legacy::LegacyMap) {
     }
 }
 
-/// Reads settings.txt and makes it the settings for the whole program.
-/// Sets the starting state of the typing switch. Returns true if legacy output should start.
-fn apply_settings(args: &[String], dir: &Path) -> bool {
-    let (chosen, notes) = settings::load(dir);
+/// Reads settings.txt (from the LIPI folder in AppData) and makes it the settings for the
+/// whole program. Sets the starting state of the typing switch.
+/// Returns true if legacy output should start.
+fn apply_settings(args: &[String], program: &Path) -> bool {
+    let dir = settings::folder(program);
+    let mut notes = settings::migrate(program, &dir);
+    let (chosen, loaded) = settings::load(&dir);
+    notes.extend(loaded);
+    notes.push(format!("Settings file: {}", dir.join(settings::FILE_NAME).display()));
     for note in notes {
         state::log(note);
     }

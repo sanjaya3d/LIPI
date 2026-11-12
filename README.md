@@ -1,30 +1,60 @@
 <p align="center">
-  <img src="assets/logo.png" width="128" alt="LIPI logo">
+  <img src="assets/banner.png" width="560" alt="LIPI (ලිපි)">
 </p>
 
-# LIPI (ලිපි)
+<p align="center">
+  <img src="https://img.shields.io/badge/Platform-Windows-BEF92C?labelColor=2b3035" alt="Platform: Windows">
+  <img src="https://img.shields.io/badge/Built%20with-Rust-BEF92C?labelColor=2b3035" alt="Built with Rust">
+  <img src="https://img.shields.io/badge/Dependencies-none-BEF92C?labelColor=2b3035" alt="Dependencies: none">
+  <img src="https://img.shields.io/badge/License-GPLv3%2B-BEF92C?labelColor=2b3035" alt="License: GPLv3+">
+</p>
 
-Type Singlish in any app and get Sinhala, live, as you type.
+<p align="center">
+  <a href="https://github.com/sanjaya3d/LIPI/releases/latest">
+    <img src="https://img.shields.io/badge/DOWNLOAD-LATEST%20RELEASE-BEF92C?labelColor=2b3035&style=for-the-badge" alt="Download the latest release">
+  </a>
+</p>
 
-LIPI is a small Windows program written in Rust. You type Sinhala words in English letters, for example `ammaa`, and LIPI writes අම්මා in the app you are using: Photoshop, Premiere Pro, Blender, Word, a browser and so on.
+<p align="center">
+  <a href="#features">Features</a> &nbsp;·&nbsp;
+  <a href="#quick-start">Quick start</a> &nbsp;·&nbsp;
+  <a href="#how-to-type">How to type</a> &nbsp;·&nbsp;
+  <a href="#settings">Settings</a> &nbsp;·&nbsp;
+  <a href="#build-from-source">Build</a>
+</p>
+
+**Type Singlish in any app and get Sinhala, live, as you type.** Type `ammaa` and LIPI writes අම්මා in Photoshop, Premiere Pro, Blender, Word, your browser and any other Windows app. The output can be Unicode or FM Abhaya.
+
+Windows program written in Rust · GPL-3.0-or-later · by **SANJAYA3D**
+
+> **ලිපි** යනු ඉංග්‍රීසි අකුරින් (Singlish) ටයිප් කරන දේ ඒ මොහොතේම සිංහල අකුරු බවට හරවන කුඩා Windows වැඩසටහනකි. උදාහරණයක් ලෙස `ammaa` ටයිප් කළ විට අම්මා ලැබේ. Photoshop, Premiere Pro, Blender වැනි ඕනෑම app එකක මෙය වැඩ කරයි. Unicode සහ FM Abhaya (legacy) යන දෙවර්ගයෙන්ම සිංහල ලිවිය හැක.
+
+<p align="center">
+  <img src="assets/hero.png" width="100%" alt="Four example words, ammaa, ballaa, sixhala and koLaBa, turning into Sinhala, next to the LIPI window">
+</p>
+
+<p align="center"><sub>Illustration (generated for this README, not a screenshot): four example words and the LIPI window.</sub></p>
 
 ## Features
 
-- Works in any app, because it watches the keyboard for the whole system.
-- Two output types: Unicode, and FM Abhaya (legacy) for apps that cannot show Unicode Sinhala properly.
-- The word is redrawn after every key, and Backspace works one English letter at a time.
-- One small exe. No installer, no extra libraries (Rust standard library only). About 1.8 MB of RAM on the author's PC.
-- A key hint page inside the window (the Keys button) and `lipi --keys` for the terminal.
-- You can use your own FM Abhaya map file.
+- **Works in any app.** LIPI watches the keyboard for the whole system, so it works wherever you can type.
+- **Two outputs.** Unicode, and FM Abhaya (legacy) for apps that cannot show Unicode Sinhala properly.
+- **Live typing.** The word is redrawn after every key, and Backspace works one English letter at a time.
+- **Punctuation in legacy mode.** Keys such as `?` `.` `:` `%` `!` `(` `)` type the right FM Abhaya codes, so you do not have to switch outputs (US keyboard layout).
+- **Tiny.** One small exe. No installer, no libraries (Rust standard library only), about 2 MB of RAM on the author's PC.
+- **Lives in the tray.** Left click the tray icon to open the window. Right click to switch Sinhala typing on or off.
+- **Key hints inside the window.** The **Keys** button shows what to type for each letter. `lipi --keys` prints the same chart in a terminal.
+- **Your own map.** You can use your own FM Abhaya map file.
+- **Private.** No network code. Nothing you type leaves your computer.
 
 ## Quick start
 
-1. Run `lipi.exe`. The window opens.
+1. Download `lipi.exe` from the [latest release](https://github.com/sanjaya3d/LIPI/releases/latest) and run it. The window opens.
 2. Tap **Right Ctrl** to switch Sinhala typing on or off.
 3. Tap **Right Shift** to switch between Unicode and legacy (FM Abhaya) output.
 4. Type in any app. For example `ballaa` gives බල්ලා.
 
-You can change both keys, and what the program starts with, in `settings.txt`. The program creates this file next to the exe the first time it runs.
+You can change both keys, and what the program starts with, in [`settings.txt`](#settings).
 
 ## How to type
 
@@ -35,9 +65,8 @@ You can change both keys, and what the program starts with, in `settings.txt`. T
 - A capital letter that no key uses is read as lowercase, so `Kamal` gives කමල්.
 - Anything LIPI does not know, such as digits and punctuation, is passed through as typed.
 
-### Key chart
-
-This is the output of `lipi --keys`.
+<details>
+<summary><b>Key chart</b> (the output of <code>lipi --keys</code>)</summary>
 
 ```
 == Vowels ==
@@ -76,6 +105,8 @@ Type them after a consonant. Also: AA = කෑ
 Capitals matter: ta = ට, Ta = ඨ. x, zn, H and X are typed after a letter.
 ```
 
+</details>
+
 ## Output types
 
 **Unicode** is normal Sinhala text. It works in modern apps and websites.
@@ -92,7 +123,7 @@ lipi --convert < unicode.txt > legacy.txt
 
 ## Settings
 
-`settings.txt` is created next to the exe on the first run:
+LIPI keeps its settings in your AppData folder, which Explorer hides by default, so no settings file sits next to the exe. To open the folder, press **Win + R**, type `%APPDATA%\LIPI` and press Enter. The file `settings.txt` is created there the first time LIPI runs.
 
 ```
 # Tap this key alone to switch Sinhala typing on or off.
@@ -112,6 +143,8 @@ start_in_tray = no
 Comments must be on their own lines, starting with `#`.
 
 Choices for the two keys: `RightCtrl`, `LeftCtrl`, `RightShift`, `LeftShift`, `RightAlt`, `LeftAlt`, `ScrollLock`, `Pause`. They must be different keys. Change a value, save, and restart the program.
+
+If you used an older version that kept `settings.txt` next to the exe, LIPI moves that file to the new folder the first time it runs.
 
 ## Command line
 
@@ -137,7 +170,7 @@ A release build has no console window, so `--test`, `--chart`, `--keys` and `--c
 
 ## Privacy
 
-LIPI has no network code and sends nothing anywhere. The Show Logs window keeps the last 500 lines in memory only, and nothing is saved to a file. The only file the program writes is `settings.txt`.
+LIPI has no network code and sends nothing anywhere. The Show Logs window keeps its lines in memory only, and nothing is saved to a file. The only file the program writes is `settings.txt`.
 
 ## Limits
 
@@ -146,8 +179,9 @@ LIPI has no network code and sends nothing anywhere. The Show Logs window keeps 
 - Turn Sinhala typing off (tap Right Ctrl) before you type a password, or the letters will be converted too.
 - The exe is not code-signed, so some antivirus programs may warn about it. The source code is here, so you can read it and build it yourself.
 - FM Abhaya output needs the FM Abhaya font in the app you paste into.
+- The legacy punctuation table is made for the US keyboard layout.
 
-## Build
+## Build from source
 
 Install Rust with the MSVC toolchain, then run this in the project folder:
 
@@ -173,12 +207,19 @@ cargo test
 | `src/settings.rs`, `src/state.rs` | Settings and shared state |
 | `src/gui.rs`, `src/layout.rs`, `src/icons.rs`, `src/theme.rs` | The window, drawn by hand with no libraries |
 | `src/hints.rs` | The key hint page |
-| `src/about.rs` | Name and contact details |
+| `src/about.rs` | Name and contact links |
 | `build.rs` | Adds the icon to the exe |
+
+## Feedback
+
+Found a wrong letter or a bad FM Abhaya glyph? [Open an issue](https://github.com/sanjaya3d/LIPI/issues) with the word you typed and what you expected.
+
+## License
+
+LIPI is free software under the [GNU General Public License v3.0 or later](LICENSE).
 
 ## Author
 
-Sanjaya3D
+Made by **SANJAYA3D**
 
-- Facebook: [facebook.com/sanjaya3d](https://facebook.com/sanjaya3d)
-- GitHub: [github.com/sanjaya3d](https://github.com/sanjaya3d)
+[GitHub](https://github.com/sanjaya3d) &nbsp;·&nbsp; [Facebook](https://facebook.com/sanjaya3d) &nbsp;·&nbsp; [YouTube](https://www.youtube.com/@SANJAYA3D/)

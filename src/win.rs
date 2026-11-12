@@ -8,6 +8,9 @@
 //!      (some Backspaces, then the new text as Unicode characters).
 //!   3. Space, Enter, digits, arrows and shortcuts are passed through and
 //!      end the word. A mouse click or a change of window also ends the word.
+//!   4. In legacy output a punctuation key is swallowed too, and its legacy
+//!      code is typed instead (the font has Sinhala letters at ? . : % and so on).
+//!      A mark whose code is the key itself is passed through.
 //!
 //! No external crates. The few Win32 functions are declared by hand below.
 
@@ -280,7 +283,22 @@ fn on_key(st: &mut State, msg: u32, k: &KbdLlHookStruct) -> bool {
         Key::Ignore => false,
         Key::Break => {
             st.session.reset();
-            false
+            // In legacy output a mark is typed as its legacy code (? gives @, . gives ' and so
+            // on), because the font has Sinhala letters at the codes of the plain keys.
+            // A key that is not a mark, or whose code is the key itself, passes through.
+            let converted = punctuation(vk, shift, shortcut).and_then(|mark| {
+                st.session.mark(mark).map(|text| (mark, text))
+            });
+            match converted {
+                Some((mark, text)) => {
+                    let edit = Edit { backspaces: 0, text };
+                    log_edit(st, &format!("'{mark}'"), &edit);
+                    apply_edit(&edit);
+                    st.swallowed[slot] = true;
+                    true
+                }
+                None => false,
+            }
         }
         Key::Letter(ch) => {
             let edit = st.session.push(ch);

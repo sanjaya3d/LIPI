@@ -59,8 +59,10 @@ pub enum Hit {
     LegacyButton,
     LogsButton,
     KeysButton,
-    Facebook,
+    /// The three round icon buttons in the footer.
     GitHub,
+    Facebook,
+    YouTube,
     /// Key hint page: back to the main page.
     Back,
     /// Key hint page: one of the tabs, counted from 0.
@@ -110,8 +112,9 @@ pub struct Layout {
     pub logs_button: Rect,
     pub keys_button: Rect,
     pub dev_row: Rect,
-    pub facebook_link: Rect,
-    pub github_link: Rect,
+    pub github_button: Rect,
+    pub facebook_button: Rect,
+    pub youtube_button: Rect,
     // key hint page
     pub back_button: Rect,
     pub hint_title: Rect,
@@ -158,8 +161,9 @@ impl Layout {
             logs_button: r(24, 354, 192, 392),
             keys_button: r(208, 354, 376, 392),
             dev_row: r(24, 406, 376, 430),
-            facebook_link: r(60, 436, 340, 456),
-            github_link: r(60, 456, 340, 476),
+            github_button: r(138, 436, 174, 472),
+            facebook_button: r(182, 436, 218, 472),
+            youtube_button: r(226, 436, 262, 472),
             back_button: r(24, 52, 112, 88),
             hint_title: r(126, 52, 376, 88),
             hint_grid: r(24, 142, 376, 440),
@@ -236,10 +240,12 @@ impl Layout {
                     Hit::LogsButton
                 } else if self.keys_button.contains(x, y) {
                     Hit::KeysButton
-                } else if self.facebook_link.contains(x, y) {
-                    Hit::Facebook
-                } else if self.github_link.contains(x, y) {
+                } else if self.github_button.contains(x, y) {
                     Hit::GitHub
+                } else if self.facebook_button.contains(x, y) {
+                    Hit::Facebook
+                } else if self.youtube_button.contains(x, y) {
+                    Hit::YouTube
                 } else {
                     Hit::None
                 }
@@ -282,8 +288,9 @@ mod tests {
                 (l.legacy_button, Hit::LegacyButton),
                 (l.logs_button, Hit::LogsButton),
                 (l.keys_button, Hit::KeysButton),
-                (l.facebook_link, Hit::Facebook),
-                (l.github_link, Hit::GitHub),
+                (l.github_button, Hit::GitHub),
+                (l.facebook_button, Hit::Facebook),
+                (l.youtube_button, Hit::YouTube),
                 (l.info_panel, Hit::None),
                 (l.logo_tile, Hit::None),
                 (l.dev_row, Hit::None),
@@ -326,7 +333,9 @@ mod tests {
     #[test]
     fn the_pointer_is_a_hand_only_over_things_that_click() {
         assert!(Hit::Close.clickable());
+        assert!(Hit::GitHub.clickable());
         assert!(Hit::Facebook.clickable());
+        assert!(Hit::YouTube.clickable());
         assert!(Hit::TypingCard.clickable());
         assert!(Hit::KeysButton.clickable());
         assert!(Hit::Back.clickable());
@@ -368,8 +377,9 @@ mod tests {
                     l.logs_button,
                     l.keys_button,
                     l.dev_row,
-                    l.facebook_link,
-                    l.github_link,
+                    l.github_button,
+                    l.facebook_button,
+                    l.youtube_button,
                 ],
                 dpi,
             );
@@ -396,6 +406,30 @@ mod tests {
         assert_eq!(l.logs_button.left, l.typing_card.left);
         assert_eq!(l.keys_button.right, l.typing_card.right);
         assert!(l.logs_button.right < l.keys_button.left);
+    }
+
+    #[test]
+    fn the_three_footer_buttons_are_equal_evenly_spaced_and_centred_under_the_developer_row() {
+        for dpi in [96, 144, 192] {
+            let l = Layout::new(dpi);
+            let buttons = [l.github_button, l.facebook_button, l.youtube_button];
+            for b in buttons {
+                assert_eq!((b.width(), b.height()), (buttons[0].width(), buttons[0].height()), "dpi {dpi}");
+                assert_eq!(b.top, buttons[0].top, "dpi {dpi}");
+                assert!(b.top > l.dev_row.bottom, "dpi {dpi}: the buttons must sit under the developer row");
+                assert!(b.width() >= l.scale(32), "dpi {dpi}: too small to click");
+            }
+            let gap1 = buttons[1].left - buttons[0].right;
+            let gap2 = buttons[2].left - buttons[1].right;
+            assert!((gap1 - gap2).abs() <= 1, "dpi {dpi}: gaps {gap1} and {gap2}");
+            assert!(gap1 > 0, "dpi {dpi}: the buttons touch");
+            // The group is in the middle of the window.
+            let left_space = buttons[0].left;
+            let right_space = l.window.right - buttons[2].right;
+            assert!((left_space - right_space).abs() <= 2, "dpi {dpi}: {left_space} against {right_space}");
+            // Room left under them for the window outline.
+            assert!(buttons[0].bottom <= l.window.bottom - l.scale(2), "dpi {dpi}");
+        }
     }
 
     #[test]
@@ -470,7 +504,9 @@ mod tests {
                 assert!(inside(&l.hint_tab(i), &l.window), "tab {i} at dpi {dpi}");
             }
             assert!(inside(&l.title_bar, &l.window));
-            assert!(inside(&l.facebook_link, &l.window));
+            for button in [l.github_button, l.facebook_button, l.youtube_button] {
+                assert!(inside(&button, &l.window), "{button:?} at dpi {dpi}");
+            }
         }
     }
 

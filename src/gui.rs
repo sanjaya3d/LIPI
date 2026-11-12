@@ -336,6 +336,7 @@ extern "system" {
     fn RoundRect(hdc: isize, left: i32, top: i32, right: i32, bottom: i32, corner_w: i32, corner_h: i32) -> i32;
     fn Ellipse(hdc: isize, left: i32, top: i32, right: i32, bottom: i32) -> i32;
     fn Polyline(hdc: isize, points: *const Point, count: i32) -> i32;
+    fn Polygon(hdc: isize, points: *const Point, count: i32) -> i32;
     fn GetDeviceCaps(hdc: isize, index: i32) -> i32;
 }
 
@@ -389,7 +390,6 @@ static FONT_TITLE_SI: AtomicIsize = AtomicIsize::new(0);
 static FONT_LABEL: AtomicIsize = AtomicIsize::new(0);
 static FONT_SMALL: AtomicIsize = AtomicIsize::new(0);
 static FONT_SMALL_BOLD: AtomicIsize = AtomicIsize::new(0);
-static FONT_LINK: AtomicIsize = AtomicIsize::new(0);
 static FONT_LOGO: AtomicIsize = AtomicIsize::new(0);
 static FONT_LOGO_SMALL: AtomicIsize = AtomicIsize::new(0);
 static FONT_HEAD: AtomicIsize = AtomicIsize::new(0);
@@ -467,6 +467,17 @@ unsafe fn polyline(hdc: isize, points: &[Point], colour: u32, width: i32) {
     Polyline(hdc, points.as_ptr(), points.len() as i32);
     SelectObject(hdc, old_pen);
     DeleteObject(pen);
+}
+
+/// A solid shape with straight sides through the points.
+unsafe fn polygon(hdc: isize, points: &[Point], colour: u32) {
+    let brush = CreateSolidBrush(colour);
+    let old_brush = SelectObject(hdc, brush);
+    let old_pen = SelectObject(hdc, GetStockObject(NULL_PEN));
+    Polygon(hdc, points.as_ptr(), points.len() as i32);
+    SelectObject(hdc, old_brush);
+    SelectObject(hdc, old_pen);
+    DeleteObject(brush);
 }
 
 /// Draws something SS times bigger in a small hidden bitmap, then shrinks it onto `dest`.
@@ -547,6 +558,10 @@ unsafe fn draw_icon(hdc: isize, icon: &Icon, slot: Rect, main: u32, back: u32, b
                 }
                 Piece::Disc { x, y, d, ink: i } => {
                     disc(m, Rect { left: big(x), top: big(y), right: big(x + d), bottom: big(y + d) }, ink(i));
+                }
+                Piece::Poly { points, ink: i } => {
+                    let pts: Vec<Point> = points.iter().map(|&(x, y)| Point { x: big(x), y: big(y) }).collect();
+                    polygon(m, &pts, ink(i));
                 }
             }
         }
@@ -684,7 +699,6 @@ unsafe fn draw_main(hdc: isize, lay: &Layout) {
     let label_font = FONT_LABEL.load(Relaxed);
     let small_font = FONT_SMALL.load(Relaxed);
     let bold_font = FONT_SMALL_BOLD.load(Relaxed);
-    let link_font = FONT_LINK.load(Relaxed);
     let left_middle = DT_LEFT | DT_VCENTER | DT_SINGLELINE;
     let centred = DT_CENTER | DT_VCENTER | DT_SINGLELINE;
     let enabled = state::enabled();
@@ -791,19 +805,14 @@ unsafe fn draw_main(hdc: isize, lay: &Layout) {
     fill(hdc, Rect { left: dev.left, top: line_top, right: dev_left - margin, bottom: line_top + stroke }, ACCENT);
     fill(hdc, Rect { left: dev_left + dev_group + margin, top: line_top, right: dev.right, bottom: line_top + stroke }, ACCENT);
 
-    // Contact links. Clicking a line opens the address in the browser.
-    rich(
-        hdc,
-        lay.facebook_link,
-        &[part(about::FACEBOOK_LABEL, small_font, MUTED), part(about::FACEBOOK_SHOWN, link_font, ACCENT)],
-        true,
-    );
-    rich(
-        hdc,
-        lay.github_link,
-        &[part(about::GITHUB_LABEL, small_font, MUTED), part(about::GITHUB_SHOWN, link_font, ACCENT)],
-        true,
-    );
+    // Contact buttons: GitHub, Facebook and YouTube. Clicking one opens its page in the browser.
+    for (button, icon) in [
+        (lay.github_button, &icons::GITHUB),
+        (lay.facebook_button, &icons::FACEBOOK),
+        (lay.youtube_button, &icons::YOUTUBE),
+    ] {
+        draw_icon(hdc, icon, button, ACCENT, BG, BG, lay);
+    }
 }
 
 /// The key hint page: a Back button, four tabs, a grid of letters with their keys, a note.
@@ -1174,12 +1183,16 @@ unsafe fn on_click(hwnd: isize, lparam: isize) {
         Hit::KeysButton => VIEW.store(1, Relaxed),
         Hit::Back => VIEW.store(0, Relaxed),
         Hit::Tab(i) => HINT_TAB.store(i, Relaxed),
+        Hit::GitHub => {
+            open_link(about::GITHUB_URL);
+            return;
+        }
         Hit::Facebook => {
             open_link(about::FACEBOOK_URL);
             return;
         }
-        Hit::GitHub => {
-            open_link(about::GITHUB_URL);
+        Hit::YouTube => {
+            open_link(about::YOUTUBE_URL);
             return;
         }
         Hit::Caption | Hit::None => return,
@@ -1367,7 +1380,6 @@ pub fn run(map: LegacyMap, legacy_output: bool) {
         FONT_LABEL.store(make_font(lay.scale(16), 700, "Segoe UI"), Relaxed);
         FONT_SMALL.store(make_font(lay.scale(14), 600, "Segoe UI"), Relaxed);
         FONT_SMALL_BOLD.store(make_font(lay.scale(14), 700, "Segoe UI"), Relaxed);
-        FONT_LINK.store(make_font_style(lay.scale(14), 600, true, "Segoe UI"), Relaxed);
         FONT_LOGO.store(make_font(lay.scale(34), 700, "Nirmala UI"), Relaxed);
         FONT_LOGO_SMALL.store(make_font(lay.scale(15), 700, "Nirmala UI"), Relaxed);
         FONT_HEAD.store(make_font(lay.scale(22), 700, "Segoe UI"), Relaxed);

@@ -70,6 +70,23 @@ impl Session {
         self.shown.clear();
     }
 
+    /// A digit or punctuation mark was typed. In legacy output the font has its own glyphs at
+    /// the codes of some marks (the key `?` would show a Sinhala letter), so the mark must be
+    /// typed as its legacy code instead. Returns the text to type, or `None` when the key
+    /// already gives the right glyph (or the output is Unicode) and should pass through.
+    pub fn mark(&self, ch: char) -> Option<String> {
+        if self.mode != Output::Legacy {
+            return None;
+        }
+        let key = ch.to_string();
+        let text = self.map.convert(&key).text;
+        if text == key {
+            None
+        } else {
+            Some(text)
+        }
+    }
+
     fn refresh(&mut self) -> Edit {
         let unicode = transliterate(&self.buf);
         let new = match self.mode {
@@ -161,6 +178,82 @@ mod tests {
         assert!(s.is_empty());
         type_word(&mut s, &mut screen, "ka");
         assert_eq!(screen, "කl"); // the first word stays, the second is legacy
+    }
+
+    // ---------- marks (? . : % ^ & and the rest) ----------
+
+    #[test]
+    fn unicode_output_never_changes_a_mark() {
+        let s = Session::new(LegacyMap::builtin());
+        for ch in "?.:%^&,!()".chars() {
+            assert_eq!(s.mark(ch), None, "{ch}");
+        }
+    }
+
+    #[test]
+    fn legacy_output_types_the_code_from_your_table() {
+        let mut s = Session::new(LegacyMap::builtin());
+        s.set_mode(Output::Legacy);
+        let table = [
+            ('?', "@"), ('.', "'"), (':', "("), ('%', "]"), (',', "\""), ('!', "æ"), ('(', "^"), (')', "&"),
+            ('\'', "z"), ('"', "—"), ('/', "$"), ('=', "}"), ('+', "¬"), (';', "¦"), ('~', "~&"),
+        ];
+        for (key, code) in table {
+            assert_eq!(s.mark(key).as_deref(), Some(code), "{key}");
+        }
+    }
+
+    #[test]
+    fn a_mark_that_is_already_right_passes_through() {
+        // ^ and & keep their own codes in the table. Digits and letters have no entry at all.
+        let mut s = Session::new(LegacyMap::builtin());
+        s.set_mode(Output::Legacy);
+        for ch in "^&#$*-<>@[\\]_`{|}0123456789".chars() {
+            assert_eq!(s.mark(ch), None, "{ch}");
+        }
+    }
+
+    #[test]
+    fn a_mark_after_a_word_leaves_the_word_alone() {
+        // "mama" then "?" : the word is finished, the mark is typed on its own.
+        let mut s = Session::new(LegacyMap::builtin());
+        s.set_mode(Output::Legacy);
+        let mut screen = String::new();
+        type_word(&mut s, &mut screen, "mama");
+        let word_on_screen = screen.clone();
+        s.reset(); // what the hook does for every Break key
+        screen.push_str(&s.mark('?').unwrap());
+        assert_eq!(screen, format!("{word_on_screen}@"));
+        assert!(s.is_empty());
+    }
+
+    #[test]
+    fn a_mark_follows_the_output_mode_when_it_changes() {
+        let mut s = Session::new(LegacyMap::builtin());
+        s.set_mode(Output::Legacy);
+        assert_eq!(s.mark('?').as_deref(), Some("@"));
+        s.set_mode(Output::Unicode);
+        assert_eq!(s.mark('?'), None);
+    }
+
+    #[test]
+    fn every_key_that_types_a_mark_is_either_converted_or_passed_through_cleanly() {
+        // Run every character a US keyboard can type through the hook's rule.
+        let mut s = Session::new(LegacyMap::builtin());
+        s.set_mode(Output::Legacy);
+        let mut converted = 0;
+        for vk in 0..=0xFFu32 {
+            for shift in [false, true] {
+                if let Some(ch) = crate::keymap::punctuation(vk, shift, false) {
+                    if let Some(text) = s.mark(ch) {
+                        converted += 1;
+                        assert!(!text.is_empty(), "{ch}");
+                        assert_ne!(text, ch.to_string(), "{ch}");
+                    }
+                }
+            }
+        }
+        assert!(converted >= 15, "only {converted} keys were converted");
     }
 
     #[test]

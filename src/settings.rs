@@ -1,15 +1,20 @@
-//! Settings read from settings.txt, which sits next to the program.
-//! Reading the text (`parse`) is separate from reading the file (`load`),
-//! so the rules can be tested on any system.
+//! Settings read from settings.txt. The file is kept in the user's AppData folder
+//! (C:\Users\<you>\AppData\Roaming\LIPI), which Explorer hides by default, so nothing
+//! extra sits next to the program. Reading the text (`parse`) is separate from
+//! reading the file (`load`), so the rules can be tested on any system.
 
-use std::path::Path;
+use std::ffi::OsString;
+use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 
 use crate::keymap::*;
 
 pub const FILE_NAME: &str = "settings.txt";
 
-/// Written next to the program the first time it runs.
+/// The folder made inside AppData.
+pub const FOLDER_NAME: &str = "LIPI";
+
+/// Written the first time the program runs.
 pub const TEMPLATE: &str = "\
 # LIPI settings.
 # Lines starting with # are comments. Change a value, save, and restart the program.
@@ -145,15 +150,62 @@ pub fn parse(text: &str) -> (Settings, Vec<String>) {
     (s, warnings)
 }
 
-/// Reads settings.txt from `dir`. If it is not there, writes the template
-/// (when the folder allows it) and uses the defaults.
+/// Where settings.txt lives: the LIPI folder inside AppData\Roaming.
+/// If AppData cannot be found, it is the program's own folder, as in older versions.
+pub fn folder(program_dir: &Path) -> PathBuf {
+    folder_from(std::env::var_os("APPDATA"), program_dir)
+}
+
+fn folder_from(appdata: Option<OsString>, program_dir: &Path) -> PathBuf {
+    match appdata {
+        Some(base) if !base.is_empty() => PathBuf::from(base).join(FOLDER_NAME),
+        _ => program_dir.to_path_buf(),
+    }
+}
+
+/// Older versions kept settings.txt next to the program. The first time, this moves that
+/// file into `dir`, so the keys the user chose are kept. It does nothing when `dir` already
+/// has a settings file, when there is no old file, or when both folders are the same.
+/// The old file is removed only after the copy is checked to be exactly the same.
+pub fn migrate(old_dir: &Path, dir: &Path) -> Vec<String> {
+    if old_dir == dir {
+        return Vec::new();
+    }
+    let old_path = old_dir.join(FILE_NAME);
+    let new_path = dir.join(FILE_NAME);
+    if new_path.exists() {
+        return Vec::new();
+    }
+    let Ok(bytes) = std::fs::read(&old_path) else {
+        return Vec::new();
+    };
+    let copied = std::fs::create_dir_all(dir).and_then(|_| std::fs::write(&new_path, &bytes));
+    if let Err(e) = copied {
+        return vec![format!("Could not move {} to {}: {e}", old_path.display(), new_path.display())];
+    }
+    let same = std::fs::read(&new_path).map_or(false, |now| now == bytes);
+    if same && std::fs::remove_file(&old_path).is_ok() {
+        vec![format!("Moved {} to {}", old_path.display(), new_path.display())]
+    } else {
+        vec![format!(
+            "Copied {} to {}. The old file can be deleted.",
+            old_path.display(),
+            new_path.display()
+        )]
+    }
+}
+
+/// Reads settings.txt from `dir`. If it is not there, makes the folder and writes the
+/// template (when that is allowed) and uses the defaults.
 pub fn load(dir: &Path) -> (Settings, Vec<String>) {
     let path = dir.join(FILE_NAME);
     match std::fs::read_to_string(&path) {
         Ok(text) => parse(&text),
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
             let mut notes = Vec::new();
-            if std::fs::write(&path, TEMPLATE.replace('\n', "\r\n")).is_ok() {
+            let written = std::fs::create_dir_all(dir)
+                .and_then(|_| std::fs::write(&path, TEMPLATE.replace('\n', "\r\n")));
+            if written.is_ok() {
                 notes.push(format!("Created {} with the default settings.", path.display()));
             }
             (Settings::default(), notes)
@@ -231,6 +283,87 @@ mod tests {
         }
         assert_eq!(key_name(0x41), "?");
         assert_eq!(key_from_name("F12"), None);
+    }
+
+    /// A fresh folder name for each test, so tests running side by side never share files.
+    fn temp(name: &str) -> PathBuf {
+        let dir = std::env::temp_dir().join(format!("lipi-settings-{name}-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        dir
+    }
+
+    #[test]
+    fn the_settings_folder_is_lipi_inside_appdata() {
+        let program = Path::new("C:\\Tools\\LIPI");
+        let got = folder_from(Some(OsString::from("C:\\Users\\me\\AppData\\Roaming")), program);
+        assert_eq!(got, PathBuf::from("C:\\Users\\me\\AppData\\Roaming").join("LIPI"));
+        assert!(got.ends_with(FOLDER_NAME));
+    }
+
+    #[test]
+    fn without_appdata_the_program_folder_is_used() {
+        let program = Path::new("C:\\Tools\\LIPI");
+        assert_eq!(folder_from(None, program), program);
+        assert_eq!(folder_from(Some(OsString::new()), program), program);
+    }
+
+    #[test]
+    fn a_missing_folder_is_made_and_the_template_written() {
+        let dir = temp("fresh").join("deeper");
+        assert!(!dir.exists());
+        let (s, notes) = load(&dir);
+        assert_eq!(s, Settings::default());
+        assert_eq!(notes.len(), 1);
+        assert_eq!(parse(&std::fs::read_to_string(dir.join(FILE_NAME)).unwrap()).0, Settings::default());
+        let _ = std::fs::remove_dir_all(dir.parent().unwrap());
+    }
+
+    #[test]
+    fn the_old_file_next_to_the_program_is_moved_and_its_keys_are_kept() {
+        let base = temp("move");
+        let (old, new) = (base.join("program"), base.join("appdata").join("LIPI"));
+        std::fs::create_dir_all(&old).unwrap();
+        std::fs::write(old.join(FILE_NAME), "on_off_key = Pause\r\nstart_output = legacy\r\n").unwrap();
+
+        let notes = migrate(&old, &new);
+        assert_eq!(notes.len(), 1, "{notes:?}");
+        assert!(notes[0].starts_with("Moved "), "{notes:?}");
+        assert!(!old.join(FILE_NAME).exists(), "the old file should be gone");
+
+        let (s, warnings) = load(&new);
+        assert!(warnings.is_empty(), "{warnings:?}");
+        assert_eq!(s.on_off_key, VK_PAUSE);
+        assert!(s.start_legacy);
+        let _ = std::fs::remove_dir_all(&base);
+    }
+
+    #[test]
+    fn nothing_is_moved_when_the_new_file_already_exists() {
+        let base = temp("keep");
+        let (old, new) = (base.join("program"), base.join("LIPI"));
+        std::fs::create_dir_all(&old).unwrap();
+        std::fs::create_dir_all(&new).unwrap();
+        std::fs::write(old.join(FILE_NAME), "start_typing = off\n").unwrap();
+        std::fs::write(new.join(FILE_NAME), "start_typing = on\n").unwrap();
+
+        assert!(migrate(&old, &new).is_empty());
+        assert!(old.join(FILE_NAME).exists(), "the old file is left alone");
+        assert_eq!(std::fs::read_to_string(new.join(FILE_NAME)).unwrap(), "start_typing = on\n");
+        let _ = std::fs::remove_dir_all(&base);
+    }
+
+    #[test]
+    fn nothing_happens_without_an_old_file_or_in_the_same_folder() {
+        let base = temp("none");
+        let (old, new) = (base.join("program"), base.join("LIPI"));
+        std::fs::create_dir_all(&old).unwrap();
+        assert!(migrate(&old, &new).is_empty());
+        assert!(!new.exists(), "no folder is made when there is nothing to move");
+
+        std::fs::write(old.join(FILE_NAME), "start_typing = off\n").unwrap();
+        assert!(migrate(&old, &old).is_empty());
+        assert!(old.join(FILE_NAME).exists());
+        let _ = std::fs::remove_dir_all(&base);
     }
 
     #[test]
