@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/sanjaya3d/LIPI/releases/latest">
+  <a href="https://github.com/sanjaya3d/LIPI/releases/download/1.0.2/lipi.exe">
     <img src="assets/download-button.svg" width="420" alt="Download the latest LIPI release for Windows">
   </a>
 </p>
