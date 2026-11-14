@@ -9,12 +9,10 @@
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/LICENSE-GPLv3%2B-BEF92C?style=for-the-badge&labelColor=2b3035" alt="License: GPLv3+"></a>
   <a href="https://github.com/sanjaya3d/LIPI/releases/latest"><img src="https://img.shields.io/github/v/release/sanjaya3d/LIPI?style=for-the-badge&labelColor=2b3035&color=BEF92C&label=RELEASE" alt="Latest release"></a>
-  <a href="https://github.com/sanjaya3d/LIPI/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/sanjaya3d/LIPI/ci.yml?style=for-the-badge&labelColor=2b3035&label=BUILD" alt="Build status"></a>
-  <a href="https://github.com/sanjaya3d/LIPI/releases"><img src="https://img.shields.io/github/downloads/sanjaya3d/LIPI/total?style=for-the-badge&labelColor=2b3035&color=BEF92C&label=DOWNLOADS" alt="Total downloads"></a>
+  <img src="https://img.shields.io/badge/PLATFORM-WINDOWS-BEF92C?style=for-the-badge&labelColor=2b3035" alt="Platform: Windows">
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/PLATFORM-WINDOWS-BEF92C?style=for-the-badge&labelColor=2b3035" alt="Platform: Windows">
   <img src="https://img.shields.io/badge/BUILT%20WITH-RUST-BEF92C?style=for-the-badge&labelColor=2b3035&logo=rust&logoColor=white" alt="Built with Rust">
   <img src="https://img.shields.io/badge/DEPENDENCIES-NONE-BEF92C?style=for-the-badge&labelColor=2b3035" alt="Dependencies: none">
   <a href="https://github.com/sanjaya3d/LIPI/stargazers"><img src="https://img.shields.io/github/stars/sanjaya3d/LIPI?style=for-the-badge&labelColor=2b3035&color=BEF92C&label=STARS&logo=github&logoColor=white" alt="GitHub stars"></a>
