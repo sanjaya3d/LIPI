@@ -20,7 +20,7 @@
 
 <p align="center">
   <a href="https://github.com/sanjaya3d/LIPI/releases/latest">
-    <img src="https://img.shields.io/badge/DOWNLOAD-LATEST%20RELEASE-BEF92C?style=for-the-badge&labelColor=2b3035" height="46" alt="Download the latest release">
+    <img src="assets/download-button.svg" width="420" alt="Download the latest LIPI release for Windows">
   </a>
 </p>
 
