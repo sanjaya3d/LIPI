@@ -3,15 +3,26 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Platform-Windows-BEF92C?labelColor=2b3035" alt="Platform: Windows">
-  <img src="https://img.shields.io/badge/Built%20with-Rust-BEF92C?labelColor=2b3035" alt="Built with Rust">
-  <img src="https://img.shields.io/badge/Dependencies-none-BEF92C?labelColor=2b3035" alt="Dependencies: none">
-  <img src="https://img.shields.io/badge/License-GPLv3%2B-BEF92C?labelColor=2b3035" alt="License: GPLv3+">
+  <b>Type Singlish in any app and get Sinhala, live, as you type.</b>
+</p>
+
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/LICENSE-GPLv3%2B-BEF92C?style=for-the-badge&labelColor=2b3035" alt="License: GPLv3+"></a>
+  <a href="https://github.com/sanjaya3d/LIPI/releases/latest"><img src="https://img.shields.io/github/v/release/sanjaya3d/LIPI?style=for-the-badge&labelColor=2b3035&color=BEF92C&label=RELEASE" alt="Latest release"></a>
+  <a href="https://github.com/sanjaya3d/LIPI/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/sanjaya3d/LIPI/ci.yml?style=for-the-badge&labelColor=2b3035&label=BUILD" alt="Build status"></a>
+  <a href="https://github.com/sanjaya3d/LIPI/releases"><img src="https://img.shields.io/github/downloads/sanjaya3d/LIPI/total?style=for-the-badge&labelColor=2b3035&color=BEF92C&label=DOWNLOADS" alt="Total downloads"></a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/PLATFORM-WINDOWS-BEF92C?style=for-the-badge&labelColor=2b3035" alt="Platform: Windows">
+  <img src="https://img.shields.io/badge/BUILT%20WITH-RUST-BEF92C?style=for-the-badge&labelColor=2b3035&logo=rust&logoColor=white" alt="Built with Rust">
+  <img src="https://img.shields.io/badge/DEPENDENCIES-NONE-BEF92C?style=for-the-badge&labelColor=2b3035" alt="Dependencies: none">
+  <a href="https://github.com/sanjaya3d/LIPI/stargazers"><img src="https://img.shields.io/github/stars/sanjaya3d/LIPI?style=for-the-badge&labelColor=2b3035&color=BEF92C&label=STARS&logo=github&logoColor=white" alt="GitHub stars"></a>
 </p>
 
 <p align="center">
   <a href="https://github.com/sanjaya3d/LIPI/releases/latest">
-    <img src="https://img.shields.io/badge/DOWNLOAD-LATEST%20RELEASE-BEF92C?labelColor=2b3035&style=for-the-badge" alt="Download the latest release">
+    <img src="https://img.shields.io/badge/DOWNLOAD-LATEST%20RELEASE-BEF92C?style=for-the-badge&labelColor=2b3035" height="46" alt="Download the latest release">
   </a>
 </p>
 
@@ -20,12 +31,11 @@
   <a href="#quick-start">Quick start</a> &nbsp;·&nbsp;
   <a href="#how-to-type">How to type</a> &nbsp;·&nbsp;
   <a href="#settings">Settings</a> &nbsp;·&nbsp;
+  <a href="#faq">FAQ</a> &nbsp;·&nbsp;
   <a href="#build-from-source">Build</a>
 </p>
 
-**Type Singlish in any app and get Sinhala, live, as you type.** Type `ammaa` and LIPI writes අම්මා in Photoshop, Premiere Pro, Blender, Word, your browser and any other Windows app. The output can be Unicode or FM Abhaya.
-
-Windows program written in Rust · GPL-3.0-or-later · by **SANJAYA3D**
+Type `ammaa` and LIPI writes අම්මා in Photoshop, Premiere Pro, Blender, Word, your browser and any other Windows app. The output can be Unicode or FM Abhaya.
 
 > **ලිපි** යනු ඉංග්‍රීසි අකුරින් (Singlish) ටයිප් කරන දේ ඒ මොහොතේම සිංහල අකුරු බවට හරවන කුඩා Windows වැඩසටහනකි. උදාහරණයක් ලෙස `ammaa` ටයිප් කළ විට අම්මා ලැබේ. Photoshop, Premiere Pro, Blender වැනි ඕනෑම app එකක මෙය වැඩ කරයි. Unicode සහ FM Abhaya (legacy) යන දෙවර්ගයෙන්ම සිංහල ලිවිය හැක.
 
@@ -37,19 +47,24 @@ Windows program written in Rust · GPL-3.0-or-later · by **SANJAYA3D**
 
 ## Features
 
-- **Works in any app.** LIPI watches the keyboard for the whole system, so it works wherever you can type.
-- **Two outputs.** Unicode, and FM Abhaya (legacy) for apps that cannot show Unicode Sinhala properly.
-- **Live typing.** The word is redrawn after every key, and Backspace works one English letter at a time.
-- **Punctuation in legacy mode.** Keys such as `?` `.` `:` `%` `!` `(` `)` type the right FM Abhaya codes, so you do not have to switch outputs (US keyboard layout).
-- **Tiny.** One small exe. No installer, no libraries (Rust standard library only), about 2 MB of RAM on the author's PC.
-- **Lives in the tray.** Left click the tray icon to open the window. Right click to switch Sinhala typing on or off.
-- **Key hints inside the window.** The **Keys** button shows what to type for each letter. `lipi --keys` prints the same chart in a terminal.
-- **Your own map.** You can use your own FM Abhaya map file.
-- **Private.** No network code. Nothing you type leaves your computer.
+<table>
+  <tr>
+    <td width="33%" valign="top"><b>Works in any app</b><br>LIPI watches the keyboard for the whole system, so it works wherever you can type.</td>
+    <td width="33%" valign="top"><b>Unicode or FM Abhaya</b><br>Switch with one key tap. In legacy mode the punctuation keys type the right codes too (US keyboard).</td>
+    <td width="33%" valign="top"><b>Live typing</b><br>The word is redrawn after every key, and Backspace works one English letter at a time.</td>
+  </tr>
+  <tr>
+    <td valign="top"><b>Tiny and private</b><br>One small exe, no installer, no libraries. About 2 MB of RAM. No network code at all.</td>
+    <td valign="top"><b>Lives in the tray</b><br>Left click the tray icon to open the window. Right click to switch Sinhala typing on or off.</td>
+    <td valign="top"><b>Key hints built in</b><br>The <b>Keys</b> button shows what to type for each letter. <code>lipi --keys</code> prints the same chart.</td>
+  </tr>
+</table>
+
+You can also use your own FM Abhaya map file. See [Output types](#output-types).
 
 ## Quick start
 
-1. Download `lipi.exe` from the [latest release](https://github.com/sanjaya3d/LIPI/releases/latest) and run it. The window opens.
+1. Download `lipi.exe` from the [latest release](https://github.com/sanjaya3d/LIPI/releases/latest) and run it. The window opens. If Windows shows a blue warning, see the [FAQ](#faq).
 2. Tap **Right Ctrl** to switch Sinhala typing on or off.
 3. Tap **Right Shift** to switch between Unicode and legacy (FM Abhaya) output.
 4. Type in any app. For example `ballaa` gives බල්ලා.
@@ -161,6 +176,56 @@ If you used an older version that kept `settings.txt` next to the exe, LIPI move
 
 A release build has no console window, so `--test`, `--chart`, `--keys` and `--console` print nothing in it. Run them with `cargo run -- --keys` instead.
 
+## FAQ
+
+<details>
+<summary><b>Windows shows "Windows protected your PC". Is LIPI safe?</b></summary>
+
+The exe is not code-signed, so Windows SmartScreen warns about every new program like this. Click **More info**, then **Run anyway**. LIPI has no network code, and the whole source is in this repository, so you can read it or build the exe yourself.
+</details>
+
+<details>
+<summary><b>My antivirus warns about LIPI.</b></summary>
+
+LIPI uses a Windows keyboard hook to see your key presses, the same way every typing tool does, and some antivirus programs flag that. LIPI never sends anything anywhere. If you do not trust the download, build it yourself (see [Build from source](#build-from-source)).
+</details>
+
+<details>
+<summary><b>I type, but I only get English letters.</b></summary>
+
+Check that Sinhala typing is on (the switch in the window says ON). Tap your on or off key once to change it. Also, if the app you are typing in runs as administrator, run LIPI as administrator too, or Windows will not let LIPI see the keys.
+</details>
+
+<details>
+<summary><b>The text looks like strange symbols.</b></summary>
+
+That is normal for legacy (FM Abhaya) output when the font is not FM Abhaya. Install the FM Abhaya font and choose it in the app, or switch LIPI to Unicode output.
+</details>
+
+<details>
+<summary><b>Can I change the keys that switch typing and output?</b></summary>
+
+Yes. Edit `on_off_key` and `output_key` in `settings.txt`. See [Settings](#settings).
+</details>
+
+<details>
+<summary><b>How do I start LIPI when Windows starts?</b></summary>
+
+Press **Win + R**, type `shell:startup` and press Enter. Put a shortcut to `lipi.exe` in that folder. To start hidden in the tray, set `start_in_tray = yes` in `settings.txt`.
+</details>
+
+<details>
+<summary><b>How do I remove LIPI?</b></summary>
+
+Close LIPI with the X button in its window, then delete `lipi.exe` and the folder `%APPDATA%\LIPI`. Nothing else is installed.
+</details>
+
+<details>
+<summary><b>Does it work on Mac or Linux?</b></summary>
+
+No. LIPI is Windows only, because it uses the Windows keyboard hook.
+</details>
+
 ## How it works
 
 1. A Windows keyboard hook sees each key press before the app does.
@@ -177,7 +242,7 @@ LIPI has no network code and sends nothing anywhere. The Show Logs window keeps 
 - Windows only.
 - In an app that runs as administrator, LIPI must also run as administrator, or Windows will block it.
 - Turn Sinhala typing off (tap Right Ctrl) before you type a password, or the letters will be converted too.
-- The exe is not code-signed, so some antivirus programs may warn about it. The source code is here, so you can read it and build it yourself.
+- The exe is not code-signed, so some antivirus programs may warn about it.
 - FM Abhaya output needs the FM Abhaya font in the app you paste into.
 - The legacy punctuation table is made for the US keyboard layout.
 
@@ -195,7 +260,8 @@ The program is `target\release\lipi.exe`. The exe icon comes from `lipi.ico` and
 cargo test
 ```
 
-## Project layout
+<details>
+<summary><b>Project layout</b></summary>
 
 | File | What it does |
 | --- | --- |
@@ -210,16 +276,26 @@ cargo test
 | `src/about.rs` | Name and contact links |
 | `build.rs` | Adds the icon to the exe |
 
-## Feedback
+</details>
 
-Found a wrong letter or a bad FM Abhaya glyph? [Open an issue](https://github.com/sanjaya3d/LIPI/issues) with the word you typed and what you expected.
+## Contributing
+
+Found a wrong letter or a bad FM Abhaya glyph? [Open an issue](https://github.com/sanjaya3d/LIPI/issues) with the word you typed and what you expected. Pull requests are welcome. Please run `cargo test` before you send one.
 
 ## License
 
 LIPI is free software under the [GNU General Public License v3.0 or later](LICENSE).
 
+<p align="center">
+  If LIPI saves you time, please <a href="https://github.com/sanjaya3d/LIPI">star the repo</a> and share it with a friend.
+</p>
+
 ## Author
 
 Made by **SANJAYA3D**
 
-[GitHub](https://github.com/sanjaya3d) &nbsp;·&nbsp; [Facebook](https://facebook.com/sanjaya3d) &nbsp;·&nbsp; [YouTube](https://www.youtube.com/@SANJAYA3D/)
+<p>
+  <a href="https://github.com/sanjaya3d"><img src="https://img.shields.io/badge/GITHUB-SANJAYA3D-BEF92C?style=for-the-badge&labelColor=2b3035&logo=github&logoColor=white" alt="GitHub: sanjaya3d"></a>
+  <a href="https://facebook.com/sanjaya3d"><img src="https://img.shields.io/badge/FACEBOOK-SANJAYA3D-BEF92C?style=for-the-badge&labelColor=2b3035&logo=facebook&logoColor=white" alt="Facebook: sanjaya3d"></a>
+  <a href="https://www.youtube.com/@SANJAYA3D/"><img src="https://img.shields.io/badge/YOUTUBE-%40SANJAYA3D-BEF92C?style=for-the-badge&labelColor=2b3035&logo=youtube&logoColor=white" alt="YouTube: SANJAYA3D"></a>
+</p>
