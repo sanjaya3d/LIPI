@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="460" height="116" viewBox="0 0 460 116" role="img" aria-labelledby="t d">
+  <title id="t">Download LIPI</title>
+  <desc id="d">Download the latest LIPI release for Windows</desc>
+  <defs>
+    <clipPath id="btn">
+      <rect x="15" y="15" width="430" height="86" rx="43"/>
+    </clipPath>
+    <linearGradient id="glint" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#ffffff" stop-opacity="0.6"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <style>
+      .halo  { animation: halo 2.4s ease-in-out infinite; }
+      .arrow { animation: bounce 1.4s ease-in-out infinite; }
+      .shine { animation: shine 3.6s ease-in-out infinite; }
+      @keyframes halo   { 0%, 100% { opacity: 0.10; } 50% { opacity: 0.65; } }
+      @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(7px); } }
+      @keyframes shine  { 0% { transform: translateX(-140px) skewX(-20deg); }
+                          45%, 100% { transform: translateX(620px) skewX(-20deg); } }
+      @media (prefers-reduced-motion: reduce) {
+        .halo, .arrow, .shine { animation: none; }
+      }
+    </style>
+  </defs>
+
+  <!-- soft pulsing ring -->
+  <rect class="halo" x="7" y="7" width="446" height="102" rx="51" fill="none" stroke="#BEF92C" stroke-width="3"/>
+
+  <!-- button -->
+  <rect x="15" y="15" width="430" height="86" rx="43" fill="#BEF92C"/>
+
+  <!-- moving glint, kept inside the button -->
+  <g clip-path="url(#btn)">
+    <rect class="shine" x="0" y="0" width="70" height="116" fill="url(#glint)"/>
+  </g>
+
+  <!-- icon -->
+  <circle cx="72" cy="58" r="30" fill="#111315"/>
+  <path d="M59 76 H85" fill="none" stroke="#BEF92C" stroke-width="5" stroke-linecap="round"/>
+  <g class="arrow" fill="none" stroke="#BEF92C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M72 40 V62"/>
+    <path d="M62 53 L72 63 L82 53"/>
+  </g>
+
+  <!-- text -->
+  <text x="124" y="56" font-family="'Segoe UI','Helvetica Neue',Arial,sans-serif" font-size="32" font-weight="800" letter-spacing="2.4" fill="#111315">DOWNLOAD</text>
+  <text x="125" y="80" font-family="'Segoe UI','Helvetica Neue',Arial,sans-serif" font-size="15" font-weight="700" letter-spacing="1.8" fill="#111315" fill-opacity="0.82">LATEST RELEASE FOR WINDOWS</text>
+</svg>
