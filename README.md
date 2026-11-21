@@ -1,37 +1,4 @@
-<p align="center">
-  <img src="assets/banner.png" width="560" alt="LIPI (ලිපි)">
-</p>
-
-<p align="center">
-  <b>Type Singlish in any app and get Sinhala, live, as you type.</b>
-</p>
-
-<p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/LICENSE-GPLv3%2B-BEF92C?style=for-the-badge&labelColor=2b3035" alt="License: GPLv3+"></a>
-  <a href="https://github.com/sanjaya3d/LIPI/releases/latest"><img src="https://img.shields.io/github/v/release/sanjaya3d/LIPI?style=for-the-badge&labelColor=2b3035&color=BEF92C&label=RELEASE" alt="Latest release"></a>
-  <img src="https://img.shields.io/badge/PLATFORM-WINDOWS-BEF92C?style=for-the-badge&labelColor=2b3035" alt="Platform: Windows">
-</p>
-
-<p align="center">
-  <img src="https://img.shields.io/badge/BUILT%20WITH-RUST-BEF92C?style=for-the-badge&labelColor=2b3035&logo=rust&logoColor=white" alt="Built with Rust">
-  <img src="https://img.shields.io/badge/DEPENDENCIES-NONE-BEF92C?style=for-the-badge&labelColor=2b3035" alt="Dependencies: none">
-  <a href="https://github.com/sanjaya3d/LIPI/stargazers"><img src="https://img.shields.io/github/stars/sanjaya3d/LIPI?style=for-the-badge&labelColor=2b3035&color=BEF92C&label=STARS&logo=github&logoColor=white" alt="GitHub stars"></a>
-</p>
-
-<p align="center">
-  <a href="[https://github.com/sanjaya3d/LIPI/releases/download/v1.0.3/lipi.exe]">
-    <img src="assets/download-button.svg" width="420" alt="Download the latest LIPI release for Windows">
-  </a>
-</p>
-
-<p align="center">
-  <a href="#features">Features</a> &nbsp;·&nbsp;
-  <a href="#quick-start">Quick start</a> &nbsp;·&nbsp;
-  <a href="#how-to-type">How to type</a> &nbsp;·&nbsp;
-  <a href="#settings">Settings</a> &nbsp;·&nbsp;
-  <a href="#faq">FAQ</a> &nbsp;·&nbsp;
-  <a href="#build-from-source">Build</a>
-</p>
+<p align="center"> <img src="assets/banner.png" width="560" alt="LIPI (ලිපි)"> </p> <p align="center"> <b>Type Singlish in any app and get Sinhala, live, as you type.</b> </p> <p align="center"> <a href="LICENSE"><img src="https://img.shields.io/badge/LICENSE-GPLv3%2B-BEF92C?style=for-the-badge&labelColor=2b3035" alt="License: GPLv3+"></a> <a href="https://github.com/sanjaya3d/LIPI/releases/latest"><img src="https://img.shields.io/github/v/release/sanjaya3d/LIPI?style=for-the-badge&labelColor=2b3035&color=BEF92C&label=RELEASE" alt="Latest release"></a> <img src="https://img.shields.io/badge/PLATFORM-WINDOWS-BEF92C?style=for-the-badge&labelColor=2b3035" alt="Platform: Windows"> </p> <p align="center"> <img src="https://img.shields.io/badge/BUILT%20WITH-RUST-BEF92C?style=for-the-badge&labelColor=2b3035&logo=rust&logoColor=white" alt="Built with Rust"> <img src="https://img.shields.io/badge/DEPENDENCIES-NONE-BEF92C?style=for-the-badge&labelColor=2b3035" alt="Dependencies: none"> <a href="https://github.com/sanjaya3d/LIPI/stargazers"><img src="https://img.shields.io/github/stars/sanjaya3d/LIPI?style=for-the-badge&labelColor=2b3035&color=BEF92C&label=STARS&logo=github&logoColor=white" alt="GitHub stars"></a> </p> <p align="center"> <a href="https://github.com/sanjaya3d/LIPI/releases/latest/download/lipi.exe"> <img src="assets/download-button.svg" width="420" alt="Download the latest LIPI release for Windows"> </a> </p> <p align="center"> <a href="#features">Features</a> &nbsp;·&nbsp; <a href="#quick-start">Quick start</a> &nbsp;·&nbsp; <a href="#how-to-type">How to type</a> &nbsp;·&nbsp; <a href="#settings">Settings</a> &nbsp;·&nbsp; <a href="#faq">FAQ</a> &nbsp;·&nbsp; <a href="#build-from-source">Build</a> </p>
 
 Type `ammaa` and LIPI writes අම්මා in Photoshop, Premiere Pro, Blender, Word, your browser and any other Windows app. The output can be Unicode or FM Abhaya.
 
