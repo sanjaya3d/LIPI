@@ -397,6 +397,8 @@ static FONT_HINT: AtomicIsize = AtomicIsize::new(0);
 static FONT_HINT_SI: AtomicIsize = AtomicIsize::new(0);
 static FONT_NOTE: AtomicIsize = AtomicIsize::new(0);
 static FONT_LOG: AtomicIsize = AtomicIsize::new(0);
+static FONT_TIP: AtomicIsize = AtomicIsize::new(0);
+static FONT_TIP_SMALL: AtomicIsize = AtomicIsize::new(0);
 /// 0 is the main page, 1 is the key hint page.
 static VIEW: AtomicU8 = AtomicU8::new(0);
 /// The tab showing on the key hint page, counted from 0.
@@ -751,6 +753,24 @@ unsafe fn draw_main(hdc: isize, lay: &Layout) {
     text(hdc, "Output", lay.output_label, label_font, TEXT, left_middle);
     pill(hdc, lay.unicode_button, "Unicode", !legacy, label_font, lay);
     pill(hdc, lay.legacy_button, "Legacy (FM Abhaya)", legacy, label_font, lay);
+
+    // Smart quotes warning. In legacy mode the full stop is a straight apostrophe, and Adobe
+    // and Microsoft apps turn it into a curly quote. The button opens the page that explains it.
+    // Both lines are centred and drawn with TextOut, so tall Sinhala marks are never cut off.
+    smooth_shape(hdc, lay.tip_card, card_radius, None, Some((ACCENT, stroke)), BG);
+    let tip_small = FONT_TIP_SMALL.load(Relaxed);
+    let mut tip_font = FONT_TIP.load(Relaxed);
+    let widest = text_size(hdc, tip_font, about::TIP_LINE1).0.max(text_size(hdc, tip_font, about::TIP_LINE2).0);
+    if widest > lay.tip_text.width() {
+        tip_font = tip_small; // the normal size would not fit the card, so use the smaller one
+    }
+    let half = lay.tip_text.height() / 2;
+    let line1 = Rect { bottom: lay.tip_text.top + half, ..lay.tip_text };
+    let line2 = Rect { top: lay.tip_text.top + half, ..lay.tip_text };
+    rich(hdc, line1, &[part(about::TIP_LINE1, tip_font, TEXT)], true);
+    rich(hdc, line2, &[part(about::TIP_LINE2, tip_font, TEXT)], true);
+    smooth_shape(hdc, lay.tip_button, lay.tip_button.height() / 2, Some(ACCENT), None, BG);
+    rich(hdc, lay.tip_button, &[part(about::TIP_BUTTON, tip_small, BG)], true);
 
     // Key hints. They name the keys chosen in settings.txt.
     smooth_shape(hdc, lay.info_panel, card_radius, None, Some((EDGE, stroke)), BG);
@@ -1183,6 +1203,10 @@ unsafe fn on_click(hwnd: isize, lparam: isize) {
         Hit::KeysButton => VIEW.store(1, Relaxed),
         Hit::Back => VIEW.store(0, Relaxed),
         Hit::Tab(i) => HINT_TAB.store(i, Relaxed),
+        Hit::TipButton => {
+            open_link(about::TIP_URL);
+            return;
+        }
         Hit::GitHub => {
             open_link(about::GITHUB_URL);
             return;
@@ -1387,6 +1411,9 @@ pub fn run(map: LegacyMap, legacy_output: bool) {
         FONT_HINT_SI.store(make_font(lay.scale(19), 700, "Nirmala UI"), Relaxed);
         FONT_NOTE.store(make_font(lay.scale(12), 600, "Nirmala UI"), Relaxed);
         FONT_LOG.store(make_font(lay.scale(16), 400, "Nirmala UI"), Relaxed);
+        // The smart quotes card: Nirmala UI draws both the Sinhala and the English words.
+        FONT_TIP.store(make_font(lay.scale(14), 700, "Nirmala UI"), Relaxed);
+        FONT_TIP_SMALL.store(make_font(lay.scale(12), 700, "Nirmala UI"), Relaxed);
 
         make_icons();
         TASKBAR_CREATED.store(RegisterWindowMessageW(wide("TaskbarCreated").as_ptr()), Relaxed);

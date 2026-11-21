@@ -35,7 +35,7 @@ impl Rect {
 
 /// Size of the window at 96 DPI. The window has no Windows title bar, so this is all of it.
 pub const WIDTH: i32 = 400;
-pub const HEIGHT: i32 = 488;
+pub const HEIGHT: i32 = 574;
 
 /// The window has two pages. The Keys button opens the second one, Back returns.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -59,6 +59,8 @@ pub enum Hit {
     LegacyButton,
     LogsButton,
     KeysButton,
+    /// The "more details" button on the smart quotes card. It opens the GitHub page.
+    TipButton,
     /// The three round icon buttons in the footer.
     GitHub,
     Facebook,
@@ -103,6 +105,10 @@ pub struct Layout {
     pub output_label: Rect,
     pub unicode_button: Rect,
     pub legacy_button: Rect,
+    // smart quotes card, between the output buttons and the key hints
+    pub tip_card: Rect,
+    pub tip_text: Rect,
+    pub tip_button: Rect,
     // key hints
     pub info_panel: Rect,
     pub info_icon: Rect,
@@ -154,20 +160,26 @@ impl Layout {
             output_label: r(54, 202, 220, 230),
             unicode_button: r(24, 236, 192, 272),
             legacy_button: r(208, 236, 376, 272),
-            info_panel: r(24, 286, 376, 340),
-            info_icon: r(40, 301, 64, 325),
-            info_line1: r(80, 290, 372, 313),
-            info_line2: r(80, 313, 372, 336),
-            logs_button: r(24, 354, 192, 392),
-            keys_button: r(208, 354, 376, 392),
-            dev_row: r(24, 406, 376, 430),
-            github_button: r(138, 436, 174, 472),
-            facebook_button: r(182, 436, 218, 472),
-            youtube_button: r(226, 436, 262, 472),
+            // The smart quotes card is 76 tall with 12 above and below it, so everything
+            // under the output buttons moved down by 86.
+            tip_card: r(24, 284, 376, 360),
+            tip_text: r(36, 290, 364, 328),
+            tip_button: r(148, 332, 252, 354),
+            info_panel: r(24, 372, 376, 426),
+            info_icon: r(40, 387, 64, 411),
+            info_line1: r(80, 376, 372, 399),
+            info_line2: r(80, 399, 372, 422),
+            logs_button: r(24, 440, 192, 478),
+            keys_button: r(208, 440, 376, 478),
+            dev_row: r(24, 492, 376, 516),
+            github_button: r(138, 522, 174, 558),
+            facebook_button: r(182, 522, 218, 558),
+            youtube_button: r(226, 522, 262, 558),
             back_button: r(24, 52, 112, 88),
             hint_title: r(126, 52, 376, 88),
-            hint_grid: r(24, 142, 376, 440),
-            hint_note: r(24, 444, 376, 482),
+            // The key hint page uses the extra height too, so its cells can be a little taller.
+            hint_grid: r(24, 142, 376, 526),
+            hint_note: r(24, 530, 376, 568),
         }
     }
 
@@ -236,6 +248,8 @@ impl Layout {
                     Hit::UnicodeButton
                 } else if self.legacy_button.contains(x, y) {
                     Hit::LegacyButton
+                } else if self.tip_button.contains(x, y) {
+                    Hit::TipButton
                 } else if self.logs_button.contains(x, y) {
                     Hit::LogsButton
                 } else if self.keys_button.contains(x, y) {
@@ -286,6 +300,9 @@ mod tests {
                 (l.switch_track, Hit::TypingCard),
                 (l.unicode_button, Hit::UnicodeButton),
                 (l.legacy_button, Hit::LegacyButton),
+                (l.tip_button, Hit::TipButton),
+                (l.tip_card, Hit::None),
+                (l.tip_text, Hit::None),
                 (l.logs_button, Hit::LogsButton),
                 (l.keys_button, Hit::KeysButton),
                 (l.github_button, Hit::GitHub),
@@ -318,6 +335,7 @@ mod tests {
                 (l.hint_note, Hit::None),
                 (l.logs_button, Hit::None), // belongs to the other page
                 (l.keys_button, Hit::None),
+                (l.tip_button, Hit::None),
                 (l.typing_card, Hit::None),
             ];
             for i in 0..HINT_TABS {
@@ -338,6 +356,7 @@ mod tests {
         assert!(Hit::YouTube.clickable());
         assert!(Hit::TypingCard.clickable());
         assert!(Hit::KeysButton.clickable());
+        assert!(Hit::TipButton.clickable());
         assert!(Hit::Back.clickable());
         assert!(Hit::Tab(2).clickable());
         assert!(!Hit::Caption.clickable());
@@ -373,6 +392,7 @@ mod tests {
                     l.output_label,
                     l.unicode_button,
                     l.legacy_button,
+                    l.tip_card,
                     l.info_panel,
                     l.logs_button,
                     l.keys_button,
@@ -396,6 +416,37 @@ mod tests {
             // Leave room for the 2 pixel window outline at the bottom.
             assert!(l.hint_note.bottom <= l.client_size().1 - l.scale(2), "dpi {dpi}");
         }
+    }
+
+    #[test]
+    fn the_smart_quotes_card_sits_between_the_output_buttons_and_the_key_hints() {
+        for dpi in [96, 144, 192] {
+            let l = Layout::new(dpi);
+            // same width and edges as the other cards
+            assert_eq!((l.tip_card.left, l.tip_card.right), (l.info_panel.left, l.info_panel.right), "dpi {dpi}");
+            assert_eq!((l.tip_card.left, l.tip_card.right), (l.typing_card.left, l.typing_card.right), "dpi {dpi}");
+            // in the middle, with a gap on both sides
+            assert!(l.tip_card.top > l.unicode_button.bottom, "dpi {dpi}");
+            assert!(l.tip_card.top > l.legacy_button.bottom, "dpi {dpi}");
+            assert!(l.tip_card.bottom < l.info_panel.top, "dpi {dpi}");
+            // the text is above the button, and the button is in the middle of the card
+            assert!(l.tip_text.bottom <= l.tip_button.top, "dpi {dpi}");
+            let button_middle = (l.tip_button.left + l.tip_button.right) / 2;
+            let card_middle = (l.tip_card.left + l.tip_card.right) / 2;
+            assert!((button_middle - card_middle).abs() <= 1, "dpi {dpi}");
+            // big enough to click and to read
+            assert!(l.tip_button.height() >= l.scale(20), "dpi {dpi}");
+            assert!(l.tip_button.width() >= l.scale(90), "dpi {dpi}");
+            assert!(l.tip_text.height() >= l.scale(36), "dpi {dpi}: room for two lines");
+        }
+    }
+
+    #[test]
+    fn the_bottom_of_the_window_still_has_room_for_the_outline() {
+        let l = Layout::new(96);
+        assert_eq!(HEIGHT, 574);
+        assert!(l.youtube_button.bottom <= l.window.bottom - l.scale(2));
+        assert!(l.hint_note.bottom <= l.window.bottom - l.scale(2));
     }
 
     #[test]
@@ -499,6 +550,9 @@ mod tests {
             }
             for part in [l.info_icon, l.info_line1, l.info_line2] {
                 assert!(inside(&part, &l.info_panel), "{part:?} at dpi {dpi}");
+            }
+            for part in [l.tip_text, l.tip_button] {
+                assert!(inside(&part, &l.tip_card), "{part:?} at dpi {dpi}");
             }
             for i in 0..HINT_TABS {
                 assert!(inside(&l.hint_tab(i), &l.window), "tab {i} at dpi {dpi}");
