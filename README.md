@@ -134,24 +134,26 @@ To convert a text file from Unicode to FM Abhaya:
 lipi --convert < unicode.txt > legacy.txt
 ```
 
-## Smart quotes (Adobe and Microsoft apps)
 
-In legacy (FM Abhaya) mode, some apps show a strange curl instead of a full stop. LIPI types the right character. The app changes it afterwards, and one setting fixes it.
+## Smart Quotes (Adobe සහ Microsoft මෘදුකාංගවල)
 
-> Adobe සහ Microsoft මෘදුකාංග වලදී "smart quotes" විශේෂාංගය ක්‍රියා විරහිත කරන්න.
+Legacy (FM Abhaya) මාදිලියේදී, සමහර මෘදුකාංගවල තිත (`.`) වෙනුවට අමුතු වක්‍ර සලකුණක් දිස්විය හැකියි. LIPI මඟින් නිවැරදි අක්ෂරය ඇතුළත් කළත්, මෘදුකාංගය විසින් එය පසුව ස්වයංක්‍රීයව වෙනස් කරයි. එක් සැකසුමක් අක්‍රිය කිරීමෙන් මෙම ගැටලුව විසඳාගත හැකියි.
 
-**Why it happens.** In FM Abhaya the full stop sits on the code of the straight apostrophe `'`, so that is what LIPI types for the `.` key. Photoshop, Premiere Pro, Word, PowerPoint and some other apps have a "smart quotes" feature that turns a straight `'` into a curly quote `‘` or `’` as you type. FM Abhaya has a different shape at the curly quote code, so you see a curl and not a full stop. Notepad and most plain text boxes do not do this. Unicode output is not affected.
+> Adobe සහ Microsoft මෘදුකාංගවලදී "Smart Quotes" විශේෂාංගය ක්‍රියා විරහිත කරන්න.
 
-**How to fix it.** Turn smart quotes off in the app you type in:
+**මෙය සිදුවන්නේ ඇයි?** FM Abhaya අකුරු රටාවේදී තිත (`.`) සඳහා භාවිත වන්නේ සාමාන්‍ය සෘජු apostrophe (`'`) සලකුණට අදාළ අක්ෂර කේතයයි. ඒ නිසා LIPI මඟින් `.` යතුර එබූ විට එම අක්ෂරය ඇතුළත් වේ. Photoshop, Premiere Pro, Word, PowerPoint සහ තවත් සමහර මෘදුකාංගවල ඇති "Smart Quotes" විශේෂාංගය මඟින් ඔබ ටයිප් කරන සෘජු apostrophe (`'`) සලකුණ වක්‍ර apostrophe (`‘` හෝ `’`) සලකුණක් බවට ස්වයංක්‍රීයව වෙනස් කරයි. FM Abhaya අකුරු රටාවේදී එම වක්‍ර apostrophe කේතයට වෙනත් හැඩයක් ලබා දී ඇති නිසා, තිත වෙනුවට වක්‍ර සලකුණක් දිස්වේ. Notepad සහ බොහෝ සාමාන්‍ය පෙළ ඇතුළත් කරන ස්ථානවල මෙම ගැටලුව ඇති නොවේ. Unicode ප්‍රතිදානයට මෙය බලපාන්නේද නැත.
 
-| App | Where |
+**මෙය විසඳාගන්නේ කෙසේද?** ඔබ ටයිප් කරන මෘදුකාංගයේ Smart Quotes විශේෂාංගය අක්‍රිය කරන්න:
+
+| මෘදුකාංගය | සැකසුම වෙනස් කළ යුතු ස්ථානය |
 | --- | --- |
-| Photoshop | Edit, Preferences, Type, then untick **Use Smart Quotes** |
-| Premiere Pro | Preferences, Graphics, then look for the smart quotes option. The place and the name change between versions, and some versions do not have it |
-| Word and PowerPoint | File, Options, Proofing, AutoCorrect Options, **AutoFormat As You Type**, then untick **"Straight quotes" with "smart quotes"**. In Word, do the same on the **AutoFormat** tab |
-| Other apps | Look for "smart quotes" or "typographer's quotes" in the text or type settings |
+| Photoshop | Edit → Preferences → Type වෙත ගොස් **Use Smart Quotes** යන්නෙහි සලකුණ ඉවත් කරන්න. |
+| Premiere Pro | Preferences → Graphics වෙත ගොස් Smart Quotes සම්බන්ධ සැකසුමක් සොයා බලන්න. එහි ස්ථානය සහ නම අනුවාදය අනුව වෙනස් විය හැකි අතර, සමහර අනුවාදවල මෙම සැකසුම නොතිබිය හැකියි. |
+| Word සහ PowerPoint | File → Options → Proofing → AutoCorrect Options → **AutoFormat As You Type** වෙත ගොස් **"Straight quotes" with "smart quotes"** යන්නෙහි සලකුණ ඉවත් කරන්න. Word හි **AutoFormat** ටැබය තුළද එම සැකසුම අක්‍රිය කරන්න. |
+| වෙනත් මෘදුකාංග | Text හෝ Type සැකසුම් තුළ "Smart Quotes" හෝ "Typographer's Quotes" යන සැකසුම් සොයා බලන්න. |
 
-After you change the setting, type the full stop again. Text that is already in the document stays as it was, so delete the curl and retype it.
+සැකසුම වෙනස් කළ පසු තිත නැවත ටයිප් කරන්න. දැනටමත් ලේඛනයේ ඇති වැරදි සලකුණු ස්වයංක්‍රීයව නිවැරදි නොවේ. එම නිසා වැරදි වක්‍ර සලකුණ මකා දමා තිත නැවත ඇතුළත් කරන්න.
+
 
 The LIPI window has a card about this. Its **වැඩි විස්තර** button opens this section.
 
