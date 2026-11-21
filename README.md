@@ -135,7 +135,7 @@ lipi --convert < unicode.txt > legacy.txt
 ```
 
 
-#smart-quotes-adobe-and-microsoft-apps
+## Smart quotes (Adobe and Microsoft apps)
 
 Legacy (FM Abhaya) මාදිලියේදී, සමහර මෘදුකාංගවල තිත (`.`) වෙනුවට අමුතු වක්‍ර සලකුණක් දිස්විය හැකියි. LIPI මඟින් නිවැරදි අක්ෂරය ඇතුළත් කළත්, මෘදුකාංගය විසින් එය පසුව ස්වයංක්‍රීයව වෙනස් කරයි. එක් සැකසුමක් අක්‍රිය කිරීමෙන් මෙම ගැටලුව විසඳාගත හැකියි.
 
