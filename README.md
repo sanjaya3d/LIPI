@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/sanjaya3d/LIPI/releases/download/1.0.2/lipi.exe">
+  <a href="https://github.com/sanjaya3d/LIPI/releases/latest">
     <img src="assets/download-button.svg" width="420" alt="Download the latest LIPI release for Windows">
   </a>
 </p>
@@ -134,6 +134,27 @@ To convert a text file from Unicode to FM Abhaya:
 lipi --convert < unicode.txt > legacy.txt
 ```
 
+## Smart quotes (Adobe and Microsoft apps)
+
+In legacy (FM Abhaya) mode, some apps show a strange curl instead of a full stop. LIPI types the right character. The app changes it afterwards, and one setting fixes it.
+
+> Adobe සහ Microsoft මෘදුකාංග වලදී "smart quotes" විශේෂාංගය ක්‍රියා විරහිත කරන්න.
+
+**Why it happens.** In FM Abhaya the full stop sits on the code of the straight apostrophe `'`, so that is what LIPI types for the `.` key. Photoshop, Premiere Pro, Word, PowerPoint and some other apps have a "smart quotes" feature that turns a straight `'` into a curly quote `‘` or `’` as you type. FM Abhaya has a different shape at the curly quote code, so you see a curl and not a full stop. Notepad and most plain text boxes do not do this. Unicode output is not affected.
+
+**How to fix it.** Turn smart quotes off in the app you type in:
+
+| App | Where |
+| --- | --- |
+| Photoshop | Edit, Preferences, Type, then untick **Use Smart Quotes** |
+| Premiere Pro | Preferences, Graphics, then look for the smart quotes option. The place and the name change between versions, and some versions do not have it |
+| Word and PowerPoint | File, Options, Proofing, AutoCorrect Options, **AutoFormat As You Type**, then untick **"Straight quotes" with "smart quotes"**. In Word, do the same on the **AutoFormat** tab |
+| Other apps | Look for "smart quotes" or "typographer's quotes" in the text or type settings |
+
+After you change the setting, type the full stop again. Text that is already in the document stays as it was, so delete the curl and retype it.
+
+The LIPI window has a card about this. Its **වැඩි විස්තර** button opens this section.
+
 ## Settings
 
 LIPI keeps its settings in your AppData folder, which Explorer hides by default, so no settings file sits next to the exe. To open the folder, press **Win + R**, type `%APPDATA%\LIPI` and press Enter. The file `settings.txt` is created there the first time LIPI runs.
@@ -201,6 +222,12 @@ That is normal for legacy (FM Abhaya) output when the font is not FM Abhaya. Ins
 </details>
 
 <details>
+<summary><b>In legacy mode the full stop shows as a curl in Photoshop, Premiere Pro or Word.</b></summary>
+
+The app is changing the straight apostrophe, which FM Abhaya uses for the full stop, into a curly "smart quote". Turn smart quotes off in that app. The steps are in [Smart quotes](#smart-quotes-adobe-and-microsoft-apps).
+</details>
+
+<details>
 <summary><b>Can I change the keys that switch typing and output?</b></summary>
 
 Yes. Edit `on_off_key` and `output_key` in `settings.txt`. See [Settings](#settings).
@@ -243,6 +270,7 @@ LIPI has no network code and sends nothing anywhere. The Show Logs window keeps 
 - The exe is not code-signed, so some antivirus programs may warn about it.
 - FM Abhaya output needs the FM Abhaya font in the app you paste into.
 - The legacy punctuation table is made for the US keyboard layout.
+- In legacy mode, apps with "smart quotes" turned on (Photoshop, Premiere Pro, Word) can change the full stop into a curl. See [Smart quotes](#smart-quotes-adobe-and-microsoft-apps).
 
 ## Build from source
 
