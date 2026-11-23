@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LIPI (ලිපි) | Type Singlish, get Sinhala in any Windows app</title>
+<meta name="description" content="LIPI turns Singlish into Sinhala as you type, in Photoshop, Premiere Pro, Blender, Word and any other Windows app. Unicode or FM Abhaya. Free and open source.">
+<meta name="theme-color" content="#111315">
+<link rel="canonical" href="https://sanjaya3d.github.io/LIPI/">
+<link rel="icon" href="assets/logo.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="LIPI (ලිපි): type Singlish, get Sinhala in any Windows app">
+<meta property="og:description" content="Live Singlish to Sinhala typing for Photoshop, Premiere Pro, Blender, Word and more. Unicode or FM Abhaya. Free and open source.">
+<meta property="og:url" content="https://sanjaya3d.github.io/LIPI/">
+<meta property="og:image" content="https://sanjaya3d.github.io/LIPI/assets/social-preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+:root{
+  --bg:#111315; --surface:#181b1e; --surface2:#1e2226; --edge:#2b3035; --edge2:#4B535A;
+  --lime:#BEF92C; --text:#ffffff; --muted:#E1E5EC; --dim:#b3bbc3;
+  --radius:18px;
+  --font:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,"Nirmala UI","Noto Sans Sinhala","Iskoola Pota",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{color-scheme:dark;scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);font-size:17px;line-height:1.65}
+img{max-width:100%;height:auto;display:block}
+a{color:var(--lime);text-underline-offset:3px}
+a:hover{color:#fff}
+:focus-visible{outline:3px solid var(--lime);outline-offset:3px;border-radius:6px}
+.wrap{width:100%;max-width:1120px;margin:0 auto;padding:0 20px}
+section{padding:88px 0;scroll-margin-top:64px}
+h1,h2,h3{line-height:1.15;margin:0}
+h2{font-size:clamp(1.8rem,4vw,2.6rem);font-weight:800;letter-spacing:-.02em}
+h3{font-size:1.15rem;font-weight:700}
+p{margin:0}
+code,kbd{font-family:var(--mono);font-size:.92em}
+code{background:var(--surface2);border:1px solid var(--edge);border-radius:6px;padding:.08em .4em;color:var(--lime)}
+.eyebrow{color:var(--lime);font-weight:700;letter-spacing:.18em;text-transform:uppercase;font-size:.82rem}
+.lead{color:var(--muted);font-size:1.12rem;max-width:62ch}
+.head{margin-bottom:40px;display:grid;gap:14px}
+.si{font-family:"Nirmala UI","Noto Sans Sinhala","Iskoola Pota","Segoe UI",system-ui,sans-serif}
+
+/* header */
+.top{position:sticky;top:0;z-index:20;background:rgba(17,19,21,.86);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--edge)}
+.top .wrap{display:flex;align-items:center;gap:20px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-weight:800;font-size:1.15rem;letter-spacing:.02em}
+.brand img{width:34px;height:34px;border-radius:9px}
+.brand span.si{color:var(--lime);font-weight:700}
+.nav{display:flex;gap:24px;margin-left:auto}
+.nav a{color:var(--muted);text-decoration:none;font-size:.95rem;font-weight:600}
+.nav a:hover{color:var(--lime)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:999px;font-weight:700;text-decoration:none;padding:10px 20px;border:2px solid var(--lime);color:var(--lime);background:transparent;font-size:.95rem;font-family:inherit;cursor:pointer}
+.btn:hover{background:rgba(190,249,44,.12);color:var(--lime)}
+.btn.solid{background:var(--lime);color:var(--bg)}
+.btn.solid:hover{background:#d2ff5a;color:var(--bg)}
+
+/* hero */
+.hero{padding:72px 0 40px;text-align:center}
+.hero h1{font-size:clamp(2.5rem,7vw,4.8rem);font-weight:800;letter-spacing:-.03em;margin:18px 0 22px}
+.hero h1 em{font-style:normal;color:var(--lime)}
+.hero .si-line{color:var(--muted);font-size:1.12rem;max-width:58ch;margin:0 auto 34px}
+.hero .cta{display:inline-block;max-width:100%}
+.hero .cta img{width:min(420px,100%)}
+.hero .meta{margin-top:10px;color:var(--dim);font-size:.95rem;display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:center}
+.hero .meta b{color:#fff}
+.shot{margin:56px auto 0;max-width:1040px;border-radius:26px;border:1px solid var(--edge2);box-shadow:0 0 0 6px rgba(190,249,44,.06),0 30px 80px rgba(0,0,0,.55);overflow:hidden;background:#000}
+
+/* cards */
+.grid{display:grid;gap:18px}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:repeat(2,1fr)}
+.card{background:var(--surface);border:1px solid var(--edge);border-radius:var(--radius);padding:26px;transition:border-color .2s,transform .2s}
+.card:hover{border-color:var(--lime);transform:translateY(-2px)}
+.card h3{margin:14px 0 8px}
+.card p{color:var(--muted);font-size:1rem}
+.ico{width:46px;height:46px;border-radius:13px;background:rgba(190,249,44,.1);display:grid;place-items:center}
+.ico svg{width:24px;height:24px;stroke:var(--lime);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* steps */
+.steps{counter-reset:s;display:grid;grid-template-columns:repeat(4,1fr);gap:18px;list-style:none;margin:0;padding:0}
+.steps li{counter-increment:s;background:var(--surface);border:1px solid var(--edge);border-radius:var(--radius);padding:24px;position:relative}
+.steps li::before{content:counter(s);display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--lime);color:var(--bg);font-weight:800;margin-bottom:14px}
+.steps li>b{display:block;margin-bottom:6px}
+.steps span{color:var(--muted);font-size:.98rem}
+
+/* typing */
+.split{display:grid;grid-template-columns:1.1fr .9fr;gap:36px;align-items:start}
+.rules{margin:0;padding:0;list-style:none;display:grid;gap:14px}
+.rules li{padding-left:28px;position:relative;color:var(--muted)}
+.rules li::before{content:"";position:absolute;left:0;top:.62em;width:12px;height:12px;border-radius:4px;background:var(--lime)}
+.pairs{display:grid;gap:12px}
+.pair{display:grid;grid-template-columns:minmax(0,1fr) 28px minmax(0,1.1fr);align-items:center;gap:10px;background:var(--surface);border:1px solid var(--edge);border-radius:16px;padding:12px 16px}
+.pair kbd{background:var(--surface2);border:2px solid var(--edge2);border-radius:12px;padding:8px 12px;text-align:center;font-weight:700;font-size:1.05rem}
+.pair .arrow{color:var(--lime);text-align:center;font-weight:800}
+.pair .out{color:var(--lime);font-size:1.7rem;font-weight:700;line-height:1.5}
+details.chart{margin-top:34px}
+details.chart>summary{list-style:none;display:inline-flex}
+details.chart>summary::-webkit-details-marker{display:none}
+.chartbody{margin-top:22px;display:grid;gap:30px}
+.chartbody h3{color:var(--lime);margin-bottom:12px;letter-spacing:.06em;text-transform:uppercase;font-size:.95rem}
+.cells{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px}
+.cells.wide{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.cell{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0;background:var(--surface);border:1px solid var(--edge);border-radius:12px;padding:8px 12px}
+.cell kbd{white-space:nowrap}
+.cell .g{font-size:1.25rem;color:var(--lime);font-weight:700}
+.cell kbd{color:#fff;font-weight:700}
+.note{color:var(--dim);font-size:.95rem;margin-top:10px}
+
+/* output + tip */
+.kind h3{display:flex;align-items:center;gap:10px}
+.tag{font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;font-weight:800;padding:3px 10px;border-radius:999px;background:var(--lime);color:var(--bg)}
+.tipcard{margin:0 auto 36px;max-width:640px;background:#000;border:3px solid var(--lime);border-radius:28px;padding:30px 24px 26px;text-align:center}
+.tipcard p{font-size:clamp(1.05rem,2.6vw,1.45rem);font-weight:700;line-height:1.5}
+.tipcard .btn{margin-top:16px;background:var(--lime);color:var(--bg);font-size:1.05rem}
+.tipcard .btn:hover{background:#d2ff5a}
+.why{display:grid;gap:14px;max-width:760px;margin:0 auto 30px;color:var(--muted)}
+.why b{color:#fff}
+.how{display:grid;gap:10px;max-width:760px;margin:0 auto}
+.how div{display:grid;grid-template-columns:170px 1fr;gap:16px;background:var(--surface);border:1px solid var(--edge);border-radius:14px;padding:14px 18px}
+.how dt{font-weight:800;color:var(--lime)}
+.how dd{margin:0;color:var(--muted)}
+
+/* faq */
+.faq{max-width:820px;margin:0 auto;display:grid;gap:12px}
+.faq details{background:var(--surface);border:1px solid var(--edge);border-radius:14px}
+.faq summary{cursor:pointer;list-style:none;padding:18px 54px 18px 22px;font-weight:700;position:relative}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";position:absolute;right:22px;top:50%;transform:translateY(-50%);color:var(--lime);font-size:1.6rem;font-weight:400;line-height:1}
+.faq details[open] summary::after{content:"\2212"}
+.faq details[open]{border-color:var(--edge2)}
+.faq details>div{padding:0 22px 20px;color:var(--muted)}
+
+/* privacy + footer */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+.list{margin:12px 0 0;padding-left:20px;color:var(--muted);display:grid;gap:8px}
+.list li::marker{color:var(--lime)}
+footer{border-top:1px solid var(--edge);padding:56px 0 64px;text-align:center}
+footer .links{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin:22px 0}
+footer p{color:var(--dim);font-size:.95rem}
+
+/* app reel */
+.reel{--w:min(760px,80vw);--gap:24px;overflow:hidden;padding-bottom:18px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
+.reel-track{display:flex;width:max-content;animation:reel 48s linear infinite}
+.reel:hover .reel-track,.reel.paused .reel-track{animation-play-state:paused}
+.slide{flex:none;width:var(--w);margin:0 calc(var(--gap) / 2);scroll-snap-align:center}
+.slide img{width:100%;aspect-ratio:16/9;filter:drop-shadow(0 0 .6px rgba(225,229,236,.55)) drop-shadow(0 22px 28px rgba(0,0,0,.6))}
+.slide figcaption{margin-top:16px;text-align:center;color:var(--muted);font-weight:700;font-size:1rem}
+.slide figcaption::before{content:"";display:inline-block;width:9px;height:9px;border-radius:3px;background:var(--lime);margin-right:9px;vertical-align:.05em}
+@keyframes reel{to{transform:translateX(-50%)}}
+.head .si-line{color:var(--muted);font-size:1.05rem;max-width:62ch}
+.reel-bar{margin-top:30px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:14px 22px;text-align:center}
+.reel-btn[hidden]{display:none}
+.reel-btn svg{width:16px;height:16px;fill:currentColor}
+.fine{color:var(--dim);font-size:.88rem;max-width:60ch}
+
+@media (max-width:900px){
+  .g3{grid-template-columns:repeat(2,1fr)}
+  .steps{grid-template-columns:repeat(2,1fr)}
+  .split{grid-template-columns:1fr}
+}
+@media (max-width:760px){
+  .nav{display:none}
+  .top .wrap{justify-content:space-between}
+  section{padding:60px 0}
+  .hero{padding-top:44px}
+  .g3,.g2,.two{grid-template-columns:1fr}
+  .how div{grid-template-columns:1fr;gap:4px}
+}
+@media (max-width:480px){
+  body{font-size:16px}
+  .steps{grid-template-columns:1fr}
+  .pair .out{font-size:1.45rem}
+  .cells.wide{grid-template-columns:repeat(2,1fr)}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .card,.card:hover{transition:none;transform:none}
+  .reel{overflow-x:auto;-webkit-mask-image:none;mask-image:none;scroll-snap-type:x proximity}
+  .reel-track{animation:none}
+  .slide[aria-hidden="true"],.reel-btn{display:none}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="LIPI home"><img src="assets/logo.png" alt="" width="34" height="34">LIPI <span class="si">ලිපි</span></a>
+    <nav class="nav" aria-label="Main">
+      <a href="#features">Features</a>
+      <a href="#how-to-type">How to type</a>
+      <a href="#smart-quotes">Smart quotes</a>
+      <a href="#faq">FAQ</a>
+      <a href="https://github.com/sanjaya3d/LIPI">GitHub</a>
+    </nav>
+    <a class="btn solid" href="https://github.com/sanjaya3d/LIPI/releases/latest/download/lipi.exe">Download</a>
+  </div>
+</header>
+
+<main id="top">
+
+<section class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Free &nbsp;·&nbsp; Open source &nbsp;·&nbsp; Windows</p>
+    <h1>Type Singlish.<br><em>Get Sinhala.</em> Live.</h1>
+    <p class="si-line si">ඉංග්&zwj;රීසි අකුරින් (Singlish) ටයිප් කරන දේ ඒ මොහොතේම සිංහල අකුරු බවට හරවන කුඩා Windows වැඩසටහනකි.</p>
+    <a class="cta" href="https://github.com/sanjaya3d/LIPI/releases/latest/download/lipi.exe">
+      <img src="assets/download-button.svg" width="420" height="106" alt="Download the latest LIPI release for Windows">
+    </a>
+    <p class="meta">
+      <span data-version-wrap hidden>Latest version <b data-version></b></span>
+      <span>No installer</span>
+      <span>About 2 MB of RAM</span>
+      <a href="https://github.com/sanjaya3d/LIPI/releases">All releases</a>
+    </p>
+    <div class="shot">
+      <img src="assets/hero.png" width="2200" height="1248" alt="Four example words, ammaa, aayuboovan, sixhala and koLaBa, turning into Sinhala, next to the LIPI window">
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow">Features</p>
+      <h2>Small, fast and private</h2>
+      <p class="lead">LIPI works in the background. You type, and the Sinhala appears.</p>
+    </div>
+    <div class="grid g3">
+      <div class="card"><div class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 9h18"/></svg></div><h3>Works in any app</h3><p>LIPI watches the keyboard for the whole system, so it works wherever you can type.</p></div>
+      <div class="card"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 8h14M14 4l4 4-4 4M20 16H6M10 12l-4 4 4 4"/></svg></div><h3>Unicode or FM Abhaya</h3><p>Switch with one key tap. In legacy mode the punctuation keys type the right codes too (US keyboard).</p></div>
+      <div class="card"><div class="ico"><svg viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg></div><h3>Live typing</h3><p>The word is redrawn after every key, and Backspace works one English letter at a time.</p></div>
+      <div class="card"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg></div><h3>Tiny and private</h3><p>One small exe, no installer, no libraries. About 2 MB of RAM. No network code at all.</p></div>
+      <div class="card"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 3v11M7 10l5 5 5-5M4 17v3h16v-3"/></svg></div><h3>Lives in the tray</h3><p>Left click the tray icon to open the window. Right click for a menu: Open, Sinhala typing on or off, and Exit. Only one LIPI runs at a time.</p></div>
+      <div class="card"><div class="ico"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="3"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg></div><h3>Key hints built in</h3><p>The <b>Keys</b> button shows what to type for each letter. <code>lipi --keys</code> prints the same chart.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="quick-start" style="padding-top:0">
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow">Quick start</p>
+      <h2>Ready in a minute</h2>
+    </div>
+    <ol class="steps">
+      <li><b>Download</b><span>Get <code>lipi.exe</code> and run it. The window opens. If Windows shows a blue warning, see the <a href="#faq">FAQ</a>.</span></li>
+      <li><b>Switch typing on</b><span>Tap <b>Right Ctrl</b> to switch Sinhala typing on or off.</span></li>
+      <li><b>Pick the output</b><span>Tap <b>Right Shift</b> to switch between Unicode and legacy (FM Abhaya) output.</span></li>
+      <li><b>Type</b><span>Type in any app. For example <code>aayuboovan</code> gives ආයුබෝවන්.</span></li>
+    </ol>
+  </div>
+</section>
+
+<section id="in-apps" style="padding-top:0" aria-labelledby="in-apps-title">
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow">In real apps</p>
+      <h2 id="in-apps-title">Type Sinhala where you work</h2>
+      <p class="lead">LIPI works in any Windows app where you can type. Here it is in four of them.</p>
+      <p class="si-line si">ටයිප් කළ හැකි ඕනෑම Windows මෘදුකාංගයක LIPI වැඩ කරයි.</p>
+    </div>
+  </div>
+  <div class="reel" data-reel role="group" aria-roledescription="carousel" aria-label="LIPI working in Photoshop, Premiere Pro, Photon Studio and Word">
+    <div class="reel-track">
+        <figure class="slide"><img src="assets/apps/photoshop.webp" width="1280" height="720" alt="Sinhala text typed with LIPI in Adobe Photoshop, with the LIPI window open beside it" decoding="async"><figcaption>Adobe Photoshop</figcaption></figure>
+        <figure class="slide"><img src="assets/apps/premiere.webp" width="1280" height="720" alt="Sinhala title text typed with LIPI in Adobe Premiere Pro, with the LIPI window open" decoding="async"><figcaption>Adobe Premiere Pro</figcaption></figure>
+        <figure class="slide"><img src="assets/apps/photon.webp" width="1280" height="720" alt="Sinhala text typed with LIPI in Photon Studio, with the LIPI window open beside it" decoding="async"><figcaption>Photon Studio</figcaption></figure>
+        <figure class="slide"><img src="assets/apps/word.webp" width="1280" height="720" alt="Sinhala text typed with LIPI in Microsoft Word, with the LIPI window open beside it" decoding="async"><figcaption>Microsoft Word</figcaption></figure>
+        <figure class="slide" aria-hidden="true"><img src="assets/apps/photoshop.webp" width="1280" height="720" alt="" decoding="async"><figcaption>Adobe Photoshop</figcaption></figure>
+        <figure class="slide" aria-hidden="true"><img src="assets/apps/premiere.webp" width="1280" height="720" alt="" decoding="async"><figcaption>Adobe Premiere Pro</figcaption></figure>
+        <figure class="slide" aria-hidden="true"><img src="assets/apps/photon.webp" width="1280" height="720" alt="" decoding="async"><figcaption>Photon Studio</figcaption></figure>
+        <figure class="slide" aria-hidden="true"><img src="assets/apps/word.webp" width="1280" height="720" alt="" decoding="async"><figcaption>Microsoft Word</figcaption></figure>
+    </div>
+  </div>
+  <div class="wrap reel-bar">
+    <button type="button" class="btn reel-btn" data-reel-btn hidden><span class="ico-now" aria-hidden="true"></span><span class="lbl">Pause slideshow</span></button>
+    <p class="fine">Adobe, Photoshop, Premiere Pro and Microsoft Word are trademarks of their owners. LIPI is not made by or connected with them.</p>
+  </div>
+</section>
+
+<section id="how-to-type" style="padding-top:0">
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow">How to type</p>
+      <h2>A few simple rules</h2>
+    </div>
+    <div class="split">
+      <ul class="rules">
+        <li>Keys are case-sensitive: <code>ta</code> gives ට and <code>Ta</code> gives ඨ, <code>na</code> gives න and <code>Na</code> gives ණ.</li>
+        <li>A consonant on its own gets a hal: <code>k</code> gives ක්, and <code>ka</code> gives ක.</li>
+        <li>Two consonants in a row join up. <code>y</code> and <code>r</code> after another consonant make yansaya and rakaransaya: <code>kya</code> gives ක්&zwj;ය and <code>kra</code> gives ක්&zwj;ර.</li>
+        <li><code>x</code> or <code>zn</code> gives ං, <code>H</code> gives ඃ and <code>X</code> gives ඞ. Type them after a Sinhala letter: <code>kax</code> gives කං, <code>kaH</code> gives කඃ and <code>kaX</code> gives කඞ.</li>
+        <li>A capital letter that no key uses is read as lowercase, so <code>Kamal</code> gives කමල්.</li>
+        <li>Anything LIPI does not know, such as digits and punctuation, is passed through as typed.</li>
+      </ul>
+      <div class="pairs" aria-label="Examples">
+        <div class="pair"><kbd>ammaa</kbd><span class="arrow">→</span><span class="out si">අම්මා</span></div>
+        <div class="pair"><kbd>aayuboovan</kbd><span class="arrow">→</span><span class="out si">ආයුබෝවන්</span></div>
+        <div class="pair"><kbd>sixhala</kbd><span class="arrow">→</span><span class="out si">සිංහල</span></div>
+        <div class="pair"><kbd>koLaBa</kbd><span class="arrow">→</span><span class="out si">කොළඹ</span></div>
+      </div>
+    </div>
+
+    <details class="chart">
+      <summary class="btn">Show the full key chart</summary>
+      <div class="chartbody">
+        <div><h3>Vowels</h3><div class="cells"><div class="cell"><span class="g si">අ</span><kbd>a</kbd></div><div class="cell"><span class="g si">ආ</span><kbd>aa</kbd></div><div class="cell"><span class="g si">ඇ</span><kbd>A</kbd></div><div class="cell"><span class="g si">ඈ</span><kbd>Aa</kbd></div><div class="cell"><span class="g si">ඉ</span><kbd>i</kbd></div><div class="cell"><span class="g si">ඊ</span><kbd>ii</kbd></div><div class="cell"><span class="g si">උ</span><kbd>u</kbd></div><div class="cell"><span class="g si">ඌ</span><kbd>uu</kbd></div><div class="cell"><span class="g si">ඍ</span><kbd>R</kbd></div><div class="cell"><span class="g si">ඎ</span><kbd>Ru</kbd></div><div class="cell"><span class="g si">එ</span><kbd>e</kbd></div><div class="cell"><span class="g si">ඒ</span><kbd>ee</kbd></div><div class="cell"><span class="g si">ඓ</span><kbd>ai</kbd></div><div class="cell"><span class="g si">ඔ</span><kbd>o</kbd></div><div class="cell"><span class="g si">ඕ</span><kbd>oo</kbd></div><div class="cell"><span class="g si">ඖ</span><kbd>au</kbd></div></div><p class="note">Also: AA = ඈ, ou = ඖ. Straight after a consonant, see Signs below.</p></div>
+        <div><h3>Consonants</h3><div class="cells"><div class="cell"><span class="g si">ක</span><kbd>ka</kbd></div><div class="cell"><span class="g si">ඛ</span><kbd>kha</kbd></div><div class="cell"><span class="g si">ග</span><kbd>ga</kbd></div><div class="cell"><span class="g si">ඝ</span><kbd>gha</kbd></div><div class="cell"><span class="g si">ඟ</span><kbd>zga</kbd></div><div class="cell"><span class="g si">ච</span><kbd>cha</kbd></div><div class="cell"><span class="g si">ඡ</span><kbd>chha</kbd></div><div class="cell"><span class="g si">ජ</span><kbd>ja</kbd></div><div class="cell"><span class="g si">ඦ</span><kbd>zja</kbd></div><div class="cell"><span class="g si">ඤ</span><kbd>zka</kbd></div><div class="cell"><span class="g si">ඥ</span><kbd>zha</kbd></div><div class="cell"><span class="g si">ට</span><kbd>ta</kbd></div><div class="cell"><span class="g si">ඨ</span><kbd>Ta</kbd></div><div class="cell"><span class="g si">ඩ</span><kbd>da</kbd></div><div class="cell"><span class="g si">ඪ</span><kbd>Da</kbd></div><div class="cell"><span class="g si">ණ</span><kbd>Na</kbd></div><div class="cell"><span class="g si">ඬ</span><kbd>zda</kbd></div><div class="cell"><span class="g si">ත</span><kbd>tha</kbd></div><div class="cell"><span class="g si">ථ</span><kbd>thha</kbd></div><div class="cell"><span class="g si">ද</span><kbd>dha</kbd></div><div class="cell"><span class="g si">ධ</span><kbd>dhha</kbd></div><div class="cell"><span class="g si">න</span><kbd>na</kbd></div><div class="cell"><span class="g si">ඳ</span><kbd>zdha</kbd></div><div class="cell"><span class="g si">ප</span><kbd>pa</kbd></div><div class="cell"><span class="g si">ඵ</span><kbd>pha</kbd></div><div class="cell"><span class="g si">බ</span><kbd>ba</kbd></div><div class="cell"><span class="g si">භ</span><kbd>bha</kbd></div><div class="cell"><span class="g si">ම</span><kbd>ma</kbd></div><div class="cell"><span class="g si">ඹ</span><kbd>Ba</kbd></div><div class="cell"><span class="g si">ය</span><kbd>ya</kbd></div><div class="cell"><span class="g si">ර</span><kbd>ra</kbd></div><div class="cell"><span class="g si">ල</span><kbd>la</kbd></div><div class="cell"><span class="g si">ළ</span><kbd>La</kbd></div><div class="cell"><span class="g si">ව</span><kbd>wa</kbd></div><div class="cell"><span class="g si">ශ</span><kbd>sha</kbd></div><div class="cell"><span class="g si">ෂ</span><kbd>Sha</kbd></div><div class="cell"><span class="g si">ස</span><kbd>sa</kbd></div><div class="cell"><span class="g si">හ</span><kbd>ha</kbd></div><div class="cell"><span class="g si">ෆ</span><kbd>fa</kbd></div></div><p class="note">Also: q = ද, zq = ඳ, v = ව, S = ෂ. A letter on its own gets a hal: k = ක්</p></div>
+        <div><h3>Signs</h3><div class="cells"><div class="cell"><span class="g si">ක</span><kbd>ka</kbd></div><div class="cell"><span class="g si">කා</span><kbd>kaa</kbd></div><div class="cell"><span class="g si">කැ</span><kbd>kA</kbd></div><div class="cell"><span class="g si">කෑ</span><kbd>kAa</kbd></div><div class="cell"><span class="g si">කි</span><kbd>ki</kbd></div><div class="cell"><span class="g si">කී</span><kbd>kii</kbd></div><div class="cell"><span class="g si">කු</span><kbd>ku</kbd></div><div class="cell"><span class="g si">කූ</span><kbd>kuu</kbd></div><div class="cell"><span class="g si">කෘ</span><kbd>kru</kbd></div><div class="cell"><span class="g si">කෲ</span><kbd>kruu</kbd></div><div class="cell"><span class="g si">කෙ</span><kbd>ke</kbd></div><div class="cell"><span class="g si">කේ</span><kbd>kee</kbd></div><div class="cell"><span class="g si">කෛ</span><kbd>kai</kbd></div><div class="cell"><span class="g si">කො</span><kbd>ko</kbd></div><div class="cell"><span class="g si">කෝ</span><kbd>koo</kbd></div><div class="cell"><span class="g si">කෞ</span><kbd>kau</kbd></div></div><p class="note">Type them after a consonant. Also: AA = කෑ</p></div>
+        <div><h3>Examples</h3><div class="cells wide"><div class="cell"><span class="g si">ක්</span><kbd>k</kbd></div><div class="cell"><span class="g si">කං</span><kbd>kax</kbd></div><div class="cell"><span class="g si">කං</span><kbd>kazn</kbd></div><div class="cell"><span class="g si">කඃ</span><kbd>kaH</kbd></div><div class="cell"><span class="g si">කඞ</span><kbd>kaX</kbd></div><div class="cell"><span class="g si">ක්‍ය</span><kbd>kya</kbd></div><div class="cell"><span class="g si">ක්‍ර</span><kbd>kra</kbd></div><div class="cell"><span class="g si">මම</span><kbd>mama</kbd></div><div class="cell"><span class="g si">අම්මා</span><kbd>ammaa</kbd></div><div class="cell"><span class="g si">ගෙදර</span><kbd>gedhara</kbd></div><div class="cell"><span class="g si">නුවර</span><kbd>nuwara</kbd></div><div class="cell"><span class="g si">කොළඹ</span><kbd>koLaBa</kbd></div><div class="cell"><span class="g si">සිංහල</span><kbd>sixhala</kbd></div><div class="cell"><span class="g si">ප්‍රශ්න</span><kbd>prashna</kbd></div></div><p class="note">Capitals matter: ta = ට, Ta = ඨ. x, zn, H and X are typed after a letter.</p></div>
+      </div>
+    </details>
+  </div>
+</section>
+
+<section id="output" style="padding-top:0">
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow">Output types</p>
+      <h2>Unicode or FM Abhaya</h2>
+      <p class="lead">Choose in the window, or tap your output key at any time.</p>
+    </div>
+    <div class="grid g2 kind">
+      <div class="card"><h3 style="margin-top:0"><span class="tag">Unicode</span></h3><p style="margin-top:12px">Normal Sinhala text. It works in modern apps and websites.</p></div>
+      <div class="card"><h3 style="margin-top:0"><span class="tag">Legacy</span> FM Abhaya</h3><p style="margin-top:12px">For apps that cannot shape Unicode Sinhala. LIPI turns the Sinhala into FM Abhaya character codes. The text looks right when the font is FM Abhaya, so that font must be installed.</p></div>
+    </div>
+    <p class="note" style="margin-top:18px">You can use your own FM Abhaya table. Copy <code>src/legacy_map.txt</code> next to the exe, edit it, and restart the program. Or start with <code>lipi --map my.txt</code>.</p>
+  </div>
+</section>
+
+<section id="smart-quotes" style="padding-top:0">
+  <div class="wrap">
+    <div class="head" style="text-align:center;justify-items:center">
+      <p class="eyebrow">Legacy (FM Abhaya)</p>
+      <h2>Smart quotes (Adobe and Microsoft apps)</h2>
+    </div>
+    <div class="tipcard si">
+      <p>Adobe සහ Microsoft මෘදුකාංග වලදී</p>
+      <p>"smart quotes" විශේෂාංගය ක්&zwj;රියා විරහිත කරන්න</p>
+      <a class="btn" href="#smart-quotes-steps">වැඩි විස්තර</a>
+    </div>
+    <div class="why si" id="smart-quotes-steps">
+      <p>Legacy (FM Abhaya) මාදිලියේදී, සමහර මෘදුකාංගවල තිත (.) වෙනුවට අමුතු වක්‍ර සලකුණක් දිස්විය හැකියි. LIPI මඟින් නිවැරදි අක්ෂරය ඇතුළත් කළත්, මෘදුකාංගය විසින් එය පසුව ස්වයංක්‍රීයව වෙනස් කරයි. එක් සැකසුමක් අක්‍රිය කිරීමෙන් මෙම ගැටලුව විසඳාගත හැකියි.</p>
+      <p><b>මෙය සිදුවන්නේ ඇයි?</b> FM Abhaya අකුරු රටාවේදී තිත (.) සඳහා භාවිත වන්නේ සාමාන්‍ය සෘජු apostrophe (<code>'</code>) සලකුණට අදාළ අක්ෂර කේතයයි. ඒ නිසා LIPI මඟින් <code>.</code> යතුර එබූ විට එම අක්ෂරය ඇතුළත් වේ. Photoshop, Premiere Pro, Word, PowerPoint සහ තවත් සමහර මෘදුකාංගවල ඇති "Smart Quotes" විශේෂාංගය මඟින් ඔබ ටයිප් කරන සෘජු apostrophe (<code>'</code>) සලකුණ වක්‍ර apostrophe (<code>‘</code> හෝ <code>’</code>) සලකුණක් බවට ස්වයංක්‍රීයව වෙනස් කරයි. FM Abhaya අකුරු රටාවේදී එම වක්‍ර apostrophe කේතයට වෙනත් හැඩයක් ලබා දී ඇති නිසා, තිත වෙනුවට වක්‍ර සලකුණක් දිස්වේ. Notepad සහ බොහෝ සාමාන්‍ය පෙළ ඇතුළත් කරන ස්ථානවල මෙම ගැටලුව ඇති නොවේ. Unicode ප්‍රතිදානයට මෙය බලපාන්නේද නැත.</p>
+      <p><b>මෙය විසඳාගන්නේ කෙසේද?</b> ඔබ ටයිප් කරන මෘදුකාංගයේ Smart Quotes විශේෂාංගය අක්‍රිය කරන්න:</p>
+    </div>
+    <dl class="how si">
+      <div><dt>Photoshop</dt><dd>Edit → Preferences → Type වෙත ගොස් <b>Use Smart Quotes</b> යන්නෙහි සලකුණ ඉවත් කරන්න.</dd></div>
+      <div><dt>Premiere Pro</dt><dd>Preferences → Graphics වෙත ගොස් Smart Quotes සම්බන්ධ සැකසුමක් සොයා බලන්න. එහි ස්ථානය සහ නම අනුවාදය අනුව වෙනස් විය හැකි අතර, සමහර අනුවාදවල මෙම සැකසුම නොතිබිය හැකියි.</dd></div>
+      <div><dt>Word සහ PowerPoint</dt><dd>File → Options → Proofing → AutoCorrect Options → <b>AutoFormat As You Type</b> වෙත ගොස් <b>"Straight quotes" with "smart quotes"</b> යන්නෙහි සලකුණ ඉවත් කරන්න. Word හි <b>AutoFormat</b> ටැබය තුළද එම සැකසුම අක්‍රිය කරන්න.</dd></div>
+      <div><dt>වෙනත් මෘදුකාංග</dt><dd>Text හෝ Type සැකසුම් තුළ "Smart Quotes" හෝ "Typographer's Quotes" යන සැකසුම් සොයා බලන්න.</dd></div>
+    </dl>
+    <p class="note si" style="text-align:center;margin-top:18px">සැකසුම වෙනස් කළ පසු තිත නැවත ටයිප් කරන්න. දැනටමත් ලේඛනයේ ඇති වැරදි සලකුණු ස්වයංක්‍රීයව නිවැරදි නොවේ. එම නිසා වැරදි වක්‍ර සලකුණ මකා දමා තිත නැවත ඇතුළත් කරන්න.</p>
+  </div>
+</section>
+
+<section id="faq" style="padding-top:0">
+  <div class="wrap">
+    <div class="head" style="text-align:center;justify-items:center">
+      <p class="eyebrow">FAQ</p>
+      <h2>Questions people ask</h2>
+    </div>
+    <div class="faq">
+      <details><summary>Windows shows "Windows protected your PC". Is LIPI safe?</summary><div>The exe is not code-signed, so Windows SmartScreen warns about every new program like this. Click <b>More info</b>, then <b>Run anyway</b>. LIPI has no network code, and the whole source is on <a href="https://github.com/sanjaya3d/LIPI">GitHub</a>, so you can read it or build the exe yourself.</div></details>
+      <details><summary>My antivirus warns about LIPI.</summary><div>LIPI uses a Windows keyboard hook to see your key presses, the same way every typing tool does, and some antivirus programs flag that. LIPI never sends anything anywhere. If you do not trust the download, <a href="https://github.com/sanjaya3d/LIPI#build-from-source">build it yourself</a>.</div></details>
+      <details><summary>I type, but I only get English letters.</summary><div>Check that Sinhala typing is on (the switch in the window says ON). Tap your on or off key once to change it. Also, if the app you are typing in runs as administrator, run LIPI as administrator too, or Windows will not let LIPI see the keys.</div></details>
+      <details><summary>The text looks like strange symbols.</summary><div>That is normal for legacy (FM Abhaya) output when the font is not FM Abhaya. Install the FM Abhaya font and choose it in the app, or switch LIPI to Unicode output.</div></details>
+      <details><summary>In legacy mode the full stop shows as a curl in Photoshop, Premiere Pro or Word.</summary><div>The app is changing the straight apostrophe, which FM Abhaya uses for the full stop, into a curly "smart quote". Turn smart quotes off in that app. The steps are in <a href="#smart-quotes">Smart quotes</a> above.</div></details>
+      <details><summary>Can I change the keys that switch typing and output?</summary><div>Yes. Edit <code>on_off_key</code> and <code>output_key</code> in <code>settings.txt</code>. To open its folder, press <b>Win + R</b>, type <code>%APPDATA%\LIPI</code> and press Enter. The choices are RightCtrl, LeftCtrl, RightShift, LeftShift, RightAlt, LeftAlt, ScrollLock and Pause, and the two keys must be different. Save the file and restart LIPI.</div></details>
+      <details><summary>How do I start LIPI when Windows starts?</summary><div>Click the gear in the title bar and turn on <b>Run on startup</b>. To start hidden in the tray, turn on <b>Start in tray</b> too. If the switch goes back to OFF after you move <code>lipi.exe</code> to another folder, turn it on again.</div></details>
+      <details><summary>I started LIPI again and nothing opened.</summary><div>Only one LIPI runs at a time. Starting it again brings the first window back, even if it is hidden in the tray (Hidden Icons, the ^ arrow near the clock). If it cannot reach the first one, it shows a message that LIPI is already running.</div></details>
+      <details><summary>How do I close LIPI?</summary><div>Right click the tray icon and choose <b>Exit</b>, or click the X in the window.</div></details>
+      <details><summary>How do I remove LIPI?</summary><div>Turn off <b>Run on startup</b> in Settings if you turned it on. Then close LIPI, delete <code>lipi.exe</code> and the folder <code>%APPDATA%\LIPI</code>. Nothing else is installed.</div></details>
+      <details><summary>Does it work on Mac or Linux?</summary><div>No. LIPI is Windows only, because it uses the Windows keyboard hook.</div></details>
+    </div>
+  </div>
+</section>
+
+<section id="privacy" style="padding-top:0">
+  <div class="wrap">
+    <div class="two">
+      <div class="card"><h3 style="margin-top:0">Privacy</h3><p style="margin-top:10px">LIPI has no network code and sends nothing anywhere. The Show Logs window keeps its lines in memory only, and nothing is saved to a file. The only file the program writes is <code>settings.txt</code>. If you turn on <b>Run on startup</b>, it also adds one entry to your Windows startup list. The <b>Check for updates</b> button only opens a web page in your browser. LIPI itself never goes online.</p></div>
+      <div class="card"><h3 style="margin-top:0">Good to know</h3>
+        <ul class="list">
+          <li>Windows only.</li>
+          <li>In an app that runs as administrator, LIPI must also run as administrator.</li>
+          <li>Turn Sinhala typing off before you type a password.</li>
+          <li>FM Abhaya output needs the FM Abhaya font in the app you paste into.</li>
+          <li>The legacy punctuation table is made for the US keyboard layout.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <a class="cta" href="https://github.com/sanjaya3d/LIPI/releases/latest/download/lipi.exe"><img src="assets/download-button.svg" width="340" height="86" alt="Download the latest LIPI release for Windows" style="margin:0 auto"></a>
+    <div class="links">
+      <a class="btn" href="https://github.com/sanjaya3d/LIPI">GitHub</a>
+      <a class="btn" href="https://facebook.com/sanjaya3d">Facebook</a>
+      <a class="btn" href="https://www.youtube.com/@SANJAYA3D/">YouTube</a>
+    </div>
+    <p>Made by <b style="color:var(--lime)">SANJAYA3D</b> &nbsp;·&nbsp; Free software under the <a href="https://github.com/sanjaya3d/LIPI/blob/main/LICENSE">GNU GPL v3.0 or later</a></p>
+  </div>
+</footer>
+
+<script>
+// Pause or play the app screenshot slideshow. Without scripts it keeps sliding and pauses on hover.
+(function () {
+  try {
+    var reel = document.querySelector("[data-reel]");
+    var btn = document.querySelector("[data-reel-btn]");
+    if (!reel || !btn) return;
+    var icon = btn.querySelector(".ico-now");
+    var label = btn.querySelector(".lbl");
+    var PAUSE = '<svg viewBox="0 0 24 24"><rect x="5" y="4" width="5" height="16" rx="1.5"/><rect x="14" y="4" width="5" height="16" rx="1.5"/></svg>';
+    var PLAY = '<svg viewBox="0 0 24 24"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z"/></svg>';
+    icon.innerHTML = PAUSE;
+    btn.hidden = false;
+    btn.addEventListener("click", function () {
+      var paused = reel.classList.toggle("paused");
+      icon.innerHTML = paused ? PLAY : PAUSE;
+      label.textContent = paused ? "Play slideshow" : "Pause slideshow";
+    });
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      reel.tabIndex = 0;
+    }
+  } catch (e) {}
+})();
+</script>
+<script>
+// Shows the newest version number. If GitHub cannot be reached, nothing changes.
+(function () {
+  try {
+    fetch("https://api.github.com/repos/sanjaya3d/LIPI/releases/latest")
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) {
+        if (!j || !j.tag_name) return;
+        document.querySelector("[data-version]").textContent = j.tag_name;
+        document.querySelector("[data-version-wrap]").hidden = false;
+      })
+      .catch(function () {});
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>
