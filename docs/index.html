@@ -216,7 +216,7 @@ footer p{color:var(--dim);font-size:.95rem}
       <a href="https://github.com/sanjaya3d/LIPI/releases">All releases</a>
     </p>
     <div class="shot">
-      <img src="assets/hero.png" width="2200" height="1248" alt="Four example words, ammaa, laxkaawa, sixhala and koLaBa, turning into Sinhala, next to the LIPI window">
+      <img src="assets/hero.png" width="2200" height="1248" alt="Four example words, ammaa, aayuboovan, sixhala and koLaBa, turning into Sinhala, next to the LIPI window">
     </div>
   </div>
 </section>
@@ -233,7 +233,7 @@ footer p{color:var(--dim);font-size:.95rem}
       <div class="card"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 8h14M14 4l4 4-4 4M20 16H6M10 12l-4 4 4 4"/></svg></div><h3>Unicode or FM Abhaya</h3><p>Switch with one key tap. In legacy mode the punctuation keys type the right codes too (US keyboard).</p></div>
       <div class="card"><div class="ico"><svg viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg></div><h3>Live typing</h3><p>The word is redrawn after every key, and Backspace works one English letter at a time.</p></div>
       <div class="card"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg></div><h3>Tiny and private</h3><p>One small exe, no installer, no libraries. About 2 MB of RAM. No network code at all.</p></div>
-      <div class="card"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 3v11M7 10l5 5 5-5M4 17v3h16v-3"/></svg></div><h3>Lives in the tray</h3><p>Left click the tray icon to open the window. Right click to switch Sinhala typing on or off.</p></div>
+      <div class="card"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 3v11M7 10l5 5 5-5M4 17v3h16v-3"/></svg></div><h3>Lives in the tray</h3><p>Left click the tray icon to open the window. Right click for a menu: Open, Sinhala typing on or off, and Exit. Only one LIPI runs at a time.</p></div>
       <div class="card"><div class="ico"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="3"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg></div><h3>Key hints built in</h3><p>The <b>Keys</b> button shows what to type for each letter. <code>lipi --keys</code> prints the same chart.</p></div>
     </div>
   </div>
@@ -246,10 +246,10 @@ footer p{color:var(--dim);font-size:.95rem}
       <h2>Ready in a minute</h2>
     </div>
     <ol class="steps">
-      <li><b>Download</b><span>Get <code>lipi.exe</code> and run it. The window opens. If Windows shows a blue warning, see the <a href="#faq">FAQ</a>.</span></li>
+      <li><b>Download</b><span>Get <code>lipi.exe</code> and run it. The window opens. If Windows shows a blue warning, see the <a href="#faq">FAQ</a> and the <a href="#code-signing-policy">Code signing policy</a>.</span></li>
       <li><b>Switch typing on</b><span>Tap <b>Right Ctrl</b> to switch Sinhala typing on or off.</span></li>
       <li><b>Pick the output</b><span>Tap <b>Right Shift</b> to switch between Unicode and legacy (FM Abhaya) output.</span></li>
-      <li><b>Type</b><span>Type in any app. For example <code>laxkaawa</code> gives ලංකාව.</span></li>
+      <li><b>Type</b><span>Type in any app. For example <code>aayuboovan</code> gives ආයුබෝවන්.</span></li>
     </ol>
   </div>
 </section>
@@ -298,7 +298,7 @@ footer p{color:var(--dim);font-size:.95rem}
       </ul>
       <div class="pairs" aria-label="Examples">
         <div class="pair"><kbd>ammaa</kbd><span class="arrow">→</span><span class="out si">අම්මා</span></div>
-        <div class="pair"><kbd>laxkaawa</kbd><span class="arrow">→</span><span class="out si">ලංකාව</span></div>
+        <div class="pair"><kbd>aayuboovan</kbd><span class="arrow">→</span><span class="out si">ආයුබෝවන්</span></div>
         <div class="pair"><kbd>sixhala</kbd><span class="arrow">→</span><span class="out si">සිංහල</span></div>
         <div class="pair"><kbd>koLaBa</kbd><span class="arrow">→</span><span class="out si">කොළඹ</span></div>
       </div>
@@ -370,8 +370,10 @@ footer p{color:var(--dim);font-size:.95rem}
       <details><summary>The text looks like strange symbols.</summary><div>That is normal for legacy (FM Abhaya) output when the font is not FM Abhaya. Install the FM Abhaya font and choose it in the app, or switch LIPI to Unicode output.</div></details>
       <details><summary>In legacy mode the full stop shows as a curl in Photoshop, Premiere Pro or Word.</summary><div>The app is changing the straight apostrophe, which FM Abhaya uses for the full stop, into a curly "smart quote". Turn smart quotes off in that app. The steps are in <a href="#smart-quotes">Smart quotes</a> above.</div></details>
       <details><summary>Can I change the keys that switch typing and output?</summary><div>Yes. Edit <code>on_off_key</code> and <code>output_key</code> in <code>settings.txt</code>. To open its folder, press <b>Win + R</b>, type <code>%APPDATA%\LIPI</code> and press Enter. The choices are RightCtrl, LeftCtrl, RightShift, LeftShift, RightAlt, LeftAlt, ScrollLock and Pause, and the two keys must be different. Save the file and restart LIPI.</div></details>
-      <details><summary>How do I start LIPI when Windows starts?</summary><div>Press <b>Win + R</b>, type <code>shell:startup</code> and press Enter. Put a shortcut to <code>lipi.exe</code> in that folder. To start hidden in the tray, set <code>start_in_tray = yes</code> in <code>settings.txt</code>.</div></details>
-      <details><summary>How do I remove LIPI?</summary><div>Close LIPI with the X button in its window, then delete <code>lipi.exe</code> and the folder <code>%APPDATA%\LIPI</code>. Nothing else is installed.</div></details>
+      <details><summary>How do I start LIPI when Windows starts?</summary><div>Click the gear in the title bar and turn on <b>Run on startup</b>. To start hidden in the tray, turn on <b>Start in tray</b> too. If the switch goes back to OFF after you move <code>lipi.exe</code> to another folder, turn it on again.</div></details>
+      <details><summary>I started LIPI again and nothing opened.</summary><div>Only one LIPI runs at a time. Starting it again brings the first window back, even if it is hidden in the tray (Hidden Icons, the ^ arrow near the clock). If it cannot reach the first one, it shows a message that LIPI is already running.</div></details>
+      <details><summary>How do I close LIPI?</summary><div>Right click the tray icon and choose <b>Exit</b>, or click the X in the window.</div></details>
+      <details><summary>How do I remove LIPI?</summary><div>Turn off <b>Run on startup</b> in Settings if you turned it on. Then close LIPI, delete <code>lipi.exe</code> and the folder <code>%APPDATA%\LIPI</code>. Nothing else is installed.</div></details>
       <details><summary>Does it work on Mac or Linux?</summary><div>No. LIPI is Windows only, because it uses the Windows keyboard hook.</div></details>
     </div>
   </div>
@@ -380,7 +382,7 @@ footer p{color:var(--dim);font-size:.95rem}
 <section id="privacy" style="padding-top:0">
   <div class="wrap">
     <div class="two">
-      <div class="card"><h3 style="margin-top:0">Privacy</h3><p style="margin-top:10px">LIPI has no network code and sends nothing anywhere. The Show Logs window keeps its lines in memory only, and nothing is saved to a file. The only file the program writes is <code>settings.txt</code>.</p></div>
+      <div class="card"><h3 style="margin-top:0">Privacy</h3><p style="margin-top:10px">LIPI has no network code and sends nothing anywhere. The Show Logs window keeps its lines in memory only, and nothing is saved to a file. The only file the program writes is <code>settings.txt</code>. If you turn on <b>Run on startup</b>, it also adds one entry to your Windows startup list. The <b>Check for updates</b> button only opens a web page in your browser. LIPI itself never goes online.</p></div>
       <div class="card"><h3 style="margin-top:0">Good to know</h3>
         <ul class="list">
           <li>Windows only.</li>
@@ -390,6 +392,24 @@ footer p{color:var(--dim);font-size:.95rem}
           <li>The legacy punctuation table is made for the US keyboard layout.</li>
         </ul>
       </div>
+    </div>
+  </div>
+</section>
+
+<section id="code-signing-policy" style="padding-top:0">
+  <div class="wrap">
+    <div class="card">
+      <h3 style="margin-top:0">Code signing policy</h3>
+      <p style="margin-top:10px"><b style="color:var(--lime)">Status:</b> <code>lipi.exe</code> is not code-signed yet. Free code signing from SignPath Foundation is being set up. This line will be removed when signed releases start.</p>
+      <p style="margin-top:10px">When releases are signed, it is free code signing provided by <a href="https://signpath.io">SignPath.io</a>, certificate by <a href="https://signpath.org">SignPath Foundation</a>.</p>
+      <ul class="list">
+        <li><b>What is signed:</b> only <code>lipi.exe</code> (and the copy inside <code>lipi-windows.zip</code>), built from the source code in the <a href="https://github.com/sanjaya3d/LIPI">GitHub repository</a>. Nothing else.</li>
+        <li><b>How it is built:</b> by GitHub Actions (<a href="https://github.com/sanjaya3d/LIPI/blob/main/.github/workflows/release.yml">release.yml</a>) from a tagged version. Nothing is signed on a personal computer, and the signing key stays with SignPath, not with the author.</li>
+        <li><b>Who approves:</b> every signing request is approved by hand before a release is signed. Committers and reviewers: <a href="https://github.com/sanjaya3d">SANJAYA3D</a>. Approvers: <a href="https://github.com/sanjaya3d">SANJAYA3D</a>. Everyone on the team uses multi-factor authentication for GitHub and SignPath.</li>
+        <li><b>Privacy:</b> LIPI will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it. See <a href="#privacy">Privacy</a>.</li>
+        <li><b>Changes to your system:</b> none by themselves. The only change is one startup entry, added when you turn on <b>Run on startup</b> in Settings and removed when you turn it off. There is no installer. To remove LIPI, see the <a href="#faq">FAQ</a>.</li>
+        <li><b>Problems:</b> if you think a signed release is wrong, <a href="https://github.com/sanjaya3d/LIPI/issues">open an issue</a>.</li>
+      </ul>
     </div>
   </div>
 </section>
@@ -404,7 +424,7 @@ footer p{color:var(--dim);font-size:.95rem}
       <a class="btn" href="https://facebook.com/sanjaya3d">Facebook</a>
       <a class="btn" href="https://www.youtube.com/@SANJAYA3D/">YouTube</a>
     </div>
-    <p>Made by <b style="color:var(--lime)">SANJAYA3D</b> &nbsp;·&nbsp; Free software under the <a href="https://github.com/sanjaya3d/LIPI/blob/main/LICENSE">GNU GPL v3.0 or later</a></p>
+    <p>Made by <b style="color:var(--lime)">SANJAYA3D</b> &nbsp;·&nbsp; Free software under the <a href="https://github.com/sanjaya3d/LIPI/blob/main/LICENSE">GNU GPL v3.0 or later</a> &nbsp;·&nbsp; <a href="#code-signing-policy">Code signing policy</a></p>
   </div>
 </footer>
 
