@@ -1,11 +1,44 @@
-<p align="center"> <img src="assets/banner.png" width="560" alt="LIPI (ලිපි)"> </p> <p align="center"> <b>Type Singlish in any app and get Sinhala, live, as you type.</b> </p> <p align="center"> <a href="LICENSE"><img src="https://img.shields.io/badge/LICENSE-GPLv3%2B-BEF92C?style=for-the-badge&labelColor=2b3035" alt="License: GPLv3+"></a> <a href="https://github.com/sanjaya3d/LIPI/releases/latest"><img src="https://img.shields.io/github/v/release/sanjaya3d/LIPI?style=for-the-badge&labelColor=2b3035&color=BEF92C&label=RELEASE" alt="Latest release"></a> <img src="https://img.shields.io/badge/PLATFORM-WINDOWS-BEF92C?style=for-the-badge&labelColor=2b3035" alt="Platform: Windows"> </p> <p align="center"> <img src="https://img.shields.io/badge/BUILT%20WITH-RUST-BEF92C?style=for-the-badge&labelColor=2b3035&logo=rust&logoColor=white" alt="Built with Rust"> <img src="https://img.shields.io/badge/DEPENDENCIES-NONE-BEF92C?style=for-the-badge&labelColor=2b3035" alt="Dependencies: none"> <a href="https://github.com/sanjaya3d/LIPI/stargazers"><img src="https://img.shields.io/github/stars/sanjaya3d/LIPI?style=for-the-badge&labelColor=2b3035&color=BEF92C&label=STARS&logo=github&logoColor=white" alt="GitHub stars"></a> </p> <p align="center"> <a href="https://github.com/sanjaya3d/LIPI/releases/latest/download/lipi.exe"> <img src="assets/download-button.svg" width="420" alt="Download the latest LIPI release for Windows"> </a> </p> <p align="center"> <a href="#features">Features</a> &nbsp;·&nbsp; <a href="#quick-start">Quick start</a> &nbsp;·&nbsp; <a href="#how-to-type">How to type</a> &nbsp;·&nbsp; <a href="#settings">Settings</a> &nbsp;·&nbsp; <a href="#faq">FAQ</a> &nbsp;·&nbsp; <a href="#build-from-source">Build</a> </p>
+<p align="center">
+  <img src="assets/banner.png" width="560" alt="LIPI (ලිපි)">
+</p>
+
+<p align="center">
+  <b>Type Singlish in any app and get Sinhala, live, as you type.</b>
+</p>
+
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/LICENSE-GPLv3%2B-BEF92C?style=for-the-badge&labelColor=2b3035" alt="License: GPLv3+"></a>
+  <a href="https://github.com/sanjaya3d/LIPI/releases/latest"><img src="https://img.shields.io/github/v/release/sanjaya3d/LIPI?style=for-the-badge&labelColor=2b3035&color=BEF92C&label=RELEASE" alt="Latest release"></a>
+  <img src="https://img.shields.io/badge/PLATFORM-WINDOWS-BEF92C?style=for-the-badge&labelColor=2b3035" alt="Platform: Windows">
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/BUILT%20WITH-RUST-BEF92C?style=for-the-badge&labelColor=2b3035&logo=rust&logoColor=white" alt="Built with Rust">
+  <img src="https://img.shields.io/badge/DEPENDENCIES-NONE-BEF92C?style=for-the-badge&labelColor=2b3035" alt="Dependencies: none">
+  <a href="https://github.com/sanjaya3d/LIPI/stargazers"><img src="https://img.shields.io/github/stars/sanjaya3d/LIPI?style=for-the-badge&labelColor=2b3035&color=BEF92C&label=STARS&logo=github&logoColor=white" alt="GitHub stars"></a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/sanjaya3d/LIPI/releases/latest/download/lipi.exe">
+    <img src="assets/download-button.svg" width="420" alt="Download the latest LIPI release for Windows">
+  </a>
+</p>
+
+<p align="center">
+  <a href="#features">Features</a> &nbsp;·&nbsp;
+  <a href="#quick-start">Quick start</a> &nbsp;·&nbsp;
+  <a href="#how-to-type">How to type</a> &nbsp;·&nbsp;
+  <a href="#settings">Settings</a> &nbsp;·&nbsp;
+  <a href="#faq">FAQ</a> &nbsp;·&nbsp;
+  <a href="#build-from-source">Build</a>
+</p>
 
 Type `ammaa` and LIPI writes අම්මා in Photoshop, Premiere Pro, Blender, Word, your browser and any other Windows app. The output can be Unicode or FM Abhaya.
 
 > **ලිපි** යනු ඉංග්‍රීසි අකුරින් (Singlish) ටයිප් කරන දේ ඒ මොහොතේම සිංහල අකුරු බවට හරවන කුඩා Windows වැඩසටහනකි. උදාහරණයක් ලෙස `ammaa` ටයිප් කළ විට අම්මා ලැබේ. Photoshop, Premiere Pro, Blender වැනි ඕනෑම app එකක මෙය වැඩ කරයි. Unicode සහ FM Abhaya (legacy) යන දෙවර්ගයෙන්ම සිංහල ලිවිය හැක.
 
 <p align="center">
-  <img src="assets/hero.png" width="100%" alt="Four example words, ammaa, ballaa, sixhala and koLaBa, turning into Sinhala, next to the LIPI window">
+  <img src="assets/hero.png" width="100%" alt="Four example words, ammaa, aayuboovan, sixhala and koLaBa, turning into Sinhala, next to the LIPI window">
 </p>
 
 <p align="center"><sub>Illustration (generated for this README, not a screenshot): four example words and the LIPI window.</sub></p>
@@ -20,7 +53,7 @@ Type `ammaa` and LIPI writes අම්මා in Photoshop, Premiere Pro, Blender
   </tr>
   <tr>
     <td valign="top"><b>Tiny and private</b><br>One small exe, no installer, no libraries. About 2 MB of RAM. No network code at all.</td>
-    <td valign="top"><b>Lives in the tray</b><br>Left click the tray icon to open the window. Right click to switch Sinhala typing on or off.</td>
+    <td valign="top"><b>Lives in the tray</b><br>Left click the tray icon to open the window. Right click for a menu: Open, Sinhala typing on or off, and Exit. Only one LIPI runs at a time.</td>
     <td valign="top"><b>Key hints built in</b><br>The <b>Keys</b> button shows what to type for each letter. <code>lipi --keys</code> prints the same chart.</td>
   </tr>
 </table>
@@ -32,9 +65,9 @@ You can also use your own FM Abhaya map file. See [Output types](#output-types).
 1. Download `lipi.exe` from the [latest release](https://github.com/sanjaya3d/LIPI/releases/latest) and run it. The window opens. If Windows shows a blue warning, see the [FAQ](#faq).
 2. Tap **Right Ctrl** to switch Sinhala typing on or off.
 3. Tap **Right Shift** to switch between Unicode and legacy (FM Abhaya) output.
-4. Type in any app. For example `ballaa` gives බල්ලා.
+4. Type in any app. For example `aayuboovan` gives ආයුබෝවන්.
 
-You can change both keys, and what the program starts with, in [`settings.txt`](#settings).
+Click the gear in the title bar for [Settings](#settings): run on startup, start in tray, and a check for updates. You can change both keys in [`settings.txt`](#settings).
 
 ## How to type
 
@@ -101,14 +134,13 @@ To convert a text file from Unicode to FM Abhaya:
 lipi --convert < unicode.txt > legacy.txt
 ```
 
-
 ## Smart quotes (Adobe and Microsoft apps)
 
-Legacy (FM Abhaya) මාදිලියේදී, සමහර මෘදුකාංගවල තිත (`.`) වෙනුවට අමුතු වක්‍ර සලකුණක් දිස්විය හැකියි. LIPI මඟින් නිවැරදි අක්ෂරය ඇතුළත් කළත්, මෘදුකාංගය විසින් එය පසුව ස්වයංක්‍රීයව වෙනස් කරයි. එක් සැකසුමක් අක්‍රිය කිරීමෙන් මෙම ගැටලුව විසඳාගත හැකියි.
+Legacy (FM Abhaya) මාදිලියේදී, සමහර මෘදුකාංගවල තිත (.) වෙනුවට අමුතු වක්‍ර සලකුණක් දිස්විය හැකියි. LIPI මඟින් නිවැරදි අක්ෂරය ඇතුළත් කළත්, මෘදුකාංගය විසින් එය පසුව ස්වයංක්‍රීයව වෙනස් කරයි. එක් සැකසුමක් අක්‍රිය කිරීමෙන් මෙම ගැටලුව විසඳාගත හැකියි.
 
 > Adobe සහ Microsoft මෘදුකාංගවලදී "Smart Quotes" විශේෂාංගය ක්‍රියා විරහිත කරන්න.
 
-**මෙය සිදුවන්නේ ඇයි?** FM Abhaya අකුරු රටාවේදී තිත (`.`) සඳහා භාවිත වන්නේ සාමාන්‍ය සෘජු apostrophe (`'`) සලකුණට අදාළ අක්ෂර කේතයයි. ඒ නිසා LIPI මඟින් `.` යතුර එබූ විට එම අක්ෂරය ඇතුළත් වේ. Photoshop, Premiere Pro, Word, PowerPoint සහ තවත් සමහර මෘදුකාංගවල ඇති "Smart Quotes" විශේෂාංගය මඟින් ඔබ ටයිප් කරන සෘජු apostrophe (`'`) සලකුණ වක්‍ර apostrophe (`‘` හෝ `’`) සලකුණක් බවට ස්වයංක්‍රීයව වෙනස් කරයි. FM Abhaya අකුරු රටාවේදී එම වක්‍ර apostrophe කේතයට වෙනත් හැඩයක් ලබා දී ඇති නිසා, තිත වෙනුවට වක්‍ර සලකුණක් දිස්වේ. Notepad සහ බොහෝ සාමාන්‍ය පෙළ ඇතුළත් කරන ස්ථානවල මෙම ගැටලුව ඇති නොවේ. Unicode ප්‍රතිදානයට මෙය බලපාන්නේද නැත.
+**මෙය සිදුවන්නේ ඇයි?** FM Abhaya අකුරු රටාවේදී තිත (.) සඳහා භාවිත වන්නේ සාමාන්‍ය සෘජු apostrophe (`'`) සලකුණට අදාළ අක්ෂර කේතයයි. ඒ නිසා LIPI මඟින් `.` යතුර එබූ විට එම අක්ෂරය ඇතුළත් වේ. Photoshop, Premiere Pro, Word, PowerPoint සහ තවත් සමහර මෘදුකාංගවල ඇති "Smart Quotes" විශේෂාංගය මඟින් ඔබ ටයිප් කරන සෘජු apostrophe (`'`) සලකුණ වක්‍ර apostrophe (`‘` හෝ `’`) සලකුණක් බවට ස්වයංක්‍රීයව වෙනස් කරයි. FM Abhaya අකුරු රටාවේදී එම වක්‍ර apostrophe කේතයට වෙනත් හැඩයක් ලබා දී ඇති නිසා, තිත වෙනුවට වක්‍ර සලකුණක් දිස්වේ. Notepad සහ බොහෝ සාමාන්‍ය පෙළ ඇතුළත් කරන ස්ථානවල මෙම ගැටලුව ඇති නොවේ. Unicode ප්‍රතිදානයට මෙය බලපාන්නේද නැත.
 
 **මෙය විසඳාගන්නේ කෙසේද?** ඔබ ටයිප් කරන මෘදුකාංගයේ Smart Quotes විශේෂාංගය අක්‍රිය කරන්න:
 
@@ -121,12 +153,19 @@ Legacy (FM Abhaya) මාදිලියේදී, සමහර මෘදුක�
 
 සැකසුම වෙනස් කළ පසු තිත නැවත ටයිප් කරන්න. දැනටමත් ලේඛනයේ ඇති වැරදි සලකුණු ස්වයංක්‍රීයව නිවැරදි නොවේ. එම නිසා වැරදි වක්‍ර සලකුණ මකා දමා තිත නැවත ඇතුළත් කරන්න.
 
-
-The LIPI window has a card about this. Its **වැඩි විස්තර** button opens this section.
+The LIPI window has a card about this. Its **වැඩි විස්තර** button opens the same steps on the [website](https://sanjaya3d.github.io/LIPI/#smart-quotes).
 
 ## Settings
 
-LIPI keeps its settings in your AppData folder, which Explorer hides by default, so no settings file sits next to the exe. To open the folder, press **Win + R**, type `%APPDATA%\LIPI` and press Enter. The file `settings.txt` is created there the first time LIPI runs.
+Click the **gear** in the title bar to open the Settings page. Press Back or Esc to return.
+
+| Setting | What it does |
+| --- | --- |
+| **Run on startup** | LIPI starts when you sign in to Windows. It adds one entry to your own startup list (no administrator rights) and removes it when you turn the switch off. If you turned LIPI off in Task Manager, Startup apps, the switch shows OFF. |
+| **Start in tray** | LIPI starts hidden. Left click the tray icon to open the window. |
+| **Version and Check for updates** | Shows the version you have. The button opens the [latest release](https://github.com/sanjaya3d/LIPI/releases/latest) page in your browser, so you can compare the numbers. LIPI itself never goes online. |
+
+The two keys and the starting state are in `settings.txt`. It is in your AppData folder, which Explorer hides by default, so no settings file sits next to the exe. To open the folder, press **Win + R**, type `%APPDATA%\LIPI` and press Enter. The file `settings.txt` is created there the first time LIPI runs.
 
 ```
 # Tap this key alone to switch Sinhala typing on or off.
@@ -145,7 +184,7 @@ start_in_tray = no
 
 Comments must be on their own lines, starting with `#`.
 
-Choices for the two keys: `RightCtrl`, `LeftCtrl`, `RightShift`, `LeftShift`, `RightAlt`, `LeftAlt`, `ScrollLock`, `Pause`. They must be different keys. Change a value, save, and restart the program.
+Choices for the two keys: `RightCtrl`, `LeftCtrl`, `RightShift`, `LeftShift`, `RightAlt`, `LeftAlt`, `ScrollLock`, `Pause`. They must be different keys. Change a value, save, and restart the program. The Settings page changes only its own line (`start_in_tray`) and leaves the rest of the file as it was.
 
 If you used an older version that kept `settings.txt` next to the exe, LIPI moves that file to the new folder the first time it runs.
 
@@ -205,13 +244,25 @@ Yes. Edit `on_off_key` and `output_key` in `settings.txt`. See [Settings](#setti
 <details>
 <summary><b>How do I start LIPI when Windows starts?</b></summary>
 
-Press **Win + R**, type `shell:startup` and press Enter. Put a shortcut to `lipi.exe` in that folder. To start hidden in the tray, set `start_in_tray = yes` in `settings.txt`.
+Click the gear in the title bar and turn on **Run on startup**. To start hidden in the tray, turn on **Start in tray** too. If the switch goes back to OFF after you move `lipi.exe` to another folder, turn it on again. It remembers the folder the exe was in.
+</details>
+
+<details>
+<summary><b>I started LIPI again and nothing opened.</b></summary>
+
+Only one LIPI runs at a time. Starting it again brings the first window back, even if it is hidden in the tray (Hidden Icons, the ^ arrow near the clock). If it cannot reach the first one, it shows a message that LIPI is already running.
+</details>
+
+<details>
+<summary><b>How do I close LIPI?</b></summary>
+
+Right click the tray icon and choose **Exit**, or click the X in the window.
 </details>
 
 <details>
 <summary><b>How do I remove LIPI?</b></summary>
 
-Close LIPI with the X button in its window, then delete `lipi.exe` and the folder `%APPDATA%\LIPI`. Nothing else is installed.
+Turn off **Run on startup** in Settings if you turned it on. Then close LIPI, delete `lipi.exe` and delete the folder `%APPDATA%\LIPI`. Nothing else is installed.
 </details>
 
 <details>
@@ -229,7 +280,7 @@ No. LIPI is Windows only, because it uses the Windows keyboard hook.
 
 ## Privacy
 
-LIPI has no network code and sends nothing anywhere. The Show Logs window keeps its lines in memory only, and nothing is saved to a file. The only file the program writes is `settings.txt`.
+LIPI has no network code and sends nothing anywhere. The Show Logs window keeps its lines in memory only, and nothing is saved to a file. The only file the program writes is `settings.txt`. If you turn on **Run on startup**, it also adds one entry to your Windows startup list. The **Check for updates** button only opens a web page in your browser. LIPI itself never goes online.
 
 ## Limits
 
@@ -266,6 +317,7 @@ cargo test
 | `src/keymap.rs` | What each key press means |
 | `src/win.rs` | The Windows keyboard hook |
 | `src/settings.rs`, `src/state.rs` | Settings and shared state |
+| `src/autostart.rs` | Run on startup (one entry in the user's startup list) |
 | `src/gui.rs`, `src/layout.rs`, `src/icons.rs`, `src/theme.rs` | The window, drawn by hand with no libraries |
 | `src/hints.rs` | The key hint page |
 | `src/about.rs` | Name and contact links |
