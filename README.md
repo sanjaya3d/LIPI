@@ -282,12 +282,28 @@ No. LIPI is Windows only, because it uses the Windows keyboard hook.
 
 LIPI has no network code and sends nothing anywhere. The Show Logs window keeps its lines in memory only, and nothing is saved to a file. The only file the program writes is `settings.txt`. If you turn on **Run on startup**, it also adds one entry to your Windows startup list. The **Check for updates** button only opens a web page in your browser. LIPI itself never goes online.
 
+## Code signing policy
+
+**Status:** `lipi.exe` is not code-signed yet. Free code signing from SignPath Foundation is being set up. This line will be removed when signed releases start.
+
+When releases are signed, it is free code signing provided by [SignPath.io](https://signpath.io), certificate by [SignPath Foundation](https://signpath.org).
+
+- **What is signed:** only `lipi.exe` (and the copy inside `lipi-windows.zip`), built from the source code in this repository. Nothing else.
+- **How it is built:** by GitHub Actions ([`release.yml`](.github/workflows/release.yml)) from a tagged version. Nothing is signed on a personal computer, and the signing key stays with SignPath, not with the author.
+- **Who approves:** every signing request is approved by hand before a release is signed.
+  - Committers and reviewers: [SANJAYA3D](https://github.com/sanjaya3d)
+  - Approvers: [SANJAYA3D](https://github.com/sanjaya3d)
+  - Everyone on the team uses multi-factor authentication for GitHub and SignPath.
+- **Privacy:** LIPI will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it. See [Privacy](#privacy).
+- **Changes to your system:** none by themselves. The only change is one startup entry, added when you turn on **Run on startup** in Settings and removed when you turn it off. There is no installer. To remove LIPI, see the [FAQ](#faq).
+- **Problems:** if you think a signed release is wrong, [open an issue](https://github.com/sanjaya3d/LIPI/issues).
+
 ## Limits
 
 - Windows only.
 - In an app that runs as administrator, LIPI must also run as administrator, or Windows will block it.
 - Turn Sinhala typing off (tap Right Ctrl) before you type a password, or the letters will be converted too.
-- The exe is not code-signed, so some antivirus programs may warn about it.
+- The exe is not code-signed yet, so Windows SmartScreen and some antivirus programs may warn about it. See the [Code signing policy](#code-signing-policy).
 - FM Abhaya output needs the FM Abhaya font in the app you paste into.
 - The legacy punctuation table is made for the US keyboard layout.
 - In legacy mode, apps with "smart quotes" turned on (Photoshop, Premiere Pro, Word) can change the full stop into a curl. See [Smart quotes](#smart-quotes-adobe-and-microsoft-apps).
