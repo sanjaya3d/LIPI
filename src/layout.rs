@@ -37,11 +37,13 @@ impl Rect {
 pub const WIDTH: i32 = 400;
 pub const HEIGHT: i32 = 574;
 
-/// The window has two pages. The Keys button opens the second one, Back returns.
+/// The window has three pages. The Keys button opens the key hints, the gear in the
+/// title bar opens Settings, and Back returns to the main page.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum View {
     Main,
     Keys,
+    Settings,
 }
 
 /// How many tabs the key hint page has.
@@ -65,10 +67,18 @@ pub enum Hit {
     GitHub,
     Facebook,
     YouTube,
-    /// Key hint page: back to the main page.
+    /// Key hint page and Settings page: back to the main page.
     Back,
     /// Key hint page: one of the tabs, counted from 0.
     Tab(u8),
+    /// The gear in the title bar. It is there on every page.
+    Settings,
+    /// Settings page: the "Run on startup" card.
+    StartupCard,
+    /// Settings page: the "Start hidden in tray" card.
+    TrayCard,
+    /// Settings page: "Check for updates".
+    UpdateButton,
 }
 
 impl Hit {
@@ -86,6 +96,7 @@ pub struct Layout {
     pub title_rule: Rect,
     pub title_logo: Rect,
     pub title_text: Rect,
+    pub settings_button: Rect,
     pub minimise_button: Rect,
     pub close_button: Rect,
     // header
@@ -126,6 +137,23 @@ pub struct Layout {
     pub hint_title: Rect,
     pub hint_grid: Rect,
     pub hint_note: Rect,
+    // settings page: the back button and a title, then one card for each switch
+    pub page_title: Rect,
+    pub startup_card: Rect,
+    pub startup_label: Rect,
+    pub startup_state: Rect,
+    pub startup_note: Rect,
+    pub startup_switch: Rect,
+    pub tray_card: Rect,
+    pub tray_label: Rect,
+    pub tray_state: Rect,
+    pub tray_note: Rect,
+    pub tray_switch: Rect,
+    // settings page, last card: the version, a short note and the update button
+    pub about_card: Rect,
+    pub about_version: Rect,
+    pub about_note: Rect,
+    pub update_button: Rect,
 }
 
 impl Layout {
@@ -144,6 +172,7 @@ impl Layout {
             title_rule: r(1, 40, 399, 42),
             title_logo: r(14, 9, 36, 31),
             title_text: r(44, 0, 240, 40),
+            settings_button: r(262, 0, 308, 40),
             minimise_button: r(308, 0, 354, 40),
             close_button: r(354, 0, 400, 40),
             logo_tile: r(24, 56, 76, 108),
@@ -180,6 +209,23 @@ impl Layout {
             // The key hint page uses the extra height too, so its cells can be a little taller.
             hint_grid: r(24, 142, 376, 526),
             hint_note: r(24, 530, 376, 568),
+            // Settings page. Each card is 68 tall: the name and ON or OFF on top, a short
+            // note under it, and the switch on the right (the same size as on the main page).
+            page_title: r(126, 52, 376, 88),
+            startup_card: r(24, 104, 376, 172),
+            startup_label: r(42, 110, 230, 140),
+            startup_state: r(232, 110, 296, 140),
+            startup_note: r(42, 140, 296, 164),
+            startup_switch: r(308, 124, 360, 152),
+            tray_card: r(24, 184, 376, 252),
+            tray_label: r(42, 190, 230, 220),
+            tray_state: r(232, 190, 296, 220),
+            tray_note: r(42, 220, 296, 244),
+            tray_switch: r(308, 204, 360, 232),
+            about_card: r(24, 264, 376, 376),
+            about_version: r(42, 272, 358, 302),
+            about_note: r(42, 302, 358, 326),
+            update_button: r(42, 334, 358, 368),
         }
     }
 
@@ -237,6 +283,9 @@ impl Layout {
         if self.close_button.contains(x, y) {
             return Hit::Close;
         }
+        if self.settings_button.contains(x, y) {
+            return Hit::Settings;
+        }
         if self.title_bar.contains(x, y) {
             return Hit::Caption;
         }
@@ -275,6 +324,19 @@ impl Layout {
                 }
                 Hit::None
             }
+            View::Settings => {
+                if self.back_button.contains(x, y) {
+                    Hit::Back
+                } else if self.startup_card.contains(x, y) {
+                    Hit::StartupCard
+                } else if self.tray_card.contains(x, y) {
+                    Hit::TrayCard
+                } else if self.update_button.contains(x, y) {
+                    Hit::UpdateButton
+                } else {
+                    Hit::None
+                }
+            }
         }
     }
 }
@@ -294,6 +356,7 @@ mod tests {
             let cases = [
                 (l.minimise_button, Hit::Minimise),
                 (l.close_button, Hit::Close),
+                (l.settings_button, Hit::Settings),
                 (l.title_text, Hit::Caption),
                 (l.title_logo, Hit::Caption),
                 (l.typing_card, Hit::TypingCard),
@@ -311,13 +374,60 @@ mod tests {
                 (l.info_panel, Hit::None),
                 (l.logo_tile, Hit::None),
                 (l.dev_row, Hit::None),
-                (l.back_button, Hit::None), // belongs to the other page
+                (l.back_button, Hit::None), // belongs to the other pages
             ];
             for (rect, expected) in cases {
                 let (x, y) = centre(&rect);
                 assert_eq!(l.hit(View::Main, x, y), expected, "{rect:?} at dpi {dpi}");
             }
             assert_eq!(l.hit(View::Main, -5, -5), Hit::None);
+        }
+    }
+
+    #[test]
+    fn hit_testing_finds_each_control_on_the_settings_page() {
+        for dpi in [96, 120, 144, 192] {
+            let l = Layout::new(dpi);
+            let cases = [
+                (l.minimise_button, Hit::Minimise),
+                (l.close_button, Hit::Close),
+                (l.settings_button, Hit::Settings),
+                (l.title_text, Hit::Caption),
+                (l.back_button, Hit::Back),
+                (l.page_title, Hit::None),
+                (l.startup_card, Hit::StartupCard),
+                (l.startup_switch, Hit::StartupCard),
+                (l.startup_note, Hit::StartupCard),
+                (l.tray_card, Hit::TrayCard),
+                (l.tray_switch, Hit::TrayCard),
+                (l.tray_note, Hit::TrayCard),
+                (l.update_button, Hit::UpdateButton),
+                (l.about_version, Hit::None), // text, not a button
+                (l.about_note, Hit::None),
+                (l.logs_button, Hit::None), // belongs to the main page
+                (l.keys_button, Hit::None),
+                (l.unicode_button, Hit::None),
+            ];
+            for (rect, expected) in cases {
+                let (x, y) = centre(&rect);
+                assert_eq!(l.hit(View::Settings, x, y), expected, "{rect:?} at dpi {dpi}");
+            }
+        }
+    }
+
+    #[test]
+    fn the_gear_works_on_every_page_and_stays_clear_of_the_other_title_bar_parts() {
+        for dpi in [96, 144, 192] {
+            let l = Layout::new(dpi);
+            let (x, y) = centre(&l.settings_button);
+            for view in [View::Main, View::Keys, View::Settings] {
+                assert_eq!(l.hit(view, x, y), Hit::Settings, "{view:?} at dpi {dpi}");
+            }
+            assert!(!l.settings_button.overlaps(&l.title_text), "dpi {dpi}");
+            assert!(!l.settings_button.overlaps(&l.title_logo), "dpi {dpi}");
+            assert_eq!(l.settings_button.right, l.minimise_button.left, "dpi {dpi}");
+            assert_eq!(l.settings_button.width(), l.minimise_button.width(), "dpi {dpi}: same size as its neighbours");
+            assert!(l.settings_button.width() >= l.scale(32) && l.settings_button.height() >= l.scale(32), "dpi {dpi}");
         }
     }
 
@@ -359,6 +469,10 @@ mod tests {
         assert!(Hit::TipButton.clickable());
         assert!(Hit::Back.clickable());
         assert!(Hit::Tab(2).clickable());
+        assert!(Hit::Settings.clickable());
+        assert!(Hit::StartupCard.clickable());
+        assert!(Hit::TrayCard.clickable());
+        assert!(Hit::UpdateButton.clickable());
         assert!(!Hit::Caption.clickable());
         assert!(!Hit::None.clickable());
     }
@@ -415,6 +529,70 @@ mod tests {
             check_blocks(&blocks, dpi);
             // Leave room for the 2 pixel window outline at the bottom.
             assert!(l.hint_note.bottom <= l.client_size().1 - l.scale(2), "dpi {dpi}");
+        }
+    }
+
+    #[test]
+    fn blocks_of_the_settings_page_do_not_overlap_and_fit_inside_the_window() {
+        for dpi in [96, 144, 192] {
+            let l = Layout::new(dpi);
+            check_blocks(
+                &[l.title_bar, l.title_rule, l.back_button, l.page_title, l.startup_card, l.tray_card, l.about_card],
+                dpi,
+            );
+        }
+    }
+
+    #[test]
+    fn the_version_card_has_room_for_its_parts_and_a_big_enough_button() {
+        for dpi in [96, 144, 192] {
+            let l = Layout::new(dpi);
+            let card = l.about_card;
+            assert_eq!((card.left, card.right), (l.typing_card.left, l.typing_card.right), "dpi {dpi}");
+            assert!(l.tray_card.bottom < card.top, "dpi {dpi}: a gap above the card");
+            for part in [l.about_version, l.about_note, l.update_button] {
+                assert!(
+                    part.left >= card.left && part.right <= card.right && part.top >= card.top && part.bottom <= card.bottom,
+                    "{part:?} sticks out of {card:?} at dpi {dpi}"
+                );
+            }
+            // version on top, then the note, then the button, none on top of another
+            assert!(l.about_version.bottom <= l.about_note.top, "dpi {dpi}");
+            assert!(l.about_note.bottom <= l.update_button.top, "dpi {dpi}");
+            // wide and tall enough to click and to hold "Check for updates"
+            assert!(l.update_button.width() >= l.scale(200) && l.update_button.height() >= l.scale(32), "dpi {dpi}");
+            // the same space left and right of the button
+            assert_eq!(l.update_button.left - card.left, card.right - l.update_button.right, "dpi {dpi}");
+        }
+    }
+
+    #[test]
+    fn the_settings_cards_are_as_wide_as_the_other_cards_and_their_parts_sit_inside() {
+        for dpi in [96, 144, 192] {
+            let l = Layout::new(dpi);
+            let inside = |inner: &Rect, outer: &Rect| {
+                inner.left >= outer.left && inner.right <= outer.right && inner.top >= outer.top && inner.bottom <= outer.bottom
+            };
+            for (card, parts) in [
+                (l.startup_card, [l.startup_label, l.startup_state, l.startup_note, l.startup_switch]),
+                (l.tray_card, [l.tray_label, l.tray_state, l.tray_note, l.tray_switch]),
+            ] {
+                assert_eq!((card.left, card.right), (l.typing_card.left, l.typing_card.right), "dpi {dpi}");
+                for part in parts {
+                    assert!(inside(&part, &card), "{part:?} sticks out of {card:?} at dpi {dpi}");
+                }
+                // the name sits above its note, and neither runs under the switch
+                assert!(parts[0].bottom <= parts[2].top, "dpi {dpi}");
+                assert!(parts[1].right < parts[3].left && parts[2].right < parts[3].left, "dpi {dpi}");
+                // the switch is on the middle line of the card and the same size as the main page switch
+                let (_, y) = centre(&parts[3]);
+                let (_, cy) = centre(&card);
+                assert!((y - cy).abs() <= 1, "dpi {dpi}");
+                assert_eq!((parts[3].width(), parts[3].height()), (l.switch_track.width(), l.switch_track.height()), "dpi {dpi}");
+                assert_eq!(parts[3].left, l.switch_track.left, "dpi {dpi}");
+            }
+            assert!(l.startup_card.bottom < l.tray_card.top, "dpi {dpi}: a gap between the cards");
+            assert!(l.startup_card.top > l.back_button.bottom, "dpi {dpi}");
         }
     }
 
@@ -542,7 +720,7 @@ mod tests {
             let inside = |inner: &Rect, outer: &Rect| {
                 inner.left >= outer.left && inner.right <= outer.right && inner.top >= outer.top && inner.bottom <= outer.bottom
             };
-            for part in [l.title_logo, l.title_text, l.minimise_button, l.close_button] {
+            for part in [l.title_logo, l.title_text, l.settings_button, l.minimise_button, l.close_button] {
                 assert!(inside(&part, &l.title_bar), "{part:?} at dpi {dpi}");
             }
             for part in [l.typing_icon, l.typing_label, l.typing_state, l.switch_track] {

@@ -214,6 +214,63 @@ pub fn load(dir: &Path) -> (Settings, Vec<String>) {
     }
 }
 
+/// Where settings.txt is for the program that is running now: the same folder `main` chose at the start.
+pub fn current_folder() -> PathBuf {
+    let program_dir = std::env::current_exe()
+        .ok()
+        .and_then(|exe| exe.parent().map(Path::to_path_buf))
+        .unwrap_or_else(|| PathBuf::from("."));
+    folder(&program_dir)
+}
+
+/// The text of a settings file with the start_in_tray line set to yes or no. Everything else
+/// stays as it was: comments, the other settings, the line endings and a byte order mark.
+/// If there is no start_in_tray line, one is added at the end.
+pub fn with_start_in_tray(text: &str, on: bool) -> String {
+    let bom = if text.starts_with('\u{feff}') { "\u{feff}" } else { "" };
+    let body = text.trim_start_matches('\u{feff}');
+    let new_value = if on { "yes" } else { "no" };
+    let eol = if body.contains("\r\n") { "\r\n" } else { "\n" };
+
+    let mut out = String::with_capacity(body.len() + 32);
+    out.push_str(bom);
+    let mut found = false;
+    for segment in body.split_inclusive('\n') {
+        let line = segment.trim_end_matches(['\r', '\n']);
+        let ending = &segment[line.len()..];
+        let is_ours = !line.trim_start().starts_with('#')
+            && line.split_once('=').map_or(false, |(key, _)| key.trim().eq_ignore_ascii_case("start_in_tray"));
+        if is_ours && !found {
+            found = true;
+            out.push_str(&format!("start_in_tray = {new_value}{ending}"));
+        } else if is_ours {
+            // A second copy of the line would be ignored or confusing: drop it.
+        } else {
+            out.push_str(segment);
+        }
+    }
+    if !found {
+        if !out.is_empty() && !out.ends_with('\n') {
+            out.push_str(eol);
+        }
+        out.push_str(&format!("start_in_tray = {new_value}{eol}"));
+    }
+    out
+}
+
+/// Saves the "start hidden in the tray" choice in settings.txt in `dir`, without touching
+/// anything else in the file. If the file is not there, it is made from the template.
+pub fn save_start_in_tray(dir: &Path, on: bool) -> std::io::Result<()> {
+    let path = dir.join(FILE_NAME);
+    let old = match std::fs::read_to_string(&path) {
+        Ok(text) => text,
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => TEMPLATE.replace('\n', "\r\n"),
+        Err(e) => return Err(e),
+    };
+    std::fs::create_dir_all(dir)?;
+    std::fs::write(&path, with_start_in_tray(&old, on))
+}
+
 static CURRENT: OnceLock<Settings> = OnceLock::new();
 
 /// Makes these the settings for the whole program. Call once, at the start.
@@ -235,6 +292,63 @@ mod tests {
         let (s, warnings) = parse(TEMPLATE);
         assert_eq!(s, Settings::default());
         assert!(warnings.is_empty(), "{warnings:?}");
+    }
+
+    #[test]
+    fn saving_start_in_tray_changes_only_that_line() {
+        let on = with_start_in_tray(TEMPLATE, true);
+        let (s, warnings) = parse(&on);
+        assert!(warnings.is_empty(), "{warnings:?}");
+        assert!(s.start_in_tray);
+        // every other setting and every comment is still there
+        assert_eq!(on.replace("start_in_tray = yes", "start_in_tray = no"), TEMPLATE);
+        let off = with_start_in_tray(&on, false);
+        assert_eq!(off, TEMPLATE);
+    }
+
+    #[test]
+    fn saving_start_in_tray_keeps_crlf_bom_and_odd_spacing() {
+        let text = format!("\u{feff}{}", TEMPLATE.replace('\n', "\r\n"));
+        let saved = with_start_in_tray(&text, true);
+        assert!(saved.starts_with('\u{feff}'));
+        assert!(saved.contains("start_in_tray = yes\r\n"));
+        assert!(!saved.replace("\r\n", "").contains('\n'), "a bare newline crept in");
+        assert!(parse(&saved).0.start_in_tray);
+
+        let odd = "on_off_key = RightCtrl\n  START_IN_TRAY=no  \n";
+        let saved = with_start_in_tray(odd, true);
+        assert_eq!(saved, "on_off_key = RightCtrl\nstart_in_tray = yes\n");
+    }
+
+    #[test]
+    fn saving_start_in_tray_adds_the_line_when_it_is_missing() {
+        assert_eq!(with_start_in_tray("on_off_key = RightCtrl\n", true), "on_off_key = RightCtrl\nstart_in_tray = yes\n");
+        // no newline at the end of the file
+        assert_eq!(with_start_in_tray("on_off_key = RightCtrl", false), "on_off_key = RightCtrl\nstart_in_tray = no\n");
+        assert_eq!(with_start_in_tray("a = b\r\nc = d", true), "a = b\r\nc = d\r\nstart_in_tray = yes\r\n");
+        assert_eq!(with_start_in_tray("", true), "start_in_tray = yes\n");
+    }
+
+    #[test]
+    fn a_comment_that_mentions_start_in_tray_is_not_changed_and_a_repeated_line_is_dropped() {
+        let text = "# start_in_tray = no\nstart_in_tray = no\nstart_in_tray = no\nstart_typing = on\n";
+        assert_eq!(with_start_in_tray(text, true), "# start_in_tray = no\nstart_in_tray = yes\nstart_typing = on\n");
+    }
+
+    #[test]
+    fn the_choice_is_saved_to_the_file_and_read_back() {
+        let dir = std::env::temp_dir().join(format!("lipi-test-save-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        // no file yet: it is made from the template
+        save_start_in_tray(&dir, true).unwrap();
+        let (s, warnings) = load(&dir);
+        assert!(s.start_in_tray && warnings.is_empty(), "{warnings:?}");
+        // a file the user edited keeps their lines
+        std::fs::write(dir.join(FILE_NAME), "on_off_key = Pause\r\n# my note\r\nstart_in_tray = yes\r\n").unwrap();
+        save_start_in_tray(&dir, false).unwrap();
+        let text = std::fs::read_to_string(dir.join(FILE_NAME)).unwrap();
+        assert_eq!(text, "on_off_key = Pause\r\n# my note\r\nstart_in_tray = no\r\n");
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     #[test]

@@ -156,6 +156,26 @@ pub const DOCUMENT: Icon = Icon {
     ],
 };
 
+/// A gear for the Settings button: a disc, eight round teeth around it, and a hole in the middle.
+pub const GEAR: Icon = Icon {
+    w: 20,
+    h: 20,
+    pieces: &[
+        Piece::Disc { x: 3, y: 3, d: 14, ink: Main },
+        // up, down, left, right
+        Piece::Lines { points: &[(10, 2), (10, 5)], width: 3, ink: Main },
+        Piece::Lines { points: &[(10, 15), (10, 18)], width: 3, ink: Main },
+        Piece::Lines { points: &[(2, 10), (5, 10)], width: 3, ink: Main },
+        Piece::Lines { points: &[(15, 10), (18, 10)], width: 3, ink: Main },
+        // the four corners
+        Piece::Lines { points: &[(4, 4), (6, 6)], width: 3, ink: Main },
+        Piece::Lines { points: &[(14, 14), (16, 16)], width: 3, ink: Main },
+        Piece::Lines { points: &[(16, 4), (14, 6)], width: 3, ink: Main },
+        Piece::Lines { points: &[(4, 16), (6, 14)], width: 3, ink: Main },
+        Piece::Disc { x: 7, y: 7, d: 6, ink: Back },
+    ],
+};
+
 /// A small arrow head pointing left, for "Back".
 pub const BACK: Icon = Icon {
     w: 10,
@@ -212,7 +232,8 @@ pub const YOUTUBE: Icon = Icon {
 mod tests {
     use super::*;
 
-    const ALL: [(&str, &Icon); 12] = [
+    const ALL: [(&str, &Icon); 13] = [
+        ("gear", &GEAR),
         ("minimise", &MINIMISE),
         ("close", &CLOSE),
         ("keyboard", &KEYBOARD),
@@ -307,6 +328,24 @@ mod tests {
             assert!(icon.w >= 24 && icon.h >= 20, "{name} is too small to read");
             assert!(icon.w <= 32 && icon.h <= 32, "{name} does not fit its button");
         }
+    }
+
+    #[test]
+    fn the_gear_has_eight_teeth_and_a_hole_that_stays_inside_the_disc() {
+        let Piece::Disc { x, y, d, ink } = GEAR.pieces[0] else { panic!("the first piece must be the disc") };
+        assert_eq!(ink, Ink::Main);
+        let teeth = GEAR.pieces.iter().filter(|p| matches!(p, Piece::Lines { ink: Ink::Main, .. })).count();
+        assert_eq!(teeth, 8);
+        let Some(Piece::Disc { ink: Ink::Back, .. }) = GEAR.pieces.last() else { panic!("the hole must be last") };
+        let (l, t, r, b) = GEAR.pieces.last().unwrap().bounds();
+        assert!(l > x + 2 && t > y + 2 && r < x + d - 2 && b < y + d - 2, "the hole is too close to the edge");
+        // the hole is in the middle of the icon
+        assert_eq!((l + r, t + b), (GEAR.w, GEAR.h));
+        // the teeth reach out past the disc, so it looks like a gear
+        let left = GEAR.pieces.iter().map(|p| p.bounds().0).min().unwrap();
+        let right = GEAR.pieces.iter().map(|p| p.bounds().2).max().unwrap();
+        assert!(right - left >= d + 2, "no tooth sticks out");
+        assert!(left >= 0 && right <= GEAR.w, "the teeth must stay inside the icon box");
     }
 
     #[test]

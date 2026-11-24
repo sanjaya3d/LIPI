@@ -12,15 +12,22 @@ pub const GITHUB_URL: &str = "https://github.com/sanjaya3d/LIPI";
 pub const FACEBOOK_URL: &str = "https://facebook.com/sanjaya3d";
 pub const YOUTUBE_URL: &str = "https://www.youtube.com/@SANJAYA3D/";
 
+/// The version of this program. It comes from Cargo.toml, so it can never be out of date.
+pub const VERSION: &str = env!("CARGO_PKG_VERSION");
+
+/// The "Check for updates" button on the Settings page opens this page in the browser.
+/// GitHub sends it on to the newest release. The program itself never goes online.
+pub const RELEASES_URL: &str = "https://github.com/sanjaya3d/LIPI/releases/latest";
+
 /// The warning card between the output buttons and the key hints.
 /// In legacy mode, Adobe and Microsoft apps turn the full stop into a curly quote.
 /// The Sinhala says: "In Adobe and Microsoft software, turn off the smart quotes feature."
-/// The button says "More details" and opens the README section that explains how and why.
+/// The button says "More details" and opens the Smart quotes section of the website, which explains how and why.
 /// The joiner (U+200D) inside the word "kriya" is written as an escape, so it cannot get lost.
 pub const TIP_LINE1: &str = "Adobe සහ Microsoft මෘදුකාංග වලදී";
 pub const TIP_LINE2: &str = "\"smart quotes\" විශේෂාංගය ක්\u{200D}රියා විරහිත කරන්න";
 pub const TIP_BUTTON: &str = "වැඩි විස්තර";
-pub const TIP_URL: &str = "https://github.com/sanjaya3d/LIPI#smart-quotes-adobe-and-microsoft-apps";
+pub const TIP_URL: &str = "https://sanjaya3d.github.io/LIPI/#smart-quotes";
 
 #[cfg(test)]
 mod tests {
@@ -28,7 +35,7 @@ mod tests {
 
     #[test]
     fn links_are_safe_web_addresses() {
-        for url in [GITHUB_URL, FACEBOOK_URL, YOUTUBE_URL, TIP_URL] {
+        for url in [GITHUB_URL, FACEBOOK_URL, YOUTUBE_URL, TIP_URL, RELEASES_URL] {
             assert!(url.starts_with("https://"), "{url}");
             assert!(!url.contains(' ') && url.is_ascii(), "{url}");
         }
@@ -42,9 +49,20 @@ mod tests {
     }
 
     #[test]
-    fn the_tip_goes_to_the_readme_section_on_the_project_page() {
-        assert!(TIP_URL.starts_with(GITHUB_URL));
-        assert!(TIP_URL.ends_with("#smart-quotes-adobe-and-microsoft-apps"));
+    fn the_update_button_opens_the_latest_release_page_of_this_project() {
+        assert_eq!(RELEASES_URL, format!("{GITHUB_URL}/releases/latest"));
+    }
+
+    #[test]
+    fn the_version_is_three_numbers_like_1_1_0() {
+        let parts: Vec<&str> = VERSION.split('.').collect();
+        assert_eq!(parts.len(), 3, "{VERSION}");
+        assert!(parts.iter().all(|p| !p.is_empty() && p.chars().all(|c| c.is_ascii_digit())), "{VERSION}");
+    }
+
+    #[test]
+    fn the_tip_goes_to_the_smart_quotes_section_of_the_website() {
+        assert_eq!(TIP_URL, "https://sanjaya3d.github.io/LIPI/#smart-quotes");
     }
 
     #[test]

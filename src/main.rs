@@ -26,6 +26,8 @@
 #[allow(dead_code)]
 mod about;
 #[allow(dead_code)]
+mod autostart;
+#[allow(dead_code)]
 mod engine;
 #[cfg(windows)]
 mod gui;

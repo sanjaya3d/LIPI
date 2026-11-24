@@ -16,6 +16,7 @@ use std::sync::atomic::{AtomicBool, AtomicI32, AtomicIsize, AtomicU32, AtomicU8,
 use std::sync::Mutex;
 
 use crate::about;
+use crate::autostart;
 use crate::hints::{self, Tab};
 use crate::icons::{self, Icon, Ink, Piece};
 use crate::layout::{Hit, Layout, Rect, View};
@@ -44,6 +45,9 @@ const WM_LBUTTONUP: u32 = 0x0202;
 const WM_RBUTTONUP: u32 = 0x0205;
 /// Message the tray icon sends to the main window (WM_APP + 1).
 const WM_TRAY: u32 = 0x8001;
+/// Message a second copy of the program sends to the first one: "show your window" (WM_APP + 2).
+const WM_SHOW_LIPI: u32 = 0x8002;
+const WM_NULL: u32 = 0x0000;
 const SIZE_MINIMIZED: usize = 1;
 const SETICON_SMALL: usize = 0;
 const SETICON_BIG: usize = 1;
@@ -109,6 +113,22 @@ const TA_BASELINE: u32 = 24;
 
 const COINIT_APARTMENTTHREADED: u32 = 0x2;
 const COINIT_DISABLE_OLE1DDE: u32 = 0x4;
+
+// The tray menu and the "already running" message.
+const MF_STRING: u32 = 0x0000;
+const MF_CHECKED: u32 = 0x0008;
+const MF_SEPARATOR: u32 = 0x0800;
+const TPM_RIGHTBUTTON: u32 = 0x0002;
+const TPM_BOTTOMALIGN: u32 = 0x0020;
+const TPM_RETURNCMD: u32 = 0x0100;
+const MB_ICONINFORMATION: u32 = 0x0040;
+const MB_SETFOREGROUND: u32 = 0x0001_0000;
+const ERROR_ALREADY_EXISTS: u32 = 183;
+/// Lets any program bring a window to the front. Used for the copy that is already running.
+const ASFW_ANY: u32 = u32::MAX;
+const MENU_OPEN: usize = 1;
+const MENU_TYPING: usize = 2;
+const MENU_EXIT: usize = 3;
 
 type WndProc = unsafe extern "system" fn(isize, u32, usize, isize) -> isize;
 
@@ -279,6 +299,14 @@ extern "system" {
     fn CreateIconIndirect(info: *const IconInfo) -> isize;
     fn LoadIconW(instance: isize, name: *const u16) -> isize;
     fn RegisterWindowMessageW(name: *const u16) -> u32;
+    fn CreatePopupMenu() -> isize;
+    fn AppendMenuW(menu: isize, flags: u32, id: usize, item: *const u16) -> i32;
+    fn TrackPopupMenu(menu: isize, flags: u32, x: i32, y: i32, reserved: i32, hwnd: isize, rect: *const Rect) -> i32;
+    fn DestroyMenu(menu: isize) -> i32;
+    fn PostMessageW(hwnd: isize, msg: u32, wparam: usize, lparam: isize) -> i32;
+    fn FindWindowW(class: *const u16, title: *const u16) -> isize;
+    fn MessageBoxW(hwnd: isize, text: *const u16, caption: *const u16, flags: u32) -> i32;
+    fn AllowSetForegroundWindow(process_id: u32) -> i32;
 }
 
 #[link(name = "gdi32")]
@@ -345,6 +373,8 @@ extern "system" {
     fn GetModuleHandleW(name: *const u16) -> isize;
     fn GetCurrentProcess() -> isize;
     fn SetProcessWorkingSetSize(process: isize, minimum: usize, maximum: usize) -> i32;
+    fn CreateMutexW(attributes: *const c_void, initial_owner: i32, name: *const u16) -> isize;
+    fn GetLastError() -> u32;
 }
 
 #[link(name = "dwmapi")]
@@ -399,8 +429,13 @@ static FONT_NOTE: AtomicIsize = AtomicIsize::new(0);
 static FONT_LOG: AtomicIsize = AtomicIsize::new(0);
 static FONT_TIP: AtomicIsize = AtomicIsize::new(0);
 static FONT_TIP_SMALL: AtomicIsize = AtomicIsize::new(0);
-/// 0 is the main page, 1 is the key hint page.
+/// 0 is the main page, 1 is the key hint page, 2 is the Settings page.
 static VIEW: AtomicU8 = AtomicU8::new(0);
+/// Settings page: true while Windows will start LIPI at sign in. Read from the registry
+/// each time the page opens, and again after every change, so it is never a guess.
+static STARTUP_ON: AtomicBool = AtomicBool::new(false);
+/// Settings page: true when LIPI starts hidden in the tray (start_in_tray in settings.txt).
+static TRAY_START_ON: AtomicBool = AtomicBool::new(false);
 /// The tab showing on the key hint page, counted from 0.
 static HINT_TAB: AtomicU8 = AtomicU8::new(0);
 static SEEN_ENABLED: AtomicBool = AtomicBool::new(true);
@@ -669,14 +704,14 @@ unsafe fn outline_corners(hdc: isize, width: i32, height: i32, lay: &Layout) {
 
 /// Which page is showing.
 fn view() -> View {
-    if VIEW.load(Relaxed) == 1 {
-        View::Keys
-    } else {
-        View::Main
+    match VIEW.load(Relaxed) {
+        1 => View::Keys,
+        2 => View::Settings,
+        _ => View::Main,
     }
 }
 
-/// What both pages share: the background, the lime outline and the title bar.
+/// What every page shares: the background, the lime outline and the title bar.
 unsafe fn draw_frame(hdc: isize, width: i32, height: i32, lay: &Layout) {
     let centred = DT_CENTER | DT_VCENTER | DT_SINGLELINE;
     let left_middle = DT_LEFT | DT_VCENTER | DT_SINGLELINE;
@@ -686,13 +721,27 @@ unsafe fn draw_frame(hdc: isize, width: i32, height: i32, lay: &Layout) {
     shape(hdc, full, lay.scale(8), None, Some((ACCENT, lay.scale(2))));
     outline_corners(hdc, width, height, lay);
 
-    // Small logo, name, minimise and close, then a lime line under the bar
+    // Small logo, name, settings gear, minimise and close, then a lime line under the bar.
+    // The gear is lime while the Settings page is open.
     smooth_shape(hdc, lay.title_logo, lay.scale(6), Some(ACCENT), None, BG);
     text(hdc, "\u{0D85}", lay.title_logo, FONT_LOGO_SMALL.load(Relaxed), BG, centred);
     text(hdc, about::NAME, lay.title_text, FONT_SMALL_BOLD.load(Relaxed), TEXT, left_middle);
+    let gear_colour = if view() == View::Settings { ACCENT } else { TEXT };
+    draw_icon(hdc, &icons::GEAR, lay.settings_button, gear_colour, BG, BG, lay);
     draw_icon(hdc, &icons::MINIMISE, lay.minimise_button, TEXT, BG, BG, lay);
     draw_icon(hdc, &icons::CLOSE, lay.close_button, TEXT, BG, BG, lay);
     fill(hdc, lay.title_rule, ACCENT);
+}
+
+/// An on/off switch: a lime track and a knob on the right when on, a grey track and a knob on the left when off.
+unsafe fn draw_switch(hdc: isize, track: Rect, on: bool, lay: &Layout) {
+    let track_colour = if on { ACCENT } else { EDGE };
+    smooth_shape(hdc, track, track.height() / 2, Some(track_colour), None, BG);
+    let pad = lay.scale(4);
+    let knob = track.height() - 2 * pad;
+    let knob_left = if on { track.right - pad - knob } else { track.left + pad };
+    let knob_rect = Rect { left: knob_left, top: track.top + pad, right: knob_left + knob, bottom: track.top + pad + knob };
+    smooth_shape(hdc, knob_rect, knob / 2, Some(BG), None, track_colour);
 }
 
 unsafe fn draw_main(hdc: isize, lay: &Layout) {
@@ -739,14 +788,7 @@ unsafe fn draw_main(hdc: isize, lay: &Layout) {
         if enabled { ACCENT } else { MUTED },
         DT_RIGHT | DT_VCENTER | DT_SINGLELINE,
     );
-    let track = lay.switch_track;
-    let track_colour = if enabled { ACCENT } else { EDGE };
-    smooth_shape(hdc, track, track.height() / 2, Some(track_colour), None, BG);
-    let pad = lay.scale(4);
-    let knob = track.height() - 2 * pad;
-    let knob_left = if enabled { track.right - pad - knob } else { track.left + pad };
-    let knob_rect = Rect { left: knob_left, top: track.top + pad, right: knob_left + knob, bottom: track.top + pad + knob };
-    smooth_shape(hdc, knob_rect, knob / 2, Some(BG), None, track_colour);
+    draw_switch(hdc, lay.switch_track, enabled, lay);
 
     // Output type
     draw_icon(hdc, &icons::OUTPUT, lay.output_icon, ACCENT, BG, BG, lay);
@@ -881,12 +923,60 @@ unsafe fn draw_keys(hdc: isize, lay: &Layout) {
     text(hdc, &page.note, note_area, FONT_NOTE.load(Relaxed), MUTED, DT_LEFT | DT_WORDBREAK);
 }
 
+/// The Settings page: a Back button, then one card for each switch.
+unsafe fn draw_settings(hdc: isize, lay: &Layout) {
+    let label_font = FONT_LABEL.load(Relaxed);
+    let note_font = FONT_NOTE.load(Relaxed);
+    let left_middle = DT_LEFT | DT_VCENTER | DT_SINGLELINE;
+    let card_radius = lay.scale(12);
+    let stroke = lay.scale(2);
+
+    icon_button(hdc, lay.back_button, &icons::BACK, "Back", label_font, lay.back_button.height() / 2, lay);
+    text(hdc, "Settings", lay.page_title, FONT_HEAD.load(Relaxed), TEXT, left_middle);
+
+    let cards = [
+        (
+            [lay.startup_card, lay.startup_label, lay.startup_state, lay.startup_note, lay.startup_switch],
+            "Run on startup",
+            "Start LIPI when Windows starts",
+            STARTUP_ON.load(Relaxed),
+        ),
+        (
+            [lay.tray_card, lay.tray_label, lay.tray_state, lay.tray_note, lay.tray_switch],
+            "Start in tray",
+            "Hide the window when LIPI starts",
+            TRAY_START_ON.load(Relaxed),
+        ),
+    ];
+    for ([card, label, state_rect, note, switch], name, hint, on) in cards {
+        smooth_shape(hdc, card, card_radius, None, Some((ACCENT, stroke)), BG);
+        text(hdc, name, label, label_font, TEXT, left_middle);
+        text(
+            hdc,
+            if on { "ON" } else { "OFF" },
+            state_rect,
+            label_font,
+            if on { ACCENT } else { MUTED },
+            DT_RIGHT | DT_VCENTER | DT_SINGLELINE,
+        );
+        text(hdc, hint, note, note_font, MUTED, left_middle);
+        draw_switch(hdc, switch, on, lay);
+    }
+
+    // The version, and a button that opens the newest release on GitHub in the browser.
+    smooth_shape(hdc, lay.about_card, card_radius, None, Some((ACCENT, stroke)), BG);
+    text(hdc, &format!("Version {}", about::VERSION), lay.about_version, label_font, TEXT, left_middle);
+    text(hdc, "Compare it with the newest one on GitHub", lay.about_note, note_font, MUTED, left_middle);
+    pill(hdc, lay.update_button, "Check for updates", true, label_font, lay);
+}
+
 unsafe fn draw(hdc: isize, width: i32, height: i32) {
     let lay = Layout::new(DPI.load(Relaxed));
     draw_frame(hdc, width, height, &lay);
     match view() {
         View::Main => draw_main(hdc, &lay),
         View::Keys => draw_keys(hdc, &lay),
+        View::Settings => draw_settings(hdc, &lay),
     }
 }
 
@@ -972,7 +1062,7 @@ unsafe fn make_icons() {
 
 fn tray_tip() -> String {
     format!(
-        "{}: {}, {}\nLeft click: open. Right click: typing on or off.",
+        "{}: {}, {}\nLeft click: open. Right click: menu.",
         about::NAME,
         if state::enabled() { "ON" } else { "OFF" },
         if state::legacy() { "Legacy" } else { "Unicode" }
@@ -1023,6 +1113,79 @@ unsafe fn refresh(hwnd: isize) {
 unsafe fn show_window(hwnd: isize) {
     ShowWindow(hwnd, SW_RESTORE);
     SetForegroundWindow(hwnd);
+}
+
+/// The tray icon's right-click menu: Open, Sinhala typing (ticked when on), Exit.
+/// It is made when the icon is clicked and thrown away straight after, so it costs no memory while idle.
+unsafe fn tray_menu(hwnd: isize) {
+    let menu = CreatePopupMenu();
+    if menu == 0 {
+        return;
+    }
+    let typing_flags = if state::enabled() { MF_STRING | MF_CHECKED } else { MF_STRING };
+    AppendMenuW(menu, MF_STRING, MENU_OPEN, wide("Open LIPI").as_ptr());
+    AppendMenuW(menu, typing_flags, MENU_TYPING, wide("Sinhala typing").as_ptr());
+    AppendMenuW(menu, MF_SEPARATOR, 0, null());
+    AppendMenuW(menu, MF_STRING, MENU_EXIT, wide("Exit").as_ptr());
+
+    let mut point = Point { x: 0, y: 0 };
+    GetCursorPos(&mut point);
+    // Windows needs the window in front, or the menu does not close when the user clicks elsewhere.
+    SetForegroundWindow(hwnd);
+    let choice = TrackPopupMenu(
+        menu,
+        TPM_RIGHTBUTTON | TPM_RETURNCMD | TPM_BOTTOMALIGN,
+        point.x,
+        point.y,
+        0,
+        hwnd,
+        null(),
+    );
+    PostMessageW(hwnd, WM_NULL, 0, 0); // the other half of the menu close fix
+    DestroyMenu(menu);
+
+    match choice as usize {
+        MENU_OPEN => show_window(hwnd),
+        MENU_TYPING => {
+            let on = !state::enabled();
+            state::set_enabled(on);
+            state::log(if on { "Sinhala typing ON (tray)" } else { "Sinhala typing OFF (tray)" });
+            refresh(hwnd);
+        }
+        // The same as the close button: the window closes, the tray icon goes, the program ends.
+        MENU_EXIT => {
+            state::log("Exit (tray)");
+            SendMessageW(hwnd, WM_CLOSE, 0, 0);
+        }
+        _ => {}
+    }
+    SetTimer(hwnd, TRIM_TIMER_ID, 3000, null()); // give the memory back a moment later
+}
+
+/// True if another copy of LIPI is already running for this Windows user.
+/// The name is kept open until the program ends, so the second copy always sees it.
+unsafe fn another_copy_is_running() -> bool {
+    let name = wide("Local\\LIPI-single-instance");
+    let handle = CreateMutexW(null(), 0, name.as_ptr());
+    // Read the error straight away, before anything else can change it.
+    let already = GetLastError() == ERROR_ALREADY_EXISTS;
+    // If Windows would not make the name at all, do not block the user: just carry on.
+    handle != 0 && already
+}
+
+/// Asks the first copy to show its window. Returns false if that could not be done.
+unsafe fn show_first_copy() -> bool {
+    // The first copy may still be starting up, so look a few times.
+    for _ in 0..10 {
+        let window = FindWindowW(wide(MAIN_CLASS).as_ptr(), null());
+        if window != 0 {
+            AllowSetForegroundWindow(ASFW_ANY);
+            // This fails when the first copy runs as administrator and this one does not.
+            return PostMessageW(window, WM_SHOW_LIPI, 0, 0) != 0;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(100));
+    }
+    false
 }
 
 /// Gives back memory the program is not using right now. Windows brings back
@@ -1173,6 +1336,33 @@ unsafe extern "system" fn log_proc(hwnd: isize, msg: u32, wparam: usize, lparam:
 
 // -------------------------------------------------------------- main window
 
+/// Settings page: turns "Run on startup" on or off in the registry.
+fn toggle_run_on_startup() {
+    let want = !STARTUP_ON.load(Relaxed);
+    match autostart::set_enabled(want) {
+        Ok(()) => state::log(if want { "Run on startup ON (settings)" } else { "Run on startup OFF (settings)" }),
+        Err(e) => state::log(format!("Could not change run on startup: {e}")),
+    }
+    // Show what Windows really has, not what was asked for.
+    let now = autostart::is_enabled();
+    STARTUP_ON.store(now, Relaxed);
+    if want && !now {
+        state::log("Windows still has LIPI switched off. Turn it on in Task Manager, Startup apps.");
+    }
+}
+
+/// Settings page: saves "Start in tray" in settings.txt. Only that line of the file changes.
+fn toggle_start_in_tray() {
+    let want = !TRAY_START_ON.load(Relaxed);
+    match settings::save_start_in_tray(&settings::current_folder(), want) {
+        Ok(()) => {
+            TRAY_START_ON.store(want, Relaxed);
+            state::log(if want { "Start in tray ON (settings)" } else { "Start in tray OFF (settings)" });
+        }
+        Err(e) => state::log(format!("Could not save settings.txt: {e}")),
+    }
+}
+
 unsafe fn on_click(hwnd: isize, lparam: isize) {
     let x = (lparam & 0xFFFF) as i16 as i32;
     let y = ((lparam >> 16) & 0xFFFF) as i16 as i32;
@@ -1202,9 +1392,26 @@ unsafe fn on_click(hwnd: isize, lparam: isize) {
         Hit::LogsButton => open_logs(hwnd),
         Hit::KeysButton => VIEW.store(1, Relaxed),
         Hit::Back => VIEW.store(0, Relaxed),
+        // The gear opens Settings, and closes it again when it is already open.
+        Hit::Settings => {
+            if view() == View::Settings {
+                VIEW.store(0, Relaxed);
+            } else {
+                STARTUP_ON.store(autostart::is_enabled(), Relaxed); // what Windows has right now
+                VIEW.store(2, Relaxed);
+            }
+        }
+        Hit::StartupCard => toggle_run_on_startup(),
+        Hit::TrayCard => toggle_start_in_tray(),
         Hit::Tab(i) => HINT_TAB.store(i, Relaxed),
         Hit::TipButton => {
             open_link(about::TIP_URL);
+            return;
+        }
+        // No network code in LIPI: the browser opens the release page, the user compares the numbers.
+        Hit::UpdateButton => {
+            state::log("Opened the GitHub releases page (check for updates)");
+            open_link(about::RELEASES_URL);
             return;
         }
         Hit::GitHub => {
@@ -1294,9 +1501,9 @@ unsafe extern "system" fn main_proc(hwnd: isize, msg: u32, wparam: usize, lparam
                 on_click(hwnd, lparam);
                 Some(0)
             }
-            // Esc closes the key hint page.
+            // Esc closes the key hint page and the Settings page.
             WM_KEYDOWN => {
-                if wparam == VK_ESCAPE && view() == View::Keys {
+                if wparam == VK_ESCAPE && view() != View::Main {
                     VIEW.store(0, Relaxed);
                     refresh(hwnd);
                     Some(0)
@@ -1317,14 +1524,14 @@ unsafe extern "system" fn main_proc(hwnd: isize, msg: u32, wparam: usize, lparam
             WM_TRAY => {
                 match (lparam & 0xFFFF) as u32 {
                     WM_LBUTTONUP => show_window(hwnd),
-                    WM_RBUTTONUP => {
-                        let on = !state::enabled();
-                        state::set_enabled(on);
-                        state::log(if on { "Sinhala typing ON (tray)" } else { "Sinhala typing OFF (tray)" });
-                        refresh(hwnd);
-                    }
+                    WM_RBUTTONUP => tray_menu(hwnd),
                     _ => {}
                 }
+                Some(0)
+            }
+            // Someone started LIPI a second time. This copy shows its window instead.
+            WM_SHOW_LIPI => {
+                show_window(hwnd);
                 Some(0)
             }
             WM_TIMER => {
@@ -1384,6 +1591,21 @@ unsafe fn make_font(height: i32, weight: i32, face: &str) -> isize {
 
 /// Opens the window, starts the keyboard hook, and runs until the window is closed.
 pub fn run(map: LegacyMap, legacy_output: bool) {
+    // Only one LIPI at a time. This must come before the keyboard hook starts, or two hooks
+    // would both type Sinhala letters for each key.
+    unsafe {
+        if another_copy_is_running() {
+            if !show_first_copy() {
+                MessageBoxW(
+                    0,
+                    wide("LIPI is already running.\nPlease check Hidden Icons (the ^ arrow near the clock).").as_ptr(),
+                    wide(about::NAME).as_ptr(),
+                    MB_ICONINFORMATION | MB_SETFOREGROUND,
+                );
+            }
+            return;
+        }
+    }
     state::set_legacy(legacy_output);
     SEEN_LEGACY.store(legacy_output, Relaxed);
     SEEN_ENABLED.store(state::enabled(), Relaxed);
@@ -1452,6 +1674,7 @@ pub fn run(map: LegacyMap, legacy_output: bool) {
 
         tray_add(window);
         // Start hidden only if the tray icon is there to open the window again.
+        TRAY_START_ON.store(settings::get().start_in_tray, Relaxed);
         if settings::get().start_in_tray && TRAY_ADDED.load(Relaxed) {
             state::log("Started in the tray. Left click the tray icon to open the window.");
         } else {
