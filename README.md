@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/BUILT%20WITH-RUST-BEF92C?style=for-the-badge&labelColor=2b3035&logo=rust&logoColor=white" alt="Built with Rust">
+  <a href="https://www.rust-lang.org"><img src="https://img.shields.io/badge/BUILT%20USING-RUST-BEF92C?style=for-the-badge&labelColor=2b3035&logo=rust&logoColor=white" alt="Built using Rust"></a>
   <img src="https://img.shields.io/badge/DEPENDENCIES-NONE-BEF92C?style=for-the-badge&labelColor=2b3035" alt="Dependencies: none">
   <a href="https://github.com/sanjaya3d/LIPI/stargazers"><img src="https://img.shields.io/github/stars/sanjaya3d/LIPI?style=for-the-badge&labelColor=2b3035&color=BEF92C&label=STARS&logo=github&logoColor=white" alt="GitHub stars"></a>
 </p>
@@ -208,7 +208,7 @@ A release build has no console window, so `--test`, `--chart`, `--keys` and `--c
 <details>
 <summary><b>Windows shows "Windows protected your PC". Is LIPI safe?</b></summary>
 
-The exe is not code-signed, so Windows SmartScreen warns about every new program like this. Click **More info**, then **Run anyway**. LIPI has no network code, and the whole source is in this repository, so you can read it or build the exe yourself.
+The exe is not code-signed, so Windows SmartScreen warns about every new program like this. Click **More info**, then **Run anyway**. LIPI has no network code, and the whole source is in this repository, so you can read it or build the exe yourself. More ways to check the file are in [Is the download safe?](#is-the-download-safe)
 </details>
 
 <details>
@@ -282,28 +282,25 @@ No. LIPI is Windows only, because it uses the Windows keyboard hook.
 
 LIPI has no network code and sends nothing anywhere. The Show Logs window keeps its lines in memory only, and nothing is saved to a file. The only file the program writes is `settings.txt`. If you turn on **Run on startup**, it also adds one entry to your Windows startup list. The **Check for updates** button only opens a web page in your browser. LIPI itself never goes online.
 
-## Code signing policy
+## Is the download safe?
 
-**Status:** `lipi.exe` is not code-signed yet. Free code signing from SignPath Foundation is being set up. This line will be removed when signed releases start.
+**Status:** `lipi.exe` is not code-signed. A signing certificate costs money every year, and the free programs for open source projects want a project to be well known first. So Windows SmartScreen may warn about LIPI, and some antivirus programs may too. That is the warning for a new, unsigned program. It does not mean LIPI is harmful.
 
-When releases are signed, it is free code signing provided by [SignPath.io](https://signpath.io), certificate by [SignPath Foundation](https://signpath.org).
-
-- **What is signed:** only `lipi.exe` (and the copy inside `lipi-windows.zip`), built from the source code in this repository. Nothing else.
-- **How it is built:** by GitHub Actions ([`release.yml`](.github/workflows/release.yml)) from a tagged version. Nothing is signed on a personal computer, and the signing key stays with SignPath, not with the author.
-- **Who approves:** every signing request is approved by hand before a release is signed.
-  - Committers and reviewers: [SANJAYA3D](https://github.com/sanjaya3d)
-  - Approvers: [SANJAYA3D](https://github.com/sanjaya3d)
-  - Everyone on the team uses multi-factor authentication for GitHub and SignPath.
+- **Read the source:** all the code is in this repository. LIPI is written in Rust and uses only Rust's standard library.
+- **Build it yourself:** the steps are in [Build from source](#build-from-source).
+- **How releases are made:** a public GitHub Actions workflow ([`release.yml`](.github/workflows/release.yml)) builds `lipi.exe` on GitHub's servers from the tagged source code.
+- **Scan it:** upload `lipi.exe` to [VirusTotal](https://www.virustotal.com) to see what many antivirus programs say. LIPI uses a keyboard hook, so some of them may flag it. See the [FAQ](#faq).
+- **If you decide to run it:** on the blue Windows window, click **More info**, then **Run anyway**.
 - **Privacy:** LIPI will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it. See [Privacy](#privacy).
 - **Changes to your system:** none by themselves. The only change is one startup entry, added when you turn on **Run on startup** in Settings and removed when you turn it off. There is no installer. To remove LIPI, see the [FAQ](#faq).
-- **Problems:** if you think a signed release is wrong, [open an issue](https://github.com/sanjaya3d/LIPI/issues).
+- **Problems:** if you think a release is wrong, or you find a security problem, [open an issue](https://github.com/sanjaya3d/LIPI/issues).
 
 ## Limits
 
 - Windows only.
 - In an app that runs as administrator, LIPI must also run as administrator, or Windows will block it.
 - Turn Sinhala typing off (tap Right Ctrl) before you type a password, or the letters will be converted too.
-- The exe is not code-signed yet, so Windows SmartScreen and some antivirus programs may warn about it. See the [Code signing policy](#code-signing-policy).
+- The exe is not code-signed, so Windows SmartScreen and some antivirus programs may warn about it. See [Is the download safe?](#is-the-download-safe).
 - FM Abhaya output needs the FM Abhaya font in the app you paste into.
 - The legacy punctuation table is made for the US keyboard layout.
 - In legacy mode, apps with "smart quotes" turned on (Photoshop, Premiere Pro, Word) can change the full stop into a curl. See [Smart quotes](#smart-quotes-adobe-and-microsoft-apps).
