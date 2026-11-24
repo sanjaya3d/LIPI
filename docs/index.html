@@ -213,6 +213,7 @@ footer p{color:var(--dim);font-size:.95rem}
       <span data-version-wrap hidden>Latest version <b data-version></b></span>
       <span>No installer</span>
       <span>About 2 MB of RAM</span>
+      <span>Built using <a href="https://www.rust-lang.org">Rust</a></span>
       <a href="https://github.com/sanjaya3d/LIPI/releases">All releases</a>
     </p>
     <div class="shot">
@@ -246,7 +247,7 @@ footer p{color:var(--dim);font-size:.95rem}
       <h2>Ready in a minute</h2>
     </div>
     <ol class="steps">
-      <li><b>Download</b><span>Get <code>lipi.exe</code> and run it. The window opens. If Windows shows a blue warning, see the <a href="#faq">FAQ</a> and the <a href="#code-signing-policy">Code signing policy</a>.</span></li>
+      <li><b>Download</b><span>Get <code>lipi.exe</code> and run it. The window opens. If Windows shows a blue warning, see the <a href="#faq">FAQ</a> and <a href="#is-the-download-safe">Is the download safe?</a></span></li>
       <li><b>Switch typing on</b><span>Tap <b>Right Ctrl</b> to switch Sinhala typing on or off.</span></li>
       <li><b>Pick the output</b><span>Tap <b>Right Shift</b> to switch between Unicode and legacy (FM Abhaya) output.</span></li>
       <li><b>Type</b><span>Type in any app. For example <code>aayuboovan</code> gives ආයුබෝවන්.</span></li>
@@ -364,7 +365,7 @@ footer p{color:var(--dim);font-size:.95rem}
       <h2>Questions people ask</h2>
     </div>
     <div class="faq">
-      <details><summary>Windows shows "Windows protected your PC". Is LIPI safe?</summary><div>The exe is not code-signed, so Windows SmartScreen warns about every new program like this. Click <b>More info</b>, then <b>Run anyway</b>. LIPI has no network code, and the whole source is on <a href="https://github.com/sanjaya3d/LIPI">GitHub</a>, so you can read it or build the exe yourself.</div></details>
+      <details><summary>Windows shows "Windows protected your PC". Is LIPI safe?</summary><div>The exe is not code-signed, so Windows SmartScreen warns about every new program like this. Click <b>More info</b>, then <b>Run anyway</b>. LIPI has no network code, and the whole source is on <a href="https://github.com/sanjaya3d/LIPI">GitHub</a>, so you can read it or build the exe yourself. More ways to check the file are in <a href="#is-the-download-safe">Is the download safe?</a></div></details>
       <details><summary>My antivirus warns about LIPI.</summary><div>LIPI uses a Windows keyboard hook to see your key presses, the same way every typing tool does, and some antivirus programs flag that. LIPI never sends anything anywhere. If you do not trust the download, <a href="https://github.com/sanjaya3d/LIPI#build-from-source">build it yourself</a>.</div></details>
       <details><summary>I type, but I only get English letters.</summary><div>Check that Sinhala typing is on (the switch in the window says ON). Tap your on or off key once to change it. Also, if the app you are typing in runs as administrator, run LIPI as administrator too, or Windows will not let LIPI see the keys.</div></details>
       <details><summary>The text looks like strange symbols.</summary><div>That is normal for legacy (FM Abhaya) output when the font is not FM Abhaya. Install the FM Abhaya font and choose it in the app, or switch LIPI to Unicode output.</div></details>
@@ -396,19 +397,20 @@ footer p{color:var(--dim);font-size:.95rem}
   </div>
 </section>
 
-<section id="code-signing-policy" style="padding-top:0">
+<section id="is-the-download-safe" style="padding-top:0">
   <div class="wrap">
     <div class="card">
-      <h3 style="margin-top:0">Code signing policy</h3>
-      <p style="margin-top:10px"><b style="color:var(--lime)">Status:</b> <code>lipi.exe</code> is not code-signed yet. Free code signing from SignPath Foundation is being set up. This line will be removed when signed releases start.</p>
-      <p style="margin-top:10px">When releases are signed, it is free code signing provided by <a href="https://signpath.io">SignPath.io</a>, certificate by <a href="https://signpath.org">SignPath Foundation</a>.</p>
+      <h3 style="margin-top:0">Is the download safe?</h3>
+      <p style="margin-top:10px"><b style="color:var(--lime)">Status:</b> <code>lipi.exe</code> is not code-signed. A signing certificate costs money every year, and the free programs for open source projects want a project to be well known first. So Windows SmartScreen may warn about LIPI, and some antivirus programs may too. That is the warning for a new, unsigned program. It does not mean LIPI is harmful.</p>
       <ul class="list">
-        <li><b>What is signed:</b> only <code>lipi.exe</code> (and the copy inside <code>lipi-windows.zip</code>), built from the source code in the <a href="https://github.com/sanjaya3d/LIPI">GitHub repository</a>. Nothing else.</li>
-        <li><b>How it is built:</b> by GitHub Actions (<a href="https://github.com/sanjaya3d/LIPI/blob/main/.github/workflows/release.yml">release.yml</a>) from a tagged version. Nothing is signed on a personal computer, and the signing key stays with SignPath, not with the author.</li>
-        <li><b>Who approves:</b> every signing request is approved by hand before a release is signed. Committers and reviewers: <a href="https://github.com/sanjaya3d">SANJAYA3D</a>. Approvers: <a href="https://github.com/sanjaya3d">SANJAYA3D</a>. Everyone on the team uses multi-factor authentication for GitHub and SignPath.</li>
+        <li><b>Read the source:</b> all the code is in the <a href="https://github.com/sanjaya3d/LIPI">GitHub repository</a>. LIPI is written in Rust and uses only Rust's standard library.</li>
+        <li><b>Build it yourself:</b> the steps are in <a href="https://github.com/sanjaya3d/LIPI#build-from-source">Build from source</a>.</li>
+        <li><b>How releases are made:</b> a public GitHub Actions workflow (<a href="https://github.com/sanjaya3d/LIPI/blob/main/.github/workflows/release.yml">release.yml</a>) builds <code>lipi.exe</code> on GitHub's servers from the tagged source code.</li>
+        <li><b>Scan it:</b> upload <code>lipi.exe</code> to <a href="https://www.virustotal.com">VirusTotal</a> to see what many antivirus programs say. LIPI uses a keyboard hook, so some of them may flag it. See the <a href="#faq">FAQ</a>.</li>
+        <li><b>If you decide to run it:</b> on the blue Windows window, click <b>More info</b>, then <b>Run anyway</b>.</li>
         <li><b>Privacy:</b> LIPI will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it. See <a href="#privacy">Privacy</a>.</li>
         <li><b>Changes to your system:</b> none by themselves. The only change is one startup entry, added when you turn on <b>Run on startup</b> in Settings and removed when you turn it off. There is no installer. To remove LIPI, see the <a href="#faq">FAQ</a>.</li>
-        <li><b>Problems:</b> if you think a signed release is wrong, <a href="https://github.com/sanjaya3d/LIPI/issues">open an issue</a>.</li>
+        <li><b>Problems:</b> if you think a release is wrong, or you find a security problem, <a href="https://github.com/sanjaya3d/LIPI/issues">open an issue</a>.</li>
       </ul>
     </div>
   </div>
@@ -424,7 +426,7 @@ footer p{color:var(--dim);font-size:.95rem}
       <a class="btn" href="https://facebook.com/sanjaya3d">Facebook</a>
       <a class="btn" href="https://www.youtube.com/@SANJAYA3D/">YouTube</a>
     </div>
-    <p>Made by <b style="color:var(--lime)">SANJAYA3D</b> &nbsp;·&nbsp; Free software under the <a href="https://github.com/sanjaya3d/LIPI/blob/main/LICENSE">GNU GPL v3.0 or later</a> &nbsp;·&nbsp; <a href="#code-signing-policy">Code signing policy</a></p>
+    <p>Made by <b style="color:var(--lime)">SANJAYA3D</b> &nbsp;·&nbsp; Free software under the <a href="https://github.com/sanjaya3d/LIPI/blob/main/LICENSE">GNU GPL v3.0 or later</a> &nbsp;·&nbsp; Built using <a href="https://www.rust-lang.org">Rust</a> &nbsp;·&nbsp; <a href="#is-the-download-safe">Is the download safe?</a></p>
   </div>
 </footer>
 
