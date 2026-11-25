@@ -3,10 +3,30 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+// Picks the language before the page is drawn, so there is no flash. The link ?lang=si or ?lang=en wins,
+// then the choice saved on this device, then the browser language (Sinhala if it starts with si). Else English.
+(function () {
+  var l = "en";
+  try {
+    var q = /[?&]lang=(si|en)(?:&|#|$)/.exec(location.search);
+    if (q) l = q[1];
+    else {
+      var s = localStorage.getItem("lipi-lang");
+      if (s === "si" || s === "en") l = s;
+      else if (/^si/i.test(navigator.language || "")) l = "si";
+    }
+  } catch (e) {}
+  document.documentElement.setAttribute("data-lang", l);
+  document.documentElement.lang = l;
+})();
+</script>
 <title>LIPI (ලිපි) | Type Singlish, get Sinhala in any Windows app</title>
 <meta name="description" content="LIPI turns Singlish into Sinhala as you type, in Photoshop, Premiere Pro, Blender, Word and any other Windows app. Unicode or FM Abhaya. Free and open source.">
 <meta name="theme-color" content="#111315">
 <link rel="canonical" href="https://sanjaya3d.github.io/LIPI/">
+<link rel="alternate" hreflang="en" href="https://sanjaya3d.github.io/LIPI/?lang=en">
+<link rel="alternate" hreflang="si" href="https://sanjaya3d.github.io/LIPI/?lang=si">
 <link rel="icon" href="assets/logo.png">
 <meta property="og:type" content="website">
 <meta property="og:title" content="LIPI (ලිපි): type Singlish, get Sinhala in any Windows app">
@@ -155,6 +175,19 @@ footer p{color:var(--dim);font-size:.95rem}
 .reel-btn svg{width:16px;height:16px;fill:currentColor}
 .fine{color:var(--dim);font-size:.88rem;max-width:60ch}
 
+/* two languages: the page holds both, one is shown */
+t-en,t-si{display:inline}
+html:not([data-lang="si"]) t-si,html[data-lang="si"] t-en{display:none}
+.lang{display:flex;gap:2px;padding:3px;border:1px solid var(--edge2);border-radius:999px;flex:none}
+.lang button{font:inherit;font-size:.85rem;font-weight:700;line-height:1.4;color:var(--muted);background:transparent;border:0;border-radius:999px;padding:4px 12px;cursor:pointer}
+.lang button:hover{color:var(--lime)}
+.lang button[aria-pressed="true"]{background:var(--lime);color:var(--bg)}
+html:not([data-lang="si"]) :is(.tipcard,.why,.how,.note,.si-line){font-family:var(--font)}
+html[data-lang="si"] body{line-height:1.8}
+html[data-lang="si"] :is(h1,h2,h3){letter-spacing:0;line-height:1.4}
+html[data-lang="si"] .hero h1{font-size:clamp(2.1rem,6vw,3.8rem);line-height:1.3}
+html[data-lang="si"] :is(.eyebrow,.tag,.chartbody h3){letter-spacing:0}
+
 @media (max-width:900px){
   .g3{grid-template-columns:repeat(2,1fr)}
   .steps{grid-template-columns:repeat(2,1fr)}
@@ -162,11 +195,24 @@ footer p{color:var(--dim);font-size:.95rem}
 }
 @media (max-width:760px){
   .nav{display:none}
-  .top .wrap{justify-content:space-between}
+  .top .wrap{justify-content:space-between;gap:10px}
+  .lang button{padding:4px 9px;font-size:.8rem}
+  .top .btn{padding:8px 14px;white-space:nowrap;line-height:1.3;flex:none}
+  .brand{white-space:nowrap;flex:none}
   section{padding:60px 0}
   .hero{padding-top:44px}
   .g3,.g2,.two{grid-template-columns:1fr}
   .how div{grid-template-columns:1fr;gap:4px}
+}
+@media (max-width:340px){
+  .brand span.si{display:none}
+}
+@media (max-width:380px){
+  .brand{font-size:1rem;gap:7px}
+  .brand img{width:30px;height:30px}
+  .top .wrap{gap:6px}
+  .lang button{padding:4px 7px}
+  .top .btn{padding:7px 11px;font-size:.88rem}
 }
 @media (max-width:480px){
   body{font-size:16px}
@@ -187,15 +233,19 @@ footer p{color:var(--dim);font-size:.95rem}
 
 <header class="top">
   <div class="wrap">
-    <a class="brand" href="#top" aria-label="LIPI home"><img src="assets/logo.png" alt="" width="34" height="34">LIPI <span class="si">ලිපි</span></a>
-    <nav class="nav" aria-label="Main">
-      <a href="#features">Features</a>
-      <a href="#how-to-type">How to type</a>
+    <a data-en-aria-label="LIPI home" data-si-aria-label="LIPI මුල් පිටුව" class="brand" href="#top" aria-label="LIPI home"><img src="assets/logo.png" alt="" width="34" height="34">LIPI <span class="si" data-i18n-skip>ලිපි</span></a>
+    <nav data-en-aria-label="Main" data-si-aria-label="ප්‍රධාන" class="nav" aria-label="Main">
+      <a href="#features"><t-en lang="en">Features</t-en><t-si lang="si">විශේෂාංග</t-si></a>
+      <a href="#how-to-type"><t-en lang="en">How to type</t-en><t-si lang="si">ටයිප් කරන ආකාරය</t-si></a>
       <a href="#smart-quotes">Smart quotes</a>
-      <a href="#faq">FAQ</a>
+      <a href="#faq"><t-en lang="en">FAQ</t-en><t-si lang="si">නිතර අසන ප්&zwj;රශ්න</t-si></a>
       <a href="https://github.com/sanjaya3d/LIPI">GitHub</a>
     </nav>
-    <a class="btn solid" href="https://github.com/sanjaya3d/LIPI/releases/latest/download/lipi.exe">Download</a>
+    <div data-en-aria-label="Language" data-si-aria-label="භාෂාව" class="lang" role="group" aria-label="Language">
+      <button type="button" data-set-lang="en" lang="en" aria-pressed="true" data-i18n-skip>EN</button>
+      <button type="button" data-set-lang="si" lang="si" aria-pressed="false" data-i18n-skip>සිංහල</button>
+    </div>
+    <a class="btn solid" href="https://github.com/sanjaya3d/LIPI/releases/latest/download/lipi.exe"><t-en lang="en">Download</t-en><t-si lang="si">බාගත කරන්න</t-si></a>
   </div>
 </header>
 
@@ -203,21 +253,21 @@ footer p{color:var(--dim);font-size:.95rem}
 
 <section class="hero">
   <div class="wrap">
-    <p class="eyebrow">Free &nbsp;·&nbsp; Open source &nbsp;·&nbsp; Windows</p>
-    <h1>Type Singlish.<br><em>Get Sinhala.</em> Live.</h1>
-    <p class="si-line si">ඉංග්&zwj;රීසි අකුරින් (Singlish) ටයිප් කරන දේ ඒ මොහොතේම සිංහල අකුරු බවට හරවන කුඩා Windows වැඩසටහනකි.</p>
+    <p class="eyebrow"><t-en lang="en">Free &nbsp;·&nbsp; Open source &nbsp;·&nbsp; Windows</t-en><t-si lang="si">නොමිලේ &nbsp;·&nbsp; Open source &nbsp;·&nbsp; Windows</t-si></p>
+    <h1><t-en lang="en">Type Singlish.<br><em>Get Sinhala.</em> Live.</t-en><t-si lang="si">Singlish ටයිප් කරන්න.<br><em>සිංහල ලබාගන්න.</em> ඒ මොහොතේම.</t-si></h1>
+    <p class="si-line si"><t-en lang="en">A small Windows program that turns what you type in English letters (Singlish) into Sinhala letters, the moment you type it.</t-en><t-si lang="si">ඉංග්&zwj;රීසි අකුරින් (Singlish) ටයිප් කරන දේ ඒ මොහොතේම සිංහල අකුරු බවට හරවන කුඩා Windows වැඩසටහනකි.</t-si></p>
     <a class="cta" href="https://github.com/sanjaya3d/LIPI/releases/latest/download/lipi.exe">
-      <img src="assets/download-button.svg" width="420" height="106" alt="Download the latest LIPI release for Windows">
+      <img data-en-alt="Download the latest LIPI release for Windows" data-si-alt="Windows සඳහා නවතම LIPI නිකුතුව බාගත කරන්න" src="assets/download-button.svg" width="420" height="106" alt="Download the latest LIPI release for Windows">
     </a>
     <p class="meta">
-      <span data-version-wrap hidden>Latest version <b data-version></b></span>
-      <span>No installer</span>
-      <span>About 2 MB of RAM</span>
-      <span>Built using <a href="https://www.rust-lang.org">Rust</a></span>
-      <a href="https://github.com/sanjaya3d/LIPI/releases">All releases</a>
+      <span data-version-wrap hidden><span><t-en lang="en">Latest version</t-en><t-si lang="si">නවතම අනුවාදය</t-si></span> <b data-version data-i18n-skip></b></span>
+      <span><t-en lang="en">No installer</t-en><t-si lang="si">Install කිරීම අවශ්&zwj;ය නැත</t-si></span>
+      <span><t-en lang="en">About 2 MB of RAM</t-en><t-si lang="si">RAM භාවිතය 2 MB පමණ</t-si></span>
+      <span><t-en lang="en">Built using <a href="https://www.rust-lang.org">Rust</a></t-en><t-si lang="si"><a href="https://www.rust-lang.org">Rust</a> භාවිතයෙන් නිර්මාණය කර ඇත</t-si></span>
+      <a href="https://github.com/sanjaya3d/LIPI/releases"><t-en lang="en">All releases</t-en><t-si lang="si">සියලුම නිකුතු</t-si></a>
     </p>
     <div class="shot">
-      <img src="assets/hero.png" width="2200" height="1248" alt="Four example words, ammaa, aayuboovan, sixhala and koLaBa, turning into Sinhala, next to the LIPI window">
+      <img data-en-alt="Four example words, ammaa, aayuboovan, sixhala and koLaBa, turning into Sinhala, next to the LIPI window" data-si-alt="ammaa, aayuboovan, sixhala සහ koLaBa යන උදාහරණ වචන හතර LIPI window එක අසලින් සිංහල අකුරු බවට හැරෙන ආකාරය" src="assets/hero.png" width="2200" height="1248" alt="Four example words, ammaa, aayuboovan, sixhala and koLaBa, turning into Sinhala, next to the LIPI window">
     </div>
   </div>
 </section>
@@ -225,17 +275,17 @@ footer p{color:var(--dim);font-size:.95rem}
 <section id="features">
   <div class="wrap">
     <div class="head">
-      <p class="eyebrow">Features</p>
-      <h2>Small, fast and private</h2>
-      <p class="lead">LIPI works in the background. You type, and the Sinhala appears.</p>
+      <p class="eyebrow"><t-en lang="en">Features</t-en><t-si lang="si">විශේෂාංග</t-si></p>
+      <h2><t-en lang="en">Small, fast and private</t-en><t-si lang="si">කුඩායි. වේගවත්. පෞද්ගලිකයි.</t-si></h2>
+      <p class="lead"><t-en lang="en">LIPI works in the background. You type, and the Sinhala appears.</t-en><t-si lang="si">LIPI පසුබිමේ ක්&zwj;රියාත්මක වෙයි. ඔබ ටයිප් කරන්න, සිංහල අකුරු ඒ මොහොතේම දිස්වේ.</t-si></p>
     </div>
     <div class="grid g3">
-      <div class="card"><div class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 9h18"/></svg></div><h3>Works in any app</h3><p>LIPI watches the keyboard for the whole system, so it works wherever you can type.</p></div>
-      <div class="card"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 8h14M14 4l4 4-4 4M20 16H6M10 12l-4 4 4 4"/></svg></div><h3>Unicode or FM Abhaya</h3><p>Switch with one key tap. In legacy mode the punctuation keys type the right codes too (US keyboard).</p></div>
-      <div class="card"><div class="ico"><svg viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg></div><h3>Live typing</h3><p>The word is redrawn after every key, and Backspace works one English letter at a time.</p></div>
-      <div class="card"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg></div><h3>Tiny and private</h3><p>One small exe, no installer, no libraries. About 2 MB of RAM. No network code at all.</p></div>
-      <div class="card"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 3v11M7 10l5 5 5-5M4 17v3h16v-3"/></svg></div><h3>Lives in the tray</h3><p>Left click the tray icon to open the window. Right click for a menu: Open, Sinhala typing on or off, and Exit. Only one LIPI runs at a time.</p></div>
-      <div class="card"><div class="ico"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="3"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg></div><h3>Key hints built in</h3><p>The <b>Keys</b> button shows what to type for each letter. <code>lipi --keys</code> prints the same chart.</p></div>
+      <div class="card"><div class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 9h18"/></svg></div><h3><t-en lang="en">Works in any app</t-en><t-si lang="si">ඕනෑම මෘදුකාංගයක වැඩ කරයි</t-si></h3><p><t-en lang="en">LIPI watches the keyboard for the whole system, so it works wherever you can type.</t-en><t-si lang="si">LIPI මුළු පද්ධතිය පුරාම යතුරු පුවරුව නිරීක්ෂණය කරන නිසා, ටයිප් කළ හැකි ඕනෑම තැනක එය වැඩ කරයි.</t-si></p></div>
+      <div class="card"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 8h14M14 4l4 4-4 4M20 16H6M10 12l-4 4 4 4"/></svg></div><h3><t-en lang="en">Unicode or FM Abhaya</t-en><t-si lang="si">Unicode හෝ FM Abhaya</t-si></h3><p><t-en lang="en">Switch with one key tap. In legacy mode the punctuation keys type the right codes too (US keyboard).</t-en><t-si lang="si">එක් යතුරක් එබීමෙන් මාරු කරගන්න. Legacy මාදිලියේදී විරාම ලකුණු යතුරු ද නිවැරදි කේත ටයිප් කරයි (US යතුරුපුවරුව).</t-si></p></div>
+      <div class="card"><div class="ico"><svg viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg></div><h3><t-en lang="en">Live typing</t-en><t-si lang="si">සජීවී ටයිප් කිරීම</t-si></h3><p><t-en lang="en">The word is redrawn after every key, and Backspace works one English letter at a time.</t-en><t-si lang="si">සෑම යතුරක් එබූ පසුවම වචනය නැවත සකසයි. Backspace එබූ විට, එක් වරකට එක් ඉංග්&zwj;රීසි අකුරක් මැකේ.</t-si></p></div>
+      <div class="card"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg></div><h3><t-en lang="en">Tiny and private</t-en><t-si lang="si">කුඩායි, පෞද්ගලිකයි</t-si></h3><p><t-en lang="en">One small exe, no installer, no libraries. About 2 MB of RAM. No network code at all.</t-en><t-si lang="si">එක් කුඩා exe ගොනුවක් පමණි. Install කිරීමක් නැත, අමතර libraries නැත. RAM 2 MB පමණ භාවිත කරයි. Network කේත කිසිවක් නැත.</t-si></p></div>
+      <div class="card"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 3v11M7 10l5 5 5-5M4 17v3h16v-3"/></svg></div><h3><t-en lang="en">Lives in the tray</t-en><t-si lang="si">Tray එකේ රැඳී සිටී</t-si></h3><p><t-en lang="en">Left click the tray icon to open the window. Right click for a menu: Open, Sinhala typing on or off, and Exit. Only one LIPI runs at a time.</t-en><t-si lang="si">Tray අයිකනය මත වම් ක්ලික් කළ විට window එක විවෘත වේ. දකුණු ක්ලික් කළ විට menu එකක් පෙනේ: Open, Sinhala typing on හෝ off, සහ Exit. එකවර ක්&zwj;රියාත්මක වන්නේ එක් LIPI එකක් පමණි.</t-si></p></div>
+      <div class="card"><div class="ico"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="3"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg></div><h3><t-en lang="en">Key hints built in</t-en><t-si lang="si">යතුරු උපදෙස් ඇතුළත්ව ඇත</t-si></h3><p><t-en lang="en">The <b>Keys</b> button shows what to type for each letter. <code>lipi --keys</code> prints the same chart.</t-en><t-si lang="si"><b>Keys</b> බොත්තමෙන් එක් එක් අකුර සඳහා ටයිප් කළ යුතු දේ පෙන්වයි. <code>lipi --keys</code> මඟින් එම වගුවම මුද්&zwj;රණය කරයි.</t-si></p></div>
     </div>
   </div>
 </section>
@@ -243,14 +293,14 @@ footer p{color:var(--dim);font-size:.95rem}
 <section id="quick-start" style="padding-top:0">
   <div class="wrap">
     <div class="head">
-      <p class="eyebrow">Quick start</p>
-      <h2>Ready in a minute</h2>
+      <p class="eyebrow"><t-en lang="en">Quick start</t-en><t-si lang="si">ඉක්මන් ආරම්භය</t-si></p>
+      <h2><t-en lang="en">Ready in a minute</t-en><t-si lang="si">විනාඩියකින් සූදානම්</t-si></h2>
     </div>
     <ol class="steps">
-      <li><b>Download</b><span>Get <code>lipi.exe</code> and run it. The window opens. If Windows shows a blue warning, see the <a href="#faq">FAQ</a> and <a href="#is-the-download-safe">Is the download safe?</a></span></li>
-      <li><b>Switch typing on</b><span>Tap <b>Right Ctrl</b> to switch Sinhala typing on or off.</span></li>
-      <li><b>Pick the output</b><span>Tap <b>Right Shift</b> to switch between Unicode and legacy (FM Abhaya) output.</span></li>
-      <li><b>Type</b><span>Type in any app. For example <code>aayuboovan</code> gives ආයුබෝවන්.</span></li>
+      <li><b><t-en lang="en">Download</t-en><t-si lang="si">බාගත කරන්න</t-si></b><span><t-en lang="en">Get <code>lipi.exe</code> and run it. The window opens. If Windows shows a blue warning, see the <a href="#faq">FAQ</a> and <a href="#is-the-download-safe">Is the download safe?</a></t-en><t-si lang="si"><code>lipi.exe</code> බාගත කර run කරන්න. Window එක විවෘත වේ. Windows විසින් නිල් පැහැති අනතුරු ඇඟවීමක් පෙන්වුවහොත්, <a href="#faq">නිතර අසන ප්&zwj;රශ්න</a> සහ <a href="#is-the-download-safe">බාගත කිරීම ආරක්ෂිතද?</a> බලන්න.</t-si></span></li>
+      <li><b><t-en lang="en">Switch typing on</t-en><t-si lang="si">ටයිප් කිරීම On කරන්න</t-si></b><span><t-en lang="en">Tap <b>Right Ctrl</b> to switch Sinhala typing on or off.</t-en><t-si lang="si">Sinhala typing on හෝ off කිරීමට <b>Right Ctrl</b> යතුර එබන්න.</t-si></span></li>
+      <li><b><t-en lang="en">Pick the output</t-en><t-si lang="si">ප්&zwj;රතිදානය තෝරන්න</t-si></b><span><t-en lang="en">Tap <b>Right Shift</b> to switch between Unicode and legacy (FM Abhaya) output.</t-en><t-si lang="si">Unicode සහ legacy (FM Abhaya) ප්&zwj;රතිදාන අතර මාරු වීමට <b>Right Shift</b> යතුර එබන්න.</t-si></span></li>
+      <li><b><t-en lang="en">Type</t-en><t-si lang="si">ටයිප් කරන්න</t-si></b><span><t-en lang="en">Type in any app. For example <code>aayuboovan</code> gives ආයුබෝවන්.</t-en><t-si lang="si">ඕනෑම මෘදුකාංගයක ටයිප් කරන්න. උදාහරණයක් ලෙස <code>aayuboovan</code> ටයිප් කළ විට ආයුබෝවන් ලැබේ.</t-si></span></li>
     </ol>
   </div>
 </section>
@@ -258,18 +308,17 @@ footer p{color:var(--dim);font-size:.95rem}
 <section id="in-apps" style="padding-top:0" aria-labelledby="in-apps-title">
   <div class="wrap">
     <div class="head">
-      <p class="eyebrow">In real apps</p>
-      <h2 id="in-apps-title">Type Sinhala where you work</h2>
-      <p class="lead">LIPI works in any Windows app where you can type. Here it is in four of them.</p>
-      <p class="si-line si">ටයිප් කළ හැකි ඕනෑම Windows මෘදුකාංගයක LIPI වැඩ කරයි.</p>
+      <p class="eyebrow"><t-en lang="en">In real apps</t-en><t-si lang="si">සැබෑ මෘදුකාංගවල</t-si></p>
+      <h2 id="in-apps-title"><t-en lang="en">Type Sinhala where you work</t-en><t-si lang="si">ඔබ වැඩ කරන තැන සිංහල ටයිප් කරන්න</t-si></h2>
+      <p class="lead"><t-en lang="en">LIPI works in any Windows app where you can type. Here it is in four of them.</t-en><t-si lang="si">ටයිප් කළ හැකි ඕනෑම Windows මෘදුකාංගයක LIPI වැඩ කරයි. ඒවායින් හතරක් මෙහි දැක්වේ.</t-si></p>
     </div>
   </div>
-  <div class="reel" data-reel role="group" aria-roledescription="carousel" aria-label="LIPI working in Photoshop, Premiere Pro, Photon Studio and Word">
+  <div data-en-aria-label="LIPI working in Photoshop, Premiere Pro, Photon Studio and Word" data-si-aria-label="Photoshop, Premiere Pro, Photon Studio සහ Word හි වැඩ කරන LIPI" class="reel" data-reel role="group" aria-roledescription="carousel" aria-label="LIPI working in Photoshop, Premiere Pro, Photon Studio and Word">
     <div class="reel-track">
-        <figure class="slide"><img src="assets/apps/photoshop.webp" width="1280" height="720" alt="Sinhala text typed with LIPI in Adobe Photoshop, with the LIPI window open beside it" decoding="async"><figcaption>Adobe Photoshop</figcaption></figure>
-        <figure class="slide"><img src="assets/apps/premiere.webp" width="1280" height="720" alt="Sinhala title text typed with LIPI in Adobe Premiere Pro, with the LIPI window open" decoding="async"><figcaption>Adobe Premiere Pro</figcaption></figure>
-        <figure class="slide"><img src="assets/apps/photon.webp" width="1280" height="720" alt="Sinhala text typed with LIPI in Photon Studio, with the LIPI window open beside it" decoding="async"><figcaption>Photon Studio</figcaption></figure>
-        <figure class="slide"><img src="assets/apps/word.webp" width="1280" height="720" alt="Sinhala text typed with LIPI in Microsoft Word, with the LIPI window open beside it" decoding="async"><figcaption>Microsoft Word</figcaption></figure>
+        <figure class="slide"><img data-en-alt="Sinhala text typed with LIPI in Adobe Photoshop, with the LIPI window open beside it" data-si-alt="Adobe Photoshop හි LIPI සමඟ ටයිප් කළ සිංහල පෙළ, LIPI window එක අසලින් විවෘතව ඇත" src="assets/apps/photoshop.webp" width="1280" height="720" alt="Sinhala text typed with LIPI in Adobe Photoshop, with the LIPI window open beside it" decoding="async"><figcaption>Adobe Photoshop</figcaption></figure>
+        <figure class="slide"><img data-en-alt="Sinhala title text typed with LIPI in Adobe Premiere Pro, with the LIPI window open" data-si-alt="Adobe Premiere Pro හි LIPI සමඟ ටයිප් කළ සිංහල ශීර්ෂ පෙළ, LIPI window එක විවෘතව ඇත" src="assets/apps/premiere.webp" width="1280" height="720" alt="Sinhala title text typed with LIPI in Adobe Premiere Pro, with the LIPI window open" decoding="async"><figcaption>Adobe Premiere Pro</figcaption></figure>
+        <figure class="slide"><img data-en-alt="Sinhala text typed with LIPI in Photon Studio, with the LIPI window open beside it" data-si-alt="Photon Studio හි LIPI සමඟ ටයිප් කළ සිංහල පෙළ, LIPI window එක අසලින් විවෘතව ඇත" src="assets/apps/photon.webp" width="1280" height="720" alt="Sinhala text typed with LIPI in Photon Studio, with the LIPI window open beside it" decoding="async"><figcaption>Photon Studio</figcaption></figure>
+        <figure class="slide"><img data-en-alt="Sinhala text typed with LIPI in Microsoft Word, with the LIPI window open beside it" data-si-alt="Microsoft Word හි LIPI සමඟ ටයිප් කළ සිංහල පෙළ, LIPI window එක අසලින් විවෘතව ඇත" src="assets/apps/word.webp" width="1280" height="720" alt="Sinhala text typed with LIPI in Microsoft Word, with the LIPI window open beside it" decoding="async"><figcaption>Microsoft Word</figcaption></figure>
         <figure class="slide" aria-hidden="true"><img src="assets/apps/photoshop.webp" width="1280" height="720" alt="" decoding="async"><figcaption>Adobe Photoshop</figcaption></figure>
         <figure class="slide" aria-hidden="true"><img src="assets/apps/premiere.webp" width="1280" height="720" alt="" decoding="async"><figcaption>Adobe Premiere Pro</figcaption></figure>
         <figure class="slide" aria-hidden="true"><img src="assets/apps/photon.webp" width="1280" height="720" alt="" decoding="async"><figcaption>Photon Studio</figcaption></figure>
@@ -277,27 +326,27 @@ footer p{color:var(--dim);font-size:.95rem}
     </div>
   </div>
   <div class="wrap reel-bar">
-    <button type="button" class="btn reel-btn" data-reel-btn hidden><span class="ico-now" aria-hidden="true"></span><span class="lbl">Pause slideshow</span></button>
-    <p class="fine">Adobe, Photoshop, Premiere Pro and Microsoft Word are trademarks of their owners. LIPI is not made by or connected with them.</p>
+    <button type="button" class="btn reel-btn" data-reel-btn hidden><span class="ico-now" aria-hidden="true"></span><span class="lbl" data-i18n-skip>Pause slideshow</span></button>
+    <p class="fine"><t-en lang="en">Adobe, Photoshop, Premiere Pro and Microsoft Word are trademarks of their owners. LIPI is not made by or connected with them.</t-en><t-si lang="si">Adobe, Photoshop, Premiere Pro සහ Microsoft Word යනු ඒවායේ හිමිකරුවන්ගේ වෙළඳ ලකුණු වේ. LIPI මෙම ආයතන විසින් නිපදවූවක් හෝ ඒවා සමඟ සම්බන්ධ වූවක් නොවේ.</t-si></p>
   </div>
 </section>
 
 <section id="how-to-type" style="padding-top:0">
   <div class="wrap">
     <div class="head">
-      <p class="eyebrow">How to type</p>
-      <h2>A few simple rules</h2>
+      <p class="eyebrow"><t-en lang="en">How to type</t-en><t-si lang="si">ටයිප් කරන ආකාරය</t-si></p>
+      <h2><t-en lang="en">A few simple rules</t-en><t-si lang="si">සරල නීති කිහිපයක්</t-si></h2>
     </div>
     <div class="split">
       <ul class="rules">
-        <li>Keys are case-sensitive: <code>ta</code> gives ට and <code>Ta</code> gives ඨ, <code>na</code> gives න and <code>Na</code> gives ණ.</li>
-        <li>A consonant on its own gets a hal: <code>k</code> gives ක්, and <code>ka</code> gives ක.</li>
-        <li>Two consonants in a row join up. <code>y</code> and <code>r</code> after another consonant make yansaya and rakaransaya: <code>kya</code> gives ක්&zwj;ය and <code>kra</code> gives ක්&zwj;ර.</li>
-        <li><code>x</code> or <code>zn</code> gives ං, <code>H</code> gives ඃ and <code>X</code> gives ඞ. Type them after a Sinhala letter: <code>kax</code> gives කං, <code>kaH</code> gives කඃ and <code>kaX</code> gives කඞ.</li>
-        <li>A capital letter that no key uses is read as lowercase, so <code>Kamal</code> gives කමල්.</li>
-        <li>Anything LIPI does not know, such as digits and punctuation, is passed through as typed.</li>
+        <li><t-en lang="en">Keys are case-sensitive: <code>ta</code> gives ට and <code>Ta</code> gives ඨ, <code>na</code> gives න and <code>Na</code> gives ණ.</t-en><t-si lang="si">ඉංග්&zwj;රීසි ලොකු අකුරු සහ කුඩා අකුරු වෙනස් ලෙස සලකයි: <code>ta</code> මඟින් ට ද, <code>Ta</code> මඟින් ඨ ද, <code>na</code> මඟින් න ද, <code>Na</code> මඟින් ණ ද ලැබේ.</t-si></li>
+        <li><t-en lang="en">A consonant on its own gets a hal: <code>k</code> gives ක්, and <code>ka</code> gives ක.</t-en><t-si lang="si">තනි ව්&zwj;යංජනයකට හල් ලකුණ ලැබේ: <code>k</code> මඟින් ක් ද, <code>ka</code> මඟින් ක ද ලැබේ.</t-si></li>
+        <li><t-en lang="en">Two consonants in a row join up. <code>y</code> and <code>r</code> after another consonant make yansaya and rakaransaya: <code>kya</code> gives ක්&zwj;ය and <code>kra</code> gives ක්&zwj;ර.</t-en><t-si lang="si">ව්&zwj;යංජන දෙකක් පිළිවෙළට ටයිප් කළ විට ඒවා එකට සම්බන්ධ වේ. වෙනත් ව්&zwj;යංජනයකට පසුව <code>y</code> සහ <code>r</code> ටයිප් කළ විට යංසය සහ රකාරාංශය සෑදේ: <code>kya</code> මඟින් ක්&zwj;ය ද, <code>kra</code> මඟින් ක්&zwj;ර ද ලැබේ.</t-si></li>
+        <li><t-en lang="en"><code>x</code> or <code>zn</code> gives ං, <code>H</code> gives ඃ and <code>X</code> gives ඞ. Type them after a Sinhala letter: <code>kax</code> gives කං, <code>kaH</code> gives කඃ and <code>kaX</code> gives කඞ.</t-en><t-si lang="si"><code>x</code> හෝ <code>zn</code> මඟින් ං ද, <code>H</code> මඟින් ඃ ද, <code>X</code> මඟින් ඞ ද ලැබේ. මේවා සිංහල අකුරකට පසුව ටයිප් කරන්න: <code>kax</code> මඟින් කං ද, <code>kaH</code> මඟින් කඃ ද, <code>kaX</code> මඟින් කඞ ද ලැබේ.</t-si></li>
+        <li><t-en lang="en">A capital letter that no key uses is read as lowercase, so <code>Kamal</code> gives කමල්.</t-en><t-si lang="si">කිසිදු යතුරක් සඳහා භාවිත නොවන ලොකු අකුරක් කුඩා අකුරක් ලෙස සලකනු ලැබේ. එම නිසා <code>Kamal</code> මඟින් කමල් ලැබේ.</t-si></li>
+        <li><t-en lang="en">Anything LIPI does not know, such as digits and punctuation, is passed through as typed.</t-en><t-si lang="si">LIPI හඳුනා නොගන්නා දේවල්, උදාහරණයක් ලෙස ඉලක්කම් සහ විරාම ලකුණු, ටයිප් කළ ලෙසම යවනු ලැබේ.</t-si></li>
       </ul>
-      <div class="pairs" aria-label="Examples">
+      <div data-en-aria-label="Examples" data-si-aria-label="උදාහරණ" class="pairs" aria-label="Examples">
         <div class="pair"><kbd>ammaa</kbd><span class="arrow">→</span><span class="out si">අම්මා</span></div>
         <div class="pair"><kbd>aayuboovan</kbd><span class="arrow">→</span><span class="out si">ආයුබෝවන්</span></div>
         <div class="pair"><kbd>sixhala</kbd><span class="arrow">→</span><span class="out si">සිංහල</span></div>
@@ -306,12 +355,12 @@ footer p{color:var(--dim);font-size:.95rem}
     </div>
 
     <details class="chart">
-      <summary class="btn">Show the full key chart</summary>
+      <summary class="btn"><t-en lang="en">Show the full key chart</t-en><t-si lang="si">සම්පූර්ණ යතුරු වගුව පෙන්වන්න</t-si></summary>
       <div class="chartbody">
-        <div><h3>Vowels</h3><div class="cells"><div class="cell"><span class="g si">අ</span><kbd>a</kbd></div><div class="cell"><span class="g si">ආ</span><kbd>aa</kbd></div><div class="cell"><span class="g si">ඇ</span><kbd>A</kbd></div><div class="cell"><span class="g si">ඈ</span><kbd>Aa</kbd></div><div class="cell"><span class="g si">ඉ</span><kbd>i</kbd></div><div class="cell"><span class="g si">ඊ</span><kbd>ii</kbd></div><div class="cell"><span class="g si">උ</span><kbd>u</kbd></div><div class="cell"><span class="g si">ඌ</span><kbd>uu</kbd></div><div class="cell"><span class="g si">ඍ</span><kbd>R</kbd></div><div class="cell"><span class="g si">ඎ</span><kbd>Ru</kbd></div><div class="cell"><span class="g si">එ</span><kbd>e</kbd></div><div class="cell"><span class="g si">ඒ</span><kbd>ee</kbd></div><div class="cell"><span class="g si">ඓ</span><kbd>ai</kbd></div><div class="cell"><span class="g si">ඔ</span><kbd>o</kbd></div><div class="cell"><span class="g si">ඕ</span><kbd>oo</kbd></div><div class="cell"><span class="g si">ඖ</span><kbd>au</kbd></div></div><p class="note">Also: AA = ඈ, ou = ඖ. Straight after a consonant, see Signs below.</p></div>
-        <div><h3>Consonants</h3><div class="cells"><div class="cell"><span class="g si">ක</span><kbd>ka</kbd></div><div class="cell"><span class="g si">ඛ</span><kbd>kha</kbd></div><div class="cell"><span class="g si">ග</span><kbd>ga</kbd></div><div class="cell"><span class="g si">ඝ</span><kbd>gha</kbd></div><div class="cell"><span class="g si">ඟ</span><kbd>zga</kbd></div><div class="cell"><span class="g si">ච</span><kbd>cha</kbd></div><div class="cell"><span class="g si">ඡ</span><kbd>chha</kbd></div><div class="cell"><span class="g si">ජ</span><kbd>ja</kbd></div><div class="cell"><span class="g si">ඦ</span><kbd>zja</kbd></div><div class="cell"><span class="g si">ඤ</span><kbd>zka</kbd></div><div class="cell"><span class="g si">ඥ</span><kbd>zha</kbd></div><div class="cell"><span class="g si">ට</span><kbd>ta</kbd></div><div class="cell"><span class="g si">ඨ</span><kbd>Ta</kbd></div><div class="cell"><span class="g si">ඩ</span><kbd>da</kbd></div><div class="cell"><span class="g si">ඪ</span><kbd>Da</kbd></div><div class="cell"><span class="g si">ණ</span><kbd>Na</kbd></div><div class="cell"><span class="g si">ඬ</span><kbd>zda</kbd></div><div class="cell"><span class="g si">ත</span><kbd>tha</kbd></div><div class="cell"><span class="g si">ථ</span><kbd>thha</kbd></div><div class="cell"><span class="g si">ද</span><kbd>dha</kbd></div><div class="cell"><span class="g si">ධ</span><kbd>dhha</kbd></div><div class="cell"><span class="g si">න</span><kbd>na</kbd></div><div class="cell"><span class="g si">ඳ</span><kbd>zdha</kbd></div><div class="cell"><span class="g si">ප</span><kbd>pa</kbd></div><div class="cell"><span class="g si">ඵ</span><kbd>pha</kbd></div><div class="cell"><span class="g si">බ</span><kbd>ba</kbd></div><div class="cell"><span class="g si">භ</span><kbd>bha</kbd></div><div class="cell"><span class="g si">ම</span><kbd>ma</kbd></div><div class="cell"><span class="g si">ඹ</span><kbd>Ba</kbd></div><div class="cell"><span class="g si">ය</span><kbd>ya</kbd></div><div class="cell"><span class="g si">ර</span><kbd>ra</kbd></div><div class="cell"><span class="g si">ල</span><kbd>la</kbd></div><div class="cell"><span class="g si">ළ</span><kbd>La</kbd></div><div class="cell"><span class="g si">ව</span><kbd>wa</kbd></div><div class="cell"><span class="g si">ශ</span><kbd>sha</kbd></div><div class="cell"><span class="g si">ෂ</span><kbd>Sha</kbd></div><div class="cell"><span class="g si">ස</span><kbd>sa</kbd></div><div class="cell"><span class="g si">හ</span><kbd>ha</kbd></div><div class="cell"><span class="g si">ෆ</span><kbd>fa</kbd></div></div><p class="note">Also: q = ද, zq = ඳ, v = ව, S = ෂ. A letter on its own gets a hal: k = ක්</p></div>
-        <div><h3>Signs</h3><div class="cells"><div class="cell"><span class="g si">ක</span><kbd>ka</kbd></div><div class="cell"><span class="g si">කා</span><kbd>kaa</kbd></div><div class="cell"><span class="g si">කැ</span><kbd>kA</kbd></div><div class="cell"><span class="g si">කෑ</span><kbd>kAa</kbd></div><div class="cell"><span class="g si">කි</span><kbd>ki</kbd></div><div class="cell"><span class="g si">කී</span><kbd>kii</kbd></div><div class="cell"><span class="g si">කු</span><kbd>ku</kbd></div><div class="cell"><span class="g si">කූ</span><kbd>kuu</kbd></div><div class="cell"><span class="g si">කෘ</span><kbd>kru</kbd></div><div class="cell"><span class="g si">කෲ</span><kbd>kruu</kbd></div><div class="cell"><span class="g si">කෙ</span><kbd>ke</kbd></div><div class="cell"><span class="g si">කේ</span><kbd>kee</kbd></div><div class="cell"><span class="g si">කෛ</span><kbd>kai</kbd></div><div class="cell"><span class="g si">කො</span><kbd>ko</kbd></div><div class="cell"><span class="g si">කෝ</span><kbd>koo</kbd></div><div class="cell"><span class="g si">කෞ</span><kbd>kau</kbd></div></div><p class="note">Type them after a consonant. Also: AA = කෑ</p></div>
-        <div><h3>Examples</h3><div class="cells wide"><div class="cell"><span class="g si">ක්</span><kbd>k</kbd></div><div class="cell"><span class="g si">කං</span><kbd>kax</kbd></div><div class="cell"><span class="g si">කං</span><kbd>kazn</kbd></div><div class="cell"><span class="g si">කඃ</span><kbd>kaH</kbd></div><div class="cell"><span class="g si">කඞ</span><kbd>kaX</kbd></div><div class="cell"><span class="g si">ක්‍ය</span><kbd>kya</kbd></div><div class="cell"><span class="g si">ක්‍ර</span><kbd>kra</kbd></div><div class="cell"><span class="g si">මම</span><kbd>mama</kbd></div><div class="cell"><span class="g si">අම්මා</span><kbd>ammaa</kbd></div><div class="cell"><span class="g si">ගෙදර</span><kbd>gedhara</kbd></div><div class="cell"><span class="g si">නුවර</span><kbd>nuwara</kbd></div><div class="cell"><span class="g si">කොළඹ</span><kbd>koLaBa</kbd></div><div class="cell"><span class="g si">සිංහල</span><kbd>sixhala</kbd></div><div class="cell"><span class="g si">ප්‍රශ්න</span><kbd>prashna</kbd></div></div><p class="note">Capitals matter: ta = ට, Ta = ඨ. x, zn, H and X are typed after a letter.</p></div>
+        <div><h3><t-en lang="en">Vowels</t-en><t-si lang="si">ස්වර</t-si></h3><div class="cells"><div class="cell"><span class="g si">අ</span><kbd>a</kbd></div><div class="cell"><span class="g si">ආ</span><kbd>aa</kbd></div><div class="cell"><span class="g si">ඇ</span><kbd>A</kbd></div><div class="cell"><span class="g si">ඈ</span><kbd>Aa</kbd></div><div class="cell"><span class="g si">ඉ</span><kbd>i</kbd></div><div class="cell"><span class="g si">ඊ</span><kbd>ii</kbd></div><div class="cell"><span class="g si">උ</span><kbd>u</kbd></div><div class="cell"><span class="g si">ඌ</span><kbd>uu</kbd></div><div class="cell"><span class="g si">ඍ</span><kbd>R</kbd></div><div class="cell"><span class="g si">ඎ</span><kbd>Ru</kbd></div><div class="cell"><span class="g si">එ</span><kbd>e</kbd></div><div class="cell"><span class="g si">ඒ</span><kbd>ee</kbd></div><div class="cell"><span class="g si">ඓ</span><kbd>ai</kbd></div><div class="cell"><span class="g si">ඔ</span><kbd>o</kbd></div><div class="cell"><span class="g si">ඕ</span><kbd>oo</kbd></div><div class="cell"><span class="g si">ඖ</span><kbd>au</kbd></div></div><p class="note"><t-en lang="en">Also: AA = ඈ, ou = ඖ. Straight after a consonant, see Signs below.</t-en><t-si lang="si">තවත්: AA = ඈ, ou = ඖ. ව්&zwj;යංජනයකට කෙලින්ම පසුව ටයිප් කළ විට ලැබෙන්නේ පහත ඇති ස්වර ලකුණු ය.</t-si></p></div>
+        <div><h3><t-en lang="en">Consonants</t-en><t-si lang="si">ව්&zwj;යංජන</t-si></h3><div class="cells"><div class="cell"><span class="g si">ක</span><kbd>ka</kbd></div><div class="cell"><span class="g si">ඛ</span><kbd>kha</kbd></div><div class="cell"><span class="g si">ග</span><kbd>ga</kbd></div><div class="cell"><span class="g si">ඝ</span><kbd>gha</kbd></div><div class="cell"><span class="g si">ඟ</span><kbd>zga</kbd></div><div class="cell"><span class="g si">ච</span><kbd>cha</kbd></div><div class="cell"><span class="g si">ඡ</span><kbd>chha</kbd></div><div class="cell"><span class="g si">ජ</span><kbd>ja</kbd></div><div class="cell"><span class="g si">ඦ</span><kbd>zja</kbd></div><div class="cell"><span class="g si">ඤ</span><kbd>zka</kbd></div><div class="cell"><span class="g si">ඥ</span><kbd>zha</kbd></div><div class="cell"><span class="g si">ට</span><kbd>ta</kbd></div><div class="cell"><span class="g si">ඨ</span><kbd>Ta</kbd></div><div class="cell"><span class="g si">ඩ</span><kbd>da</kbd></div><div class="cell"><span class="g si">ඪ</span><kbd>Da</kbd></div><div class="cell"><span class="g si">ණ</span><kbd>Na</kbd></div><div class="cell"><span class="g si">ඬ</span><kbd>zda</kbd></div><div class="cell"><span class="g si">ත</span><kbd>tha</kbd></div><div class="cell"><span class="g si">ථ</span><kbd>thha</kbd></div><div class="cell"><span class="g si">ද</span><kbd>dha</kbd></div><div class="cell"><span class="g si">ධ</span><kbd>dhha</kbd></div><div class="cell"><span class="g si">න</span><kbd>na</kbd></div><div class="cell"><span class="g si">ඳ</span><kbd>zdha</kbd></div><div class="cell"><span class="g si">ප</span><kbd>pa</kbd></div><div class="cell"><span class="g si">ඵ</span><kbd>pha</kbd></div><div class="cell"><span class="g si">බ</span><kbd>ba</kbd></div><div class="cell"><span class="g si">භ</span><kbd>bha</kbd></div><div class="cell"><span class="g si">ම</span><kbd>ma</kbd></div><div class="cell"><span class="g si">ඹ</span><kbd>Ba</kbd></div><div class="cell"><span class="g si">ය</span><kbd>ya</kbd></div><div class="cell"><span class="g si">ර</span><kbd>ra</kbd></div><div class="cell"><span class="g si">ල</span><kbd>la</kbd></div><div class="cell"><span class="g si">ළ</span><kbd>La</kbd></div><div class="cell"><span class="g si">ව</span><kbd>wa</kbd></div><div class="cell"><span class="g si">ශ</span><kbd>sha</kbd></div><div class="cell"><span class="g si">ෂ</span><kbd>Sha</kbd></div><div class="cell"><span class="g si">ස</span><kbd>sa</kbd></div><div class="cell"><span class="g si">හ</span><kbd>ha</kbd></div><div class="cell"><span class="g si">ෆ</span><kbd>fa</kbd></div></div><p class="note"><t-en lang="en">Also: q = ද, zq = ඳ, v = ව, S = ෂ. A letter on its own gets a hal: k = ක්</t-en><t-si lang="si">තවත්: q = ද, zq = ඳ, v = ව, S = ෂ. තනි අකුරකට හල් ලකුණ ලැබේ: k = ක්</t-si></p></div>
+        <div><h3><t-en lang="en">Signs</t-en><t-si lang="si">ස්වර ලකුණු</t-si></h3><div class="cells"><div class="cell"><span class="g si">ක</span><kbd>ka</kbd></div><div class="cell"><span class="g si">කා</span><kbd>kaa</kbd></div><div class="cell"><span class="g si">කැ</span><kbd>kA</kbd></div><div class="cell"><span class="g si">කෑ</span><kbd>kAa</kbd></div><div class="cell"><span class="g si">කි</span><kbd>ki</kbd></div><div class="cell"><span class="g si">කී</span><kbd>kii</kbd></div><div class="cell"><span class="g si">කු</span><kbd>ku</kbd></div><div class="cell"><span class="g si">කූ</span><kbd>kuu</kbd></div><div class="cell"><span class="g si">කෘ</span><kbd>kru</kbd></div><div class="cell"><span class="g si">කෲ</span><kbd>kruu</kbd></div><div class="cell"><span class="g si">කෙ</span><kbd>ke</kbd></div><div class="cell"><span class="g si">කේ</span><kbd>kee</kbd></div><div class="cell"><span class="g si">කෛ</span><kbd>kai</kbd></div><div class="cell"><span class="g si">කො</span><kbd>ko</kbd></div><div class="cell"><span class="g si">කෝ</span><kbd>koo</kbd></div><div class="cell"><span class="g si">කෞ</span><kbd>kau</kbd></div></div><p class="note"><t-en lang="en">Type them after a consonant. Also: AA = කෑ</t-en><t-si lang="si">මේවා ව්&zwj;යංජනයකට පසුව ටයිප් කරන්න. තවත්: AA = කෑ</t-si></p></div>
+        <div><h3><t-en lang="en">Examples</t-en><t-si lang="si">උදාහරණ</t-si></h3><div class="cells wide"><div class="cell"><span class="g si">ක්</span><kbd>k</kbd></div><div class="cell"><span class="g si">කං</span><kbd>kax</kbd></div><div class="cell"><span class="g si">කං</span><kbd>kazn</kbd></div><div class="cell"><span class="g si">කඃ</span><kbd>kaH</kbd></div><div class="cell"><span class="g si">කඞ</span><kbd>kaX</kbd></div><div class="cell"><span class="g si">ක්‍ය</span><kbd>kya</kbd></div><div class="cell"><span class="g si">ක්‍ර</span><kbd>kra</kbd></div><div class="cell"><span class="g si">මම</span><kbd>mama</kbd></div><div class="cell"><span class="g si">අම්මා</span><kbd>ammaa</kbd></div><div class="cell"><span class="g si">ගෙදර</span><kbd>gedhara</kbd></div><div class="cell"><span class="g si">නුවර</span><kbd>nuwara</kbd></div><div class="cell"><span class="g si">කොළඹ</span><kbd>koLaBa</kbd></div><div class="cell"><span class="g si">සිංහල</span><kbd>sixhala</kbd></div><div class="cell"><span class="g si">ප්‍රශ්න</span><kbd>prashna</kbd></div></div><p class="note"><t-en lang="en">Capitals matter: ta = ට, Ta = ඨ. x, zn, H and X are typed after a letter.</t-en><t-si lang="si">ලොකු අකුරු වැදගත් වේ: ta = ට, Ta = ඨ. x, zn, H සහ X ටයිප් කරන්නේ අකුරකට පසුවය.</t-si></p></div>
       </div>
     </details>
   </div>
@@ -320,15 +369,15 @@ footer p{color:var(--dim);font-size:.95rem}
 <section id="output" style="padding-top:0">
   <div class="wrap">
     <div class="head">
-      <p class="eyebrow">Output types</p>
-      <h2>Unicode or FM Abhaya</h2>
-      <p class="lead">Choose in the window, or tap your output key at any time.</p>
+      <p class="eyebrow"><t-en lang="en">Output types</t-en><t-si lang="si">ප්&zwj;රතිදාන වර්ග</t-si></p>
+      <h2><t-en lang="en">Unicode or FM Abhaya</t-en><t-si lang="si">Unicode හෝ FM Abhaya</t-si></h2>
+      <p class="lead"><t-en lang="en">Choose in the window, or tap your output key at any time.</t-en><t-si lang="si">Window එකේ තෝරන්න, නැතහොත් ඕනෑම වේලාවක ඔබේ output යතුර එබන්න.</t-si></p>
     </div>
     <div class="grid g2 kind">
-      <div class="card"><h3 style="margin-top:0"><span class="tag">Unicode</span></h3><p style="margin-top:12px">Normal Sinhala text. It works in modern apps and websites.</p></div>
-      <div class="card"><h3 style="margin-top:0"><span class="tag">Legacy</span> FM Abhaya</h3><p style="margin-top:12px">For apps that cannot shape Unicode Sinhala. LIPI turns the Sinhala into FM Abhaya character codes. The text looks right when the font is FM Abhaya, so that font must be installed.</p></div>
+      <div class="card"><h3 style="margin-top:0"><span class="tag">Unicode</span></h3><p style="margin-top:12px"><t-en lang="en">Normal Sinhala text. It works in modern apps and websites.</t-en><t-si lang="si">සාමාන්&zwj;ය සිංහල අකුරු. නවීන මෘදුකාංග සහ වෙබ් අඩවි වල මෙය වැඩ කරයි.</t-si></p></div>
+      <div class="card"><h3 style="margin-top:0"><span class="tag">Legacy</span> FM Abhaya</h3><p style="margin-top:12px"><t-en lang="en">For apps that cannot shape Unicode Sinhala. LIPI turns the Sinhala into FM Abhaya character codes. The text looks right when the font is FM Abhaya, so that font must be installed.</t-en><t-si lang="si">Unicode සිංහල නිවැරදිව පෙන්විය නොහැකි මෘදුකාංග සඳහා. LIPI සිංහල අකුරු FM Abhaya අක්ෂර කේත බවට හරවයි. Font එක FM Abhaya වන විට පමණක් අකුරු නිවැරදිව පෙනෙන නිසා, එම font එක install කර තිබිය යුතුය.</t-si></p></div>
     </div>
-    <p class="note" style="margin-top:18px">You can use your own FM Abhaya table. Copy <code>src/legacy_map.txt</code> next to the exe, edit it, and restart the program. Or start with <code>lipi --map my.txt</code>.</p>
+    <p class="note" style="margin-top:18px"><t-en lang="en">You can use your own FM Abhaya table. Copy <code>src/legacy_map.txt</code> next to the exe, edit it, and restart the program. Or start with <code>lipi --map my.txt</code>.</t-en><t-si lang="si">ඔබට ඔබේම FM Abhaya වගුවක් භාවිත කළ හැක. <code>src/legacy_map.txt</code> ගොනුව exe එක අසලට පිටපත් කර, එය සංස්කරණය කර, වැඩසටහන නැවත ආරම්භ කරන්න. නැතහොත් <code>lipi --map my.txt</code> මඟින් ආරම්භ කරන්න.</t-si></p>
   </div>
 </section>
 
@@ -336,46 +385,46 @@ footer p{color:var(--dim);font-size:.95rem}
   <div class="wrap">
     <div class="head" style="text-align:center;justify-items:center">
       <p class="eyebrow">Legacy (FM Abhaya)</p>
-      <h2>Smart quotes (Adobe and Microsoft apps)</h2>
+      <h2><t-en lang="en">Smart quotes (Adobe and Microsoft apps)</t-en><t-si lang="si">Smart quotes (Adobe සහ Microsoft මෘදුකාංග)</t-si></h2>
     </div>
     <div class="tipcard si">
-      <p>Adobe සහ Microsoft මෘදුකාංග වලදී</p>
-      <p>"smart quotes" විශේෂාංගය ක්&zwj;රියා විරහිත කරන්න</p>
-      <a class="btn" href="#smart-quotes-steps">වැඩි විස්තර</a>
+      <p><t-en lang="en">In Adobe and Microsoft software,</t-en><t-si lang="si">Adobe සහ Microsoft මෘදුකාංග වලදී</t-si></p>
+      <p><t-en lang="en">turn off the "smart quotes" feature</t-en><t-si lang="si">"smart quotes" විශේෂාංගය ක්&zwj;රියා විරහිත කරන්න</t-si></p>
+      <a class="btn" href="#smart-quotes-steps"><t-en lang="en">More details</t-en><t-si lang="si">වැඩි විස්තර</t-si></a>
     </div>
     <div class="why si" id="smart-quotes-steps">
-      <p>Legacy (FM Abhaya) මාදිලියේදී, සමහර මෘදුකාංගවල තිත (.) වෙනුවට අමුතු වක්‍ර සලකුණක් දිස්විය හැකියි. LIPI මඟින් නිවැරදි අක්ෂරය ඇතුළත් කළත්, මෘදුකාංගය විසින් එය පසුව ස්වයංක්‍රීයව වෙනස් කරයි. එක් සැකසුමක් අක්‍රිය කිරීමෙන් මෙම ගැටලුව විසඳාගත හැකියි.</p>
-      <p><b>මෙය සිදුවන්නේ ඇයි?</b> FM Abhaya අකුරු රටාවේදී තිත (.) සඳහා භාවිත වන්නේ සාමාන්‍ය සෘජු apostrophe (<code>'</code>) සලකුණට අදාළ අක්ෂර කේතයයි. ඒ නිසා LIPI මඟින් <code>.</code> යතුර එබූ විට එම අක්ෂරය ඇතුළත් වේ. Photoshop, Premiere Pro, Word, PowerPoint සහ තවත් සමහර මෘදුකාංගවල ඇති "Smart Quotes" විශේෂාංගය මඟින් ඔබ ටයිප් කරන සෘජු apostrophe (<code>'</code>) සලකුණ වක්‍ර apostrophe (<code>‘</code> හෝ <code>’</code>) සලකුණක් බවට ස්වයංක්‍රීයව වෙනස් කරයි. FM Abhaya අකුරු රටාවේදී එම වක්‍ර apostrophe කේතයට වෙනත් හැඩයක් ලබා දී ඇති නිසා, තිත වෙනුවට වක්‍ර සලකුණක් දිස්වේ. Notepad සහ බොහෝ සාමාන්‍ය පෙළ ඇතුළත් කරන ස්ථානවල මෙම ගැටලුව ඇති නොවේ. Unicode ප්‍රතිදානයට මෙය බලපාන්නේද නැත.</p>
-      <p><b>මෙය විසඳාගන්නේ කෙසේද?</b> ඔබ ටයිප් කරන මෘදුකාංගයේ Smart Quotes විශේෂාංගය අක්‍රිය කරන්න:</p>
+      <p><t-en lang="en">In legacy (FM Abhaya) mode, some software may show a strange curl instead of the full stop (.). LIPI types the correct character, but the software then changes it automatically afterwards. You can fix this by turning off one setting.</t-en><t-si lang="si">Legacy (FM Abhaya) මාදිලියේදී, සමහර මෘදුකාංගවල තිත (.) වෙනුවට අමුතු වක්‍ර සලකුණක් දිස්විය හැකියි. LIPI මඟින් නිවැරදි අක්ෂරය ඇතුළත් කළත්, මෘදුකාංගය විසින් එය පසුව ස්වයංක්‍රීයව වෙනස් කරයි. එක් සැකසුමක් අක්‍රිය කිරීමෙන් මෙම ගැටලුව විසඳාගත හැකියි.</t-si></p>
+      <p><t-en lang="en"><b>Why does this happen?</b> In the FM Abhaya font, the full stop (.) uses the character code of the plain straight apostrophe (<code>'</code>). So when you press the <code>.</code> key, LIPI types that character. The "Smart Quotes" feature in Photoshop, Premiere Pro, Word, PowerPoint and some other software automatically changes the straight apostrophe (<code>'</code>) you type into a curly apostrophe (<code>‘</code> or <code>’</code>). In the FM Abhaya font those curly apostrophe codes have a different shape, so a curl appears in place of the full stop. This problem does not happen in Notepad and most plain text boxes. It does not affect Unicode output either.</t-en><t-si lang="si"><b>මෙය සිදුවන්නේ ඇයි?</b> FM Abhaya අකුරු රටාවේදී තිත (.) සඳහා භාවිත වන්නේ සාමාන්‍ය සෘජු apostrophe (<code>'</code>) සලකුණට අදාළ අක්ෂර කේතයයි. ඒ නිසා LIPI මඟින් <code>.</code> යතුර එබූ විට එම අක්ෂරය ඇතුළත් වේ. Photoshop, Premiere Pro, Word, PowerPoint සහ තවත් සමහර මෘදුකාංගවල ඇති "Smart Quotes" විශේෂාංගය මඟින් ඔබ ටයිප් කරන සෘජු apostrophe (<code>'</code>) සලකුණ වක්‍ර apostrophe (<code>‘</code> හෝ <code>’</code>) සලකුණක් බවට ස්වයංක්‍රීයව වෙනස් කරයි. FM Abhaya අකුරු රටාවේදී එම වක්‍ර apostrophe කේතයට වෙනත් හැඩයක් ලබා දී ඇති නිසා, තිත වෙනුවට වක්‍ර සලකුණක් දිස්වේ. Notepad සහ බොහෝ සාමාන්‍ය පෙළ ඇතුළත් කරන ස්ථානවල මෙම ගැටලුව ඇති නොවේ. Unicode ප්‍රතිදානයට මෙය බලපාන්නේද නැත.</t-si></p>
+      <p><t-en lang="en"><b>How do I fix it?</b> Turn off the Smart Quotes feature in the software you are typing in:</t-en><t-si lang="si"><b>මෙය විසඳාගන්නේ කෙසේද?</b> ඔබ ටයිප් කරන මෘදුකාංගයේ Smart Quotes විශේෂාංගය අක්‍රිය කරන්න:</t-si></p>
     </div>
     <dl class="how si">
-      <div><dt>Photoshop</dt><dd>Edit → Preferences → Type වෙත ගොස් <b>Use Smart Quotes</b> යන්නෙහි සලකුණ ඉවත් කරන්න.</dd></div>
-      <div><dt>Premiere Pro</dt><dd>Preferences → Graphics වෙත ගොස් Smart Quotes සම්බන්ධ සැකසුමක් සොයා බලන්න. එහි ස්ථානය සහ නම අනුවාදය අනුව වෙනස් විය හැකි අතර, සමහර අනුවාදවල මෙම සැකසුම නොතිබිය හැකියි.</dd></div>
-      <div><dt>Word සහ PowerPoint</dt><dd>File → Options → Proofing → AutoCorrect Options → <b>AutoFormat As You Type</b> වෙත ගොස් <b>"Straight quotes" with "smart quotes"</b> යන්නෙහි සලකුණ ඉවත් කරන්න. Word හි <b>AutoFormat</b> ටැබය තුළද එම සැකසුම අක්‍රිය කරන්න.</dd></div>
-      <div><dt>වෙනත් මෘදුකාංග</dt><dd>Text හෝ Type සැකසුම් තුළ "Smart Quotes" හෝ "Typographer's Quotes" යන සැකසුම් සොයා බලන්න.</dd></div>
+      <div><dt>Photoshop</dt><dd><t-en lang="en">Go to Edit → Preferences → Type and untick <b>Use Smart Quotes</b>.</t-en><t-si lang="si">Edit → Preferences → Type වෙත ගොස් <b>Use Smart Quotes</b> යන්නෙහි සලකුණ ඉවත් කරන්න.</t-si></dd></div>
+      <div><dt>Premiere Pro</dt><dd><t-en lang="en">Go to Preferences → Graphics and look for a setting about Smart Quotes. Its place and name can differ between versions, and some versions may not have this setting.</t-en><t-si lang="si">Preferences → Graphics වෙත ගොස් Smart Quotes සම්බන්ධ සැකසුමක් සොයා බලන්න. එහි ස්ථානය සහ නම අනුවාදය අනුව වෙනස් විය හැකි අතර, සමහර අනුවාදවල මෙම සැකසුම නොතිබිය හැකියි.</t-si></dd></div>
+      <div><dt><t-en lang="en">Word and PowerPoint</t-en><t-si lang="si">Word සහ PowerPoint</t-si></dt><dd><t-en lang="en">Go to File → Options → Proofing → AutoCorrect Options → <b>AutoFormat As You Type</b> and untick <b>"Straight quotes" with "smart quotes"</b>. In Word, also turn this setting off in the <b>AutoFormat</b> tab.</t-en><t-si lang="si">File → Options → Proofing → AutoCorrect Options → <b>AutoFormat As You Type</b> වෙත ගොස් <b>"Straight quotes" with "smart quotes"</b> යන්නෙහි සලකුණ ඉවත් කරන්න. Word හි <b>AutoFormat</b> ටැබය තුළද එම සැකසුම අක්‍රිය කරන්න.</t-si></dd></div>
+      <div><dt><t-en lang="en">Other software</t-en><t-si lang="si">වෙනත් මෘදුකාංග</t-si></dt><dd><t-en lang="en">Look for "Smart Quotes" or "Typographer's Quotes" in the Text or Type settings.</t-en><t-si lang="si">Text හෝ Type සැකසුම් තුළ "Smart Quotes" හෝ "Typographer's Quotes" යන සැකසුම් සොයා බලන්න.</t-si></dd></div>
     </dl>
-    <p class="note si" style="text-align:center;margin-top:18px">සැකසුම වෙනස් කළ පසු තිත නැවත ටයිප් කරන්න. දැනටමත් ලේඛනයේ ඇති වැරදි සලකුණු ස්වයංක්‍රීයව නිවැරදි නොවේ. එම නිසා වැරදි වක්‍ර සලකුණ මකා දමා තිත නැවත ඇතුළත් කරන්න.</p>
+    <p class="note si" style="text-align:center;margin-top:18px"><t-en lang="en">After you change the setting, type the full stop again. Wrong marks that are already in the document are not corrected automatically. So delete the wrong curl and type the full stop again.</t-en><t-si lang="si">සැකසුම වෙනස් කළ පසු තිත නැවත ටයිප් කරන්න. දැනටමත් ලේඛනයේ ඇති වැරදි සලකුණු ස්වයංක්‍රීයව නිවැරදි නොවේ. එම නිසා වැරදි වක්‍ර සලකුණ මකා දමා තිත නැවත ඇතුළත් කරන්න.</t-si></p>
   </div>
 </section>
 
 <section id="faq" style="padding-top:0">
   <div class="wrap">
     <div class="head" style="text-align:center;justify-items:center">
-      <p class="eyebrow">FAQ</p>
-      <h2>Questions people ask</h2>
+      <p class="eyebrow"><t-en lang="en">FAQ</t-en><t-si lang="si">නිතර අසන ප්&zwj;රශ්න</t-si></p>
+      <h2><t-en lang="en">Questions people ask</t-en><t-si lang="si">මිනිසුන් අසන ප්&zwj;රශ්න</t-si></h2>
     </div>
     <div class="faq">
-      <details><summary>Windows shows "Windows protected your PC". Is LIPI safe?</summary><div>The exe is not code-signed, so Windows SmartScreen warns about every new program like this. Click <b>More info</b>, then <b>Run anyway</b>. LIPI has no network code, and the whole source is on <a href="https://github.com/sanjaya3d/LIPI">GitHub</a>, so you can read it or build the exe yourself. More ways to check the file are in <a href="#is-the-download-safe">Is the download safe?</a></div></details>
-      <details><summary>My antivirus warns about LIPI.</summary><div>LIPI uses a Windows keyboard hook to see your key presses, the same way every typing tool does, and some antivirus programs flag that. LIPI never sends anything anywhere. If you do not trust the download, <a href="https://github.com/sanjaya3d/LIPI#build-from-source">build it yourself</a>.</div></details>
-      <details><summary>I type, but I only get English letters.</summary><div>Check that Sinhala typing is on (the switch in the window says ON). Tap your on or off key once to change it. Also, if the app you are typing in runs as administrator, run LIPI as administrator too, or Windows will not let LIPI see the keys.</div></details>
-      <details><summary>The text looks like strange symbols.</summary><div>That is normal for legacy (FM Abhaya) output when the font is not FM Abhaya. Install the FM Abhaya font and choose it in the app, or switch LIPI to Unicode output.</div></details>
-      <details><summary>In legacy mode the full stop shows as a curl in Photoshop, Premiere Pro or Word.</summary><div>The app is changing the straight apostrophe, which FM Abhaya uses for the full stop, into a curly "smart quote". Turn smart quotes off in that app. The steps are in <a href="#smart-quotes">Smart quotes</a> above.</div></details>
-      <details><summary>Can I change the keys that switch typing and output?</summary><div>Yes. Edit <code>on_off_key</code> and <code>output_key</code> in <code>settings.txt</code>. To open its folder, press <b>Win + R</b>, type <code>%APPDATA%\LIPI</code> and press Enter. The choices are RightCtrl, LeftCtrl, RightShift, LeftShift, RightAlt, LeftAlt, ScrollLock and Pause, and the two keys must be different. Save the file and restart LIPI.</div></details>
-      <details><summary>How do I start LIPI when Windows starts?</summary><div>Click the gear in the title bar and turn on <b>Run on startup</b>. To start hidden in the tray, turn on <b>Start in tray</b> too. If the switch goes back to OFF after you move <code>lipi.exe</code> to another folder, turn it on again.</div></details>
-      <details><summary>I started LIPI again and nothing opened.</summary><div>Only one LIPI runs at a time. Starting it again brings the first window back, even if it is hidden in the tray (Hidden Icons, the ^ arrow near the clock). If it cannot reach the first one, it shows a message that LIPI is already running.</div></details>
-      <details><summary>How do I close LIPI?</summary><div>Right click the tray icon and choose <b>Exit</b>, or click the X in the window.</div></details>
-      <details><summary>How do I remove LIPI?</summary><div>Turn off <b>Run on startup</b> in Settings if you turned it on. Then close LIPI, delete <code>lipi.exe</code> and the folder <code>%APPDATA%\LIPI</code>. Nothing else is installed.</div></details>
-      <details><summary>Does it work on Mac or Linux?</summary><div>No. LIPI is Windows only, because it uses the Windows keyboard hook.</div></details>
+      <details><summary><t-en lang="en">Windows shows "Windows protected your PC". Is LIPI safe?</t-en><t-si lang="si">Windows විසින් "Windows protected your PC" ලෙස පෙන්වයි. LIPI ආරක්ෂිතද?</t-si></summary><div><t-en lang="en">The exe is not code-signed, so Windows SmartScreen warns about every new program like this. Click <b>More info</b>, then <b>Run anyway</b>. LIPI has no network code, and the whole source is on <a href="https://github.com/sanjaya3d/LIPI">GitHub</a>, so you can read it or build the exe yourself. More ways to check the file are in <a href="#is-the-download-safe">Is the download safe?</a></t-en><t-si lang="si">Exe ගොනුව code-signed නොවන නිසා, Windows SmartScreen මෙවැනි සෑම නව වැඩසටහනක් ගැනම අනතුරු ඇඟවීමක් පෙන්වයි. <b>More info</b> ක්ලික් කර, ඉන්පසු <b>Run anyway</b> ක්ලික් කරන්න. LIPI හි network කේත කිසිවක් නැත, තවද සම්පූර්ණ source code එක <a href="https://github.com/sanjaya3d/LIPI">GitHub</a> හි ඇති නිසා, ඔබට එය කියවීමට හෝ exe එක ඔබම build කිරීමට හැක. ගොනුව පරීක්ෂා කිරීමට තවත් ක්&zwj;රම <a href="#is-the-download-safe">බාගත කිරීම ආරක්ෂිතද?</a> යන්නෙහි ඇත.</t-si></div></details>
+      <details><summary><t-en lang="en">My antivirus warns about LIPI.</t-en><t-si lang="si">මගේ antivirus එක LIPI ගැන අනතුරු අඟවයි.</t-si></summary><div><t-en lang="en">LIPI uses a Windows keyboard hook to see your key presses, the same way every typing tool does, and some antivirus programs flag that. LIPI never sends anything anywhere. If you do not trust the download, <a href="https://github.com/sanjaya3d/LIPI#build-from-source">build it yourself</a>.</t-en><t-si lang="si">සෑම ටයිප් කිරීමේ මෘදුකාංගයක්ම මෙන්ම, LIPI ද ඔබ එබූ යතුරු දැකීමට Windows keyboard hook එකක් භාවිත කරයි. සමහර antivirus වැඩසටහන් එය අනතුරුදායක ලෙස සලකුණු කරයි. LIPI කිසිවක් කිසිතැනකට නොයවයි. බාගත කළ ගොනුව ඔබට විශ්වාස නොවේ නම්, <a href="https://github.com/sanjaya3d/LIPI#build-from-source">එය ඔබම build කරන්න</a>.</t-si></div></details>
+      <details><summary><t-en lang="en">I type, but I only get English letters.</t-en><t-si lang="si">මම ටයිප් කරනවා, නමුත් ලැබෙන්නේ ඉංග්&zwj;රීසි අකුරු පමණි.</t-si></summary><div><t-en lang="en">Check that Sinhala typing is on (the switch in the window says ON). Tap your on or off key once to change it. Also, if the app you are typing in runs as administrator, run LIPI as administrator too, or Windows will not let LIPI see the keys.</t-en><t-si lang="si">Sinhala typing on වී ඇත්දැයි පරීක්ෂා කරන්න (window එකේ ඇති switch එකේ ON ලෙස පෙන්විය යුතුය). එය වෙනස් කිරීමට ඔබේ on හෝ off යතුර එක් වරක් එබන්න. එමෙන්ම, ඔබ ටයිප් කරන මෘදුකාංගය administrator ලෙස ක්&zwj;රියා කරන්නේ නම්, LIPI ද administrator ලෙස run කරන්න, නැතහොත් Windows විසින් LIPI හට යතුරු දැකීමට ඉඩ නොදෙයි.</t-si></div></details>
+      <details><summary><t-en lang="en">The text looks like strange symbols.</t-en><t-si lang="si">අකුරු අමුතු සංකේත මෙන් පෙනේ.</t-si></summary><div><t-en lang="en">That is normal for legacy (FM Abhaya) output when the font is not FM Abhaya. Install the FM Abhaya font and choose it in the app, or switch LIPI to Unicode output.</t-en><t-si lang="si">Font එක FM Abhaya නොවන විට legacy (FM Abhaya) ප්&zwj;රතිදානයේදී මෙය සාමාන්&zwj;යයි. FM Abhaya font එක install කර මෘදුකාංගයේදී එය තෝරන්න, නැතහොත් LIPI Unicode ප්&zwj;රතිදානයට මාරු කරන්න.</t-si></div></details>
+      <details><summary><t-en lang="en">In legacy mode the full stop shows as a curl in Photoshop, Premiere Pro or Word.</t-en><t-si lang="si">Legacy මාදිලියේදී Photoshop, Premiere Pro හෝ Word හි තිත (.) වක්&zwj;ර සලකුණක් ලෙස පෙනේ.</t-si></summary><div><t-en lang="en">The app is changing the straight apostrophe, which FM Abhaya uses for the full stop, into a curly "smart quote". Turn smart quotes off in that app. The steps are in <a href="#smart-quotes">Smart quotes</a> above.</t-en><t-si lang="si">FM Abhaya විසින් තිත සඳහා භාවිත කරන සෘජු apostrophe එක, මෘදුකාංගය විසින් වක්&zwj;ර "smart quote" එකක් බවට වෙනස් කරයි. එම මෘදුකාංගයේ smart quotes ක්&zwj;රියා විරහිත කරන්න. ඒ සඳහා පියවර ඉහළ ඇති <a href="#smart-quotes">Smart quotes</a> කොටසේ ඇත.</t-si></div></details>
+      <details><summary><t-en lang="en">Can I change the keys that switch typing and output?</t-en><t-si lang="si">ටයිප් කිරීම සහ ප්&zwj;රතිදානය මාරු කරන යතුරු වෙනස් කළ හැකිද?</t-si></summary><div><t-en lang="en">Yes. Edit <code>on_off_key</code> and <code>output_key</code> in <code>settings.txt</code>. To open its folder, press <b>Win + R</b>, type <code>%APPDATA%\LIPI</code> and press Enter. The choices are RightCtrl, LeftCtrl, RightShift, LeftShift, RightAlt, LeftAlt, ScrollLock and Pause, and the two keys must be different. Save the file and restart LIPI.</t-en><t-si lang="si">ඔව්. <code>settings.txt</code> හි <code>on_off_key</code> සහ <code>output_key</code> වෙනස් කරන්න. එහි folder එක විවෘත කිරීමට <b>Win + R</b> එබූ පසු <code>%APPDATA%\LIPI</code> ටයිප් කර Enter එබන්න. තෝරාගත හැකි යතුරු: RightCtrl, LeftCtrl, RightShift, LeftShift, RightAlt, LeftAlt, ScrollLock සහ Pause වේ. යතුරු දෙක එකිනෙකට වෙනස් විය යුතුය. ගොනුව save කර LIPI නැවත ආරම්භ කරන්න.</t-si></div></details>
+      <details><summary><t-en lang="en">How do I start LIPI when Windows starts?</t-en><t-si lang="si">Windows ආරම්භ වන විට LIPI ආරම්භ කරගන්නේ කෙසේද?</t-si></summary><div><t-en lang="en">Click the gear in the title bar and turn on <b>Run on startup</b>. To start hidden in the tray, turn on <b>Start in tray</b> too. If the switch goes back to OFF after you move <code>lipi.exe</code> to another folder, turn it on again.</t-en><t-si lang="si">Title bar එකේ ඇති gear අයිකනය ක්ලික් කර <b>Run on startup</b> on කරන්න. Tray එකේ සැඟවී ආරම්භ වීමට <b>Start in tray</b> ද on කරන්න. <code>lipi.exe</code> වෙනත් folder එකකට ගෙන ගිය පසු switch එක නැවත OFF වුවහොත්, එය නැවත on කරන්න.</t-si></div></details>
+      <details><summary><t-en lang="en">I started LIPI again and nothing opened.</t-en><t-si lang="si">මම LIPI නැවත ආරම්භ කළා, නමුත් කිසිවක් විවෘත වූයේ නැත.</t-si></summary><div><t-en lang="en">Only one LIPI runs at a time. Starting it again brings the first window back, even if it is hidden in the tray (Hidden Icons, the ^ arrow near the clock). If it cannot reach the first one, it shows a message that LIPI is already running.</t-en><t-si lang="si">එකවර ක්&zwj;රියාත්මක වන්නේ එක් LIPI එකක් පමණි. එය නැවත ආරම්භ කළ විට, tray එකේ සැඟවී තිබුණත් (Hidden Icons, ඔරලෝසුව අසල ඇති ^ ඊතලය) පළමු window එක නැවත ඉදිරියට පැමිණේ. පළමු එක වෙත ළඟා විය නොහැකි නම්, LIPI දැනටමත් ක්&zwj;රියාත්මක වන බවට පණිවිඩයක් පෙන්වයි.</t-si></div></details>
+      <details><summary><t-en lang="en">How do I close LIPI?</t-en><t-si lang="si">LIPI වසා දමන්නේ කෙසේද?</t-si></summary><div><t-en lang="en">Right click the tray icon and choose <b>Exit</b>, or click the X in the window.</t-en><t-si lang="si">Tray අයිකනය මත දකුණු ක්ලික් කර <b>Exit</b> තෝරන්න, නැතහොත් window එකේ ඇති X ක්ලික් කරන්න.</t-si></div></details>
+      <details><summary><t-en lang="en">How do I remove LIPI?</t-en><t-si lang="si">LIPI ඉවත් කරන්නේ කෙසේද?</t-si></summary><div><t-en lang="en">Turn off <b>Run on startup</b> in Settings if you turned it on. Then close LIPI, delete <code>lipi.exe</code> and the folder <code>%APPDATA%\LIPI</code>. Nothing else is installed.</t-en><t-si lang="si"><b>Run on startup</b> on කර තිබුණේ නම් Settings හි එය off කරන්න. ඉන්පසු LIPI වසා දමා, <code>lipi.exe</code> සහ <code>%APPDATA%\LIPI</code> folder එක මකා දමන්න. වෙනත් කිසිවක් install වී නැත.</t-si></div></details>
+      <details><summary><t-en lang="en">Does it work on Mac or Linux?</t-en><t-si lang="si">Mac හෝ Linux වල වැඩ කරයිද?</t-si></summary><div><t-en lang="en">No. LIPI is Windows only, because it uses the Windows keyboard hook.</t-en><t-si lang="si">නැත. LIPI Windows සඳහා පමණි, මන්ද එය Windows keyboard hook එක භාවිත කරයි.</t-si></div></details>
     </div>
   </div>
 </section>
@@ -383,14 +432,14 @@ footer p{color:var(--dim);font-size:.95rem}
 <section id="privacy" style="padding-top:0">
   <div class="wrap">
     <div class="two">
-      <div class="card"><h3 style="margin-top:0">Privacy</h3><p style="margin-top:10px">LIPI has no network code and sends nothing anywhere. The Show Logs window keeps its lines in memory only, and nothing is saved to a file. The only file the program writes is <code>settings.txt</code>. If you turn on <b>Run on startup</b>, it also adds one entry to your Windows startup list. The <b>Check for updates</b> button only opens a web page in your browser. LIPI itself never goes online.</p></div>
-      <div class="card"><h3 style="margin-top:0">Good to know</h3>
+      <div class="card"><h3 style="margin-top:0"><t-en lang="en">Privacy</t-en><t-si lang="si">පෞද්ගලිකත්වය</t-si></h3><p style="margin-top:10px"><t-en lang="en">LIPI has no network code and sends nothing anywhere. The Show Logs window keeps its lines in memory only, and nothing is saved to a file. The only file the program writes is <code>settings.txt</code>. If you turn on <b>Run on startup</b>, it also adds one entry to your Windows startup list. The <b>Check for updates</b> button only opens a web page in your browser. LIPI itself never goes online.</t-en><t-si lang="si">LIPI හි network කේත නැත, එය කිසිවක් කිසිතැනකට නොයවයි. Show Logs window එක එහි පේළි තබාගන්නේ memory එකේ පමණක් වන අතර, ගොනුවකට කිසිවක් save නොකෙරේ. වැඩසටහන ලියන එකම ගොනුව <code>settings.txt</code> වේ. ඔබ <b>Run on startup</b> on කළහොත්, එය ඔබේ Windows startup ලැයිස්තුවට එක් entry එකක් ද එක් කරයි. <b>Check for updates</b> බොත්තම කරන්නේ ඔබේ browser එකේ වෙබ් පිටුවක් විවෘත කිරීම පමණි. LIPI කිසිවිටෙක තනිවම online නොයයි.</t-si></p></div>
+      <div class="card"><h3 style="margin-top:0"><t-en lang="en">Good to know</t-en><t-si lang="si">දැනගත යුතු දේ</t-si></h3>
         <ul class="list">
-          <li>Windows only.</li>
-          <li>In an app that runs as administrator, LIPI must also run as administrator.</li>
-          <li>Turn Sinhala typing off before you type a password.</li>
-          <li>FM Abhaya output needs the FM Abhaya font in the app you paste into.</li>
-          <li>The legacy punctuation table is made for the US keyboard layout.</li>
+          <li><t-en lang="en">Windows only.</t-en><t-si lang="si">Windows සඳහා පමණි.</t-si></li>
+          <li><t-en lang="en">In an app that runs as administrator, LIPI must also run as administrator.</t-en><t-si lang="si">Administrator ලෙස ක්&zwj;රියා කරන මෘදුකාංගයක LIPI ද administrator ලෙස run කළ යුතුය.</t-si></li>
+          <li><t-en lang="en">Turn Sinhala typing off before you type a password.</t-en><t-si lang="si">Password එකක් ටයිප් කිරීමට පෙර Sinhala typing off කරන්න.</t-si></li>
+          <li><t-en lang="en">FM Abhaya output needs the FM Abhaya font in the app you paste into.</t-en><t-si lang="si">FM Abhaya ප්&zwj;රතිදානය සඳහා, ඔබ paste කරන මෘදුකාංගයේ FM Abhaya font එක තිබිය යුතුය.</t-si></li>
+          <li><t-en lang="en">The legacy punctuation table is made for the US keyboard layout.</t-en><t-si lang="si">Legacy විරාම ලකුණු වගුව සාදා ඇත්තේ US යතුරුපුවරු පිරිසැලසුම සඳහාය.</t-si></li>
         </ul>
       </div>
     </div>
@@ -400,17 +449,17 @@ footer p{color:var(--dim);font-size:.95rem}
 <section id="is-the-download-safe" style="padding-top:0">
   <div class="wrap">
     <div class="card">
-      <h3 style="margin-top:0">Is the download safe?</h3>
-      <p style="margin-top:10px"><b style="color:var(--lime)">Status:</b> <code>lipi.exe</code> is not code-signed. A signing certificate costs money every year, and the free programs for open source projects want a project to be well known first. So Windows SmartScreen may warn about LIPI, and some antivirus programs may too. That is the warning for a new, unsigned program. It does not mean LIPI is harmful.</p>
+      <h3 style="margin-top:0"><t-en lang="en">Is the download safe?</t-en><t-si lang="si">බාගත කිරීම ආරක්ෂිතද?</t-si></h3>
+      <p style="margin-top:10px"><t-en lang="en"><b style="color:var(--lime)">Status:</b> <code>lipi.exe</code> is not code-signed. A signing certificate costs money every year, and the free programs for open source projects want a project to be well known first. So Windows SmartScreen may warn about LIPI, and some antivirus programs may too. That is the warning for a new, unsigned program. It does not mean LIPI is harmful.</t-en><t-si lang="si"><b style="color:var(--lime)">තත්ත්වය:</b> <code>lipi.exe</code> code-signed නොවේ. Signing certificate එකකට සෑම වසරකම මුදල් වැය වන අතර, open source ව්&zwj;යාපෘති සඳහා ඇති නොමිලේ වැඩසටහන් බලාපොරොත්තු වන්නේ ව්&zwj;යාපෘතිය මුලින්ම ප්&zwj;රසිද්ධ වී තිබීමයි. ඒ නිසා Windows SmartScreen විසින් ද, සමහර antivirus වැඩසටහන් විසින් ද LIPI ගැන අනතුරු ඇඟවිය හැක. එය අලුත්, sign නොකළ වැඩසටහනක් සඳහා දෙන අනතුරු ඇඟවීමකි. LIPI හානිකර බව එයින් අදහස් නොවේ.</t-si></p>
       <ul class="list">
-        <li><b>Read the source:</b> all the code is in the <a href="https://github.com/sanjaya3d/LIPI">GitHub repository</a>. LIPI is written in Rust and uses only Rust's standard library.</li>
-        <li><b>Build it yourself:</b> the steps are in <a href="https://github.com/sanjaya3d/LIPI#build-from-source">Build from source</a>.</li>
-        <li><b>How releases are made:</b> a public GitHub Actions workflow (<a href="https://github.com/sanjaya3d/LIPI/blob/main/.github/workflows/release.yml">release.yml</a>) builds <code>lipi.exe</code> on GitHub's servers from the tagged source code.</li>
-        <li><b>Scan it:</b> upload <code>lipi.exe</code> to <a href="https://www.virustotal.com">VirusTotal</a> to see what many antivirus programs say. LIPI uses a keyboard hook, so some of them may flag it. See the <a href="#faq">FAQ</a>.</li>
-        <li><b>If you decide to run it:</b> on the blue Windows window, click <b>More info</b>, then <b>Run anyway</b>.</li>
-        <li><b>Privacy:</b> LIPI will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it. See <a href="#privacy">Privacy</a>.</li>
-        <li><b>Changes to your system:</b> none by themselves. The only change is one startup entry, added when you turn on <b>Run on startup</b> in Settings and removed when you turn it off. There is no installer. To remove LIPI, see the <a href="#faq">FAQ</a>.</li>
-        <li><b>Problems:</b> if you think a release is wrong, or you find a security problem, <a href="https://github.com/sanjaya3d/LIPI/issues">open an issue</a>.</li>
+        <li><t-en lang="en"><b>Read the source:</b> all the code is in the <a href="https://github.com/sanjaya3d/LIPI">GitHub repository</a>. LIPI is written in Rust and uses only Rust's standard library.</t-en><t-si lang="si"><b>Source code කියවන්න:</b> සියලුම කේත <a href="https://github.com/sanjaya3d/LIPI">GitHub repository</a> එකේ ඇත. LIPI ලියා ඇත්තේ Rust වලින් වන අතර, භාවිත කරන්නේ Rust හි standard library එක පමණි.</t-si></li>
+        <li><t-en lang="en"><b>Build it yourself:</b> the steps are in <a href="https://github.com/sanjaya3d/LIPI#build-from-source">Build from source</a>.</t-en><t-si lang="si"><b>ඔබම build කරන්න:</b> පියවර <a href="https://github.com/sanjaya3d/LIPI#build-from-source">Build from source</a> යටතේ ඇත.</t-si></li>
+        <li><t-en lang="en"><b>How releases are made:</b> a public GitHub Actions workflow (<a href="https://github.com/sanjaya3d/LIPI/blob/main/.github/workflows/release.yml">release.yml</a>) builds <code>lipi.exe</code> on GitHub's servers from the tagged source code.</t-en><t-si lang="si"><b>Release සාදන ආකාරය:</b> ප්&zwj;රසිද්ධියේ බලාගත හැකි GitHub Actions workflow එකක් (<a href="https://github.com/sanjaya3d/LIPI/blob/main/.github/workflows/release.yml">release.yml</a>) මඟින්, tag කළ source code එකෙන් <code>lipi.exe</code> GitHub හි servers මත build කරයි.</t-si></li>
+        <li><t-en lang="en"><b>Scan it:</b> upload <code>lipi.exe</code> to <a href="https://www.virustotal.com">VirusTotal</a> to see what many antivirus programs say. LIPI uses a keyboard hook, so some of them may flag it. See the <a href="#faq">FAQ</a>.</t-en><t-si lang="si"><b>Scan කරන්න:</b> බොහෝ antivirus වැඩසටහන් කියන්නේ කුමක්දැයි බැලීමට <code>lipi.exe</code> <a href="https://www.virustotal.com">VirusTotal</a> වෙත upload කරන්න. LIPI keyboard hook එකක් භාවිත කරන නිසා, ඒවායින් සමහරක් එය සලකුණු කළ හැක. <a href="#faq">නිතර අසන ප්&zwj;රශ්න</a> බලන්න.</t-si></li>
+        <li><t-en lang="en"><b>If you decide to run it:</b> on the blue Windows window, click <b>More info</b>, then <b>Run anyway</b>.</t-en><t-si lang="si"><b>Run කිරීමට තීරණය කළහොත්:</b> නිල් පැහැති Windows window එකේ <b>More info</b> ක්ලික් කර, ඉන්පසු <b>Run anyway</b> ක්ලික් කරන්න.</t-si></li>
+        <li><t-en lang="en"><b>Privacy:</b> LIPI will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it. See <a href="#privacy">Privacy</a>.</t-en><t-si lang="si"><b>පෞද්ගලිකත්වය:</b> LIPI භාවිත කරන්නා හෝ එය install කරන හෝ ක්&zwj;රියාත්මක කරන පුද්ගලයා විසින් ප්&zwj;රකාශිතව ඉල්ලා සිටින්නේ නම් මිස, LIPI විසින් වෙනත් ජාලගත පද්ධති වෙත කිසිදු තොරතුරක් හුවමාරු නොකරයි. <a href="#privacy">පෞද්ගලිකත්වය</a> බලන්න.</t-si></li>
+        <li><t-en lang="en"><b>Changes to your system:</b> none by themselves. The only change is one startup entry, added when you turn on <b>Run on startup</b> in Settings and removed when you turn it off. There is no installer. To remove LIPI, see the <a href="#faq">FAQ</a>.</t-en><t-si lang="si"><b>ඔබේ පද්ධතියට වන වෙනස්කම්:</b> තනිවම කිසිවක් නැත. එකම වෙනස්කම වන්නේ, Settings හි <b>Run on startup</b> on කළ විට එක් කරන සහ off කළ විට ඉවත් කරන, එක් startup entry එකක් පමණි. Installer එකක් නැත. LIPI ඉවත් කිරීමට <a href="#faq">නිතර අසන ප්&zwj;රශ්න</a> බලන්න.</t-si></li>
+        <li><t-en lang="en"><b>Problems:</b> if you think a release is wrong, or you find a security problem, <a href="https://github.com/sanjaya3d/LIPI/issues">open an issue</a>.</t-en><t-si lang="si"><b>ගැටලු:</b> release එකක වැරැද්දක් ඇතැයි ඔබට සිතේ නම්, හෝ ආරක්ෂක ගැටලුවක් සොයාගතහොත්, <a href="https://github.com/sanjaya3d/LIPI/issues">issue එකක් විවෘත කරන්න</a>.</t-si></li>
       </ul>
     </div>
   </div>
@@ -420,13 +469,13 @@ footer p{color:var(--dim);font-size:.95rem}
 
 <footer>
   <div class="wrap">
-    <a class="cta" href="https://github.com/sanjaya3d/LIPI/releases/latest/download/lipi.exe"><img src="assets/download-button.svg" width="340" height="86" alt="Download the latest LIPI release for Windows" style="margin:0 auto"></a>
+    <a class="cta" href="https://github.com/sanjaya3d/LIPI/releases/latest/download/lipi.exe"><img data-en-alt="Download the latest LIPI release for Windows" data-si-alt="Windows සඳහා නවතම LIPI නිකුතුව බාගත කරන්න" src="assets/download-button.svg" width="340" height="86" alt="Download the latest LIPI release for Windows" style="margin:0 auto"></a>
     <div class="links">
       <a class="btn" href="https://github.com/sanjaya3d/LIPI">GitHub</a>
       <a class="btn" href="https://facebook.com/sanjaya3d">Facebook</a>
       <a class="btn" href="https://www.youtube.com/@SANJAYA3D/">YouTube</a>
     </div>
-    <p>Made by <b style="color:var(--lime)">SANJAYA3D</b> &nbsp;·&nbsp; Free software under the <a href="https://github.com/sanjaya3d/LIPI/blob/main/LICENSE">GNU GPL v3.0 or later</a> &nbsp;·&nbsp; Built using <a href="https://www.rust-lang.org">Rust</a> &nbsp;·&nbsp; <a href="#is-the-download-safe">Is the download safe?</a></p>
+    <p><t-en lang="en">Made by <b style="color:var(--lime)">SANJAYA3D</b> &nbsp;·&nbsp; Free software under the <a href="https://github.com/sanjaya3d/LIPI/blob/main/LICENSE">GNU GPL v3.0 or later</a> &nbsp;·&nbsp; Built using <a href="https://www.rust-lang.org">Rust</a> &nbsp;·&nbsp; <a href="#is-the-download-safe">Is the download safe?</a></t-en><t-si lang="si"><b style="color:var(--lime)">SANJAYA3D</b> විසින් සාදන ලදී &nbsp;·&nbsp; <a href="https://github.com/sanjaya3d/LIPI/blob/main/LICENSE">GNU GPL v3.0 හෝ ඊට පසු</a> අනුවාදය යටතේ නිදහස් මෘදුකාංගයකි &nbsp;·&nbsp; <a href="https://www.rust-lang.org">Rust</a> භාවිතයෙන් නිර්මාණය කර ඇත &nbsp;·&nbsp; <a href="#is-the-download-safe">බාගත කිරීම ආරක්ෂිතද?</a></t-si></p>
   </div>
 </footer>
 
@@ -441,17 +490,62 @@ footer p{color:var(--dim);font-size:.95rem}
     var label = btn.querySelector(".lbl");
     var PAUSE = '<svg viewBox="0 0 24 24"><rect x="5" y="4" width="5" height="16" rx="1.5"/><rect x="14" y="4" width="5" height="16" rx="1.5"/></svg>';
     var PLAY = '<svg viewBox="0 0 24 24"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z"/></svg>';
-    icon.innerHTML = PAUSE;
+    var TEXT = {
+      en: { pause: "Pause slideshow", play: "Play slideshow" },
+      si: { pause: "ස්ලයිඩ් නවත්වන්න", play: "ස්ලයිඩ් ධාවනය කරන්න" }
+    };
+    function paint() {
+      var l = document.documentElement.getAttribute("data-lang") === "si" ? "si" : "en";
+      var paused = reel.classList.contains("paused");
+      icon.innerHTML = paused ? PLAY : PAUSE;
+      label.textContent = TEXT[l][paused ? "play" : "pause"];
+    }
+    paint();
     btn.hidden = false;
     btn.addEventListener("click", function () {
-      var paused = reel.classList.toggle("paused");
-      icon.innerHTML = paused ? PLAY : PAUSE;
-      label.textContent = paused ? "Play slideshow" : "Pause slideshow";
+      reel.classList.toggle("paused");
+      paint();
     });
+    document.addEventListener("lipilangchange", paint);
     if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       reel.tabIndex = 0;
     }
   } catch (e) {}
+})();
+</script>
+<script>
+// Language switch. The page holds both languages, and this shows one of them.
+(function () {
+  var META = {"en": {"title": "LIPI (ලිපි) | Type Singlish, get Sinhala in any Windows app", "description": "LIPI turns Singlish into Sinhala as you type, in Photoshop, Premiere Pro, Blender, Word and any other Windows app. Unicode or FM Abhaya. Free and open source."}, "si": {"title": "LIPI (ලිපි) | Singlish ටයිප් කර ඕනෑම Windows මෘදුකාංගයක සිංහල ලබාගන්න", "description": "ඔබ ටයිප් කරන විටම LIPI මඟින් Singlish සිංහල බවට හරවයි. Photoshop, Premiere Pro, Blender, Word සහ වෙනත් ඕනෑම Windows මෘදුකාංගයක. Unicode හෝ FM Abhaya. නොමිලේ, විවෘත මූලාශ්‍ර."}};
+  var root = document.documentElement;
+  var buttons = document.querySelectorAll("[data-set-lang]");
+  var description = document.querySelector('meta[name="description"]');
+  function setLang(l, save) {
+    if (l !== "si") l = "en";
+    root.setAttribute("data-lang", l);
+    root.lang = l;
+    document.title = META[l].title;
+    if (description) description.setAttribute("content", META[l].description);
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].setAttribute("aria-pressed", buttons[i].getAttribute("data-set-lang") === l ? "true" : "false");
+    }
+    var marked = document.querySelectorAll("[data-si-alt],[data-si-aria-label]");
+    for (var j = 0; j < marked.length; j++) {
+      ["alt", "aria-label"].forEach(function (a) {
+        var v = marked[j].getAttribute("data-" + l + "-" + a);
+        if (v !== null) marked[j].setAttribute(a, v);
+      });
+    }
+    if (save) {
+      try { localStorage.setItem("lipi-lang", l); } catch (e) {}
+      try { var u = new URL(location.href); u.searchParams.set("lang", l); history.replaceState(null, "", u); } catch (e) {}
+    }
+    document.dispatchEvent(new CustomEvent("lipilangchange", { detail: l }));
+  }
+  for (var k = 0; k < buttons.length; k++) {
+    buttons[k].addEventListener("click", function (e) { setLang(e.currentTarget.getAttribute("data-set-lang"), true); });
+  }
+  setLang(root.getAttribute("data-lang"), false);
 })();
 </script>
 <script>
