@@ -69,7 +69,14 @@ code{background:var(--surface2);border:1px solid var(--edge);border-radius:6px;p
 .brand img{width:34px;height:34px;border-radius:9px}
 .brand span.si{color:var(--lime);font-weight:700}
 .nav{display:flex;gap:24px;margin-left:auto}
-.nav a{color:var(--muted);text-decoration:none;font-size:.95rem;font-weight:600}
+.nav a{color:var(--muted);text-decoration:none;font-size:.95rem;font-weight:600;white-space:nowrap;line-height:1.3}
+.top .btn{white-space:nowrap;line-height:1.3;flex:none}
+.brand{white-space:nowrap;flex:none}
+html[data-lang="si"] .nav{gap:14px}
+html[data-lang="si"] .nav a{font-size:.9rem}
+@media (min-width:761px){html[data-lang="si"] .top .wrap{gap:14px}}
+.top.nav-fit .nav{display:none}
+.top.nav-fit .lang{margin-left:auto}
 .nav a:hover{color:var(--lime)}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:999px;font-weight:700;text-decoration:none;padding:10px 20px;border:2px solid var(--lime);color:var(--lime);background:transparent;font-size:.95rem;font-family:inherit;cursor:pointer}
 .btn:hover{background:rgba(190,249,44,.12);color:var(--lime)}
@@ -204,15 +211,21 @@ html[data-lang="si"] :is(.eyebrow,.tag,.chartbody h3){letter-spacing:0}
   .g3,.g2,.two{grid-template-columns:1fr}
   .how div{grid-template-columns:1fr;gap:4px}
 }
-@media (max-width:340px){
+@media (max-width:480px){
   .brand span.si{display:none}
+  .top .wrap{gap:8px}
+  .lang button{padding:4px 8px;font-size:.78rem}
+  .top .btn{padding:7px 12px;font-size:.88rem}
 }
 @media (max-width:380px){
   .brand{font-size:1rem;gap:7px}
   .brand img{width:30px;height:30px}
   .top .wrap{gap:6px}
   .lang button{padding:4px 7px}
-  .top .btn{padding:7px 11px;font-size:.88rem}
+  .top .btn{padding:7px 11px;font-size:.86rem}
+}
+@media (max-width:340px){
+  .brand{font-size:0;gap:0}
 }
 @media (max-width:480px){
   body{font-size:16px}
@@ -546,6 +559,35 @@ html[data-lang="si"] :is(.eyebrow,.tag,.chartbody h3){letter-spacing:0}
     buttons[k].addEventListener("click", function (e) { setLang(e.currentTarget.getAttribute("data-set-lang"), true); });
   }
   setLang(root.getAttribute("data-lang"), false);
+})();
+</script>
+<script>
+// Header fit. If the menu links do not fit in one line next to the logo, the buttons and
+// the language switch, hide the menu (the same as on a phone). It depends on the real
+// width of the text, so it works with any font.
+(function () {
+  var top = document.querySelector(".top");
+  var wrap = top.querySelector(".wrap");
+  var nav = top.querySelector(".nav");
+  var brand = top.querySelector(".brand");
+  var queued = false;
+  function fit() {
+    queued = false;
+    top.classList.remove("nav-fit");
+    if (getComputedStyle(nav).display === "none") return;
+    var room = nav.getBoundingClientRect().left - brand.getBoundingClientRect().right;
+    if (wrap.scrollWidth > wrap.clientWidth + 1 || room < 36) top.classList.add("nav-fit");
+  }
+  function queue() {
+    if (queued) return;
+    queued = true;
+    (window.requestAnimationFrame || setTimeout)(fit);
+  }
+  window.addEventListener("resize", queue);
+  window.addEventListener("load", queue);
+  document.addEventListener("lipilangchange", queue);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(queue);
+  fit();
 })();
 </script>
 <script>
