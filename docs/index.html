@@ -36,8 +36,8 @@
 <meta name="twitter:card" content="summary_large_image">
 <style>
 :root{
-  --bg:#111315; --surface:#181b1e; --surface2:#1e2226; --edge:#2b3035; --edge2:#4B535A;
-  --lime:#BEF92C; --text:#ffffff; --muted:#E1E5EC; --dim:#b3bbc3;
+  --bg:#111315; --band:#0c0e10; --low:#1a1c1e; --surface:#181b1e; --surface2:#1e2226; --edge:#2b3035; --edge2:#4B535A;
+  --lime:#BEF92C; --lime-hi:#d2ff5a; --text:#ffffff; --muted:#E1E5EC; --dim:#b3bbc3;
   --radius:18px;
   --font:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,"Nirmala UI","Noto Sans Sinhala","Iskoola Pota",sans-serif;
   --mono:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",Menlo,monospace;
@@ -48,58 +48,93 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);fon
 img{max-width:100%;height:auto;display:block}
 a{color:var(--lime);text-underline-offset:3px}
 a:hover{color:#fff}
+[hidden]{display:none!important}
 :focus-visible{outline:3px solid var(--lime);outline-offset:3px;border-radius:6px}
-.wrap{width:100%;max-width:1120px;margin:0 auto;padding:0 20px}
-section{padding:88px 0;scroll-margin-top:64px}
+.wrap{width:100%;max-width:1120px;margin:0 auto;padding:0 24px}
+section{padding:76px 0 0;scroll-margin-top:80px}
+#creator,#key-map{padding-bottom:76px}
+#how-to-type,.cta-section{padding-bottom:76px}
 h1,h2,h3{line-height:1.15;margin:0}
-h2{font-size:clamp(1.8rem,4vw,2.6rem);font-weight:800;letter-spacing:-.02em}
+h2{font-size:clamp(1.75rem,3.6vw,2.5rem);font-weight:800;letter-spacing:-.02em}
 h3{font-size:1.15rem;font-weight:700}
 p{margin:0}
 code,kbd{font-family:var(--mono);font-size:.92em}
 code{background:var(--surface2);border:1px solid var(--edge);border-radius:6px;padding:.08em .4em;color:var(--lime)}
-.eyebrow{color:var(--lime);font-weight:700;letter-spacing:.18em;text-transform:uppercase;font-size:.82rem}
-.lead{color:var(--muted);font-size:1.12rem;max-width:62ch}
-.head{margin-bottom:40px;display:grid;gap:14px}
+.eyebrow{color:var(--lime);font-family:var(--mono);font-weight:700;letter-spacing:.16em;text-transform:uppercase;font-size:.76rem}
+.lead{color:var(--muted);font-size:1.1rem;max-width:62ch}
+.head{margin-bottom:36px;display:grid;gap:12px;justify-items:start}
 .si{font-family:"Nirmala UI","Noto Sans Sinhala","Iskoola Pota","Segoe UI",system-ui,sans-serif}
+#creator,#key-map{background:var(--band);border-top:1px solid var(--edge);border-bottom:1px solid var(--edge);margin-top:0}
+#quick-start,#smart-quotes,#privacy{background:var(--bg)}
 
 /* header */
-.top{position:sticky;top:0;z-index:20;background:rgba(17,19,21,.86);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--edge)}
-.top .wrap{display:flex;align-items:center;gap:20px;height:64px}
-.brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-weight:800;font-size:1.15rem;letter-spacing:.02em}
-.brand img{width:34px;height:34px;border-radius:9px}
+.top{position:sticky;top:0;z-index:20;background:rgba(17,19,21,.9);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--edge);box-shadow:0 1px 10px rgba(0,0,0,.35)}
+.top .wrap{display:flex;align-items:center;gap:16px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-weight:800;font-size:1.15rem;letter-spacing:.02em;white-space:nowrap;flex:none}
+.brand img{width:32px;height:32px;border-radius:9px}
 .brand span.si{color:var(--lime);font-weight:700}
-.nav{display:flex;gap:24px;margin-left:auto}
-.nav a{color:var(--muted);text-decoration:none;font-size:.95rem;font-weight:600;white-space:nowrap;line-height:1.3}
+.nav{display:flex;gap:2px;margin:0 auto;padding:4px;border-radius:999px;background:var(--low);border:1px solid var(--edge)}
+.nav a{color:var(--muted);text-decoration:none;font-size:.92rem;font-weight:600;white-space:nowrap;line-height:1.3;padding:5px 12px;border-radius:999px;transition:background .15s,color .15s}
+.nav a:hover{color:var(--lime);background:var(--surface2)}
 .top .btn{white-space:nowrap;line-height:1.3;flex:none}
-.brand{white-space:nowrap;flex:none}
-html[data-lang="si"] .nav{gap:14px}
-html[data-lang="si"] .nav a{font-size:.9rem}
-@media (min-width:761px){html[data-lang="si"] .top .wrap{gap:14px}}
+html[data-lang="si"] .nav a{font-size:.88rem;padding:5px 10px}
+@media (min-width:761px){html[data-lang="si"] .top .wrap{gap:12px}}
 .top.nav-fit .nav{display:none}
 .top.nav-fit .lang{margin-left:auto}
-.nav a:hover{color:var(--lime)}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:999px;font-weight:700;text-decoration:none;padding:10px 20px;border:2px solid var(--lime);color:var(--lime);background:transparent;font-size:.95rem;font-family:inherit;cursor:pointer}
-.btn:hover{background:rgba(190,249,44,.12);color:var(--lime)}
-.btn.solid{background:var(--lime);color:var(--bg)}
-.btn.solid:hover{background:#d2ff5a;color:var(--bg)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:999px;font-weight:700;text-decoration:none;padding:10px 20px;border:1px solid var(--edge2);color:#fff;background:transparent;font-size:.95rem;font-family:inherit;cursor:pointer;transition:background .15s,border-color .15s,color .15s,box-shadow .15s}
+.btn:hover{background:var(--surface2);border-color:var(--lime);color:var(--lime)}
+.btn.solid{background:var(--lime);border-color:var(--lime);color:var(--bg)}
+.btn.solid:hover{background:var(--lime-hi);border-color:var(--lime-hi);color:var(--bg);box-shadow:0 0 24px rgba(190,249,44,.28)}
+.btn svg{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
 /* hero */
-.hero{padding:72px 0 40px;text-align:center}
-.hero h1{font-size:clamp(2.5rem,7vw,4.8rem);font-weight:800;letter-spacing:-.03em;margin:18px 0 22px}
+.hero{padding:56px 0 72px;background:radial-gradient(640px 340px at 24% 0,rgba(190,249,44,.07),transparent 70%)}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:48px;align-items:center}
+.hero-copy{display:grid;gap:22px;justify-items:start}
+.hero .eyebrow{display:inline-flex;align-items:center;gap:9px;padding:6px 14px;border-radius:999px;background:var(--low);border:1px solid var(--edge);color:var(--muted);letter-spacing:.12em}
+.hero .eyebrow::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--lime);box-shadow:0 0 0 4px rgba(190,249,44,.16);flex:none}
+.hero h1{font-size:clamp(2.4rem,5.2vw,4.2rem);font-weight:800;letter-spacing:-.03em}
 .hero h1 em{font-style:normal;color:var(--lime)}
-.hero .si-line{color:var(--muted);font-size:1.12rem;max-width:58ch;margin:0 auto 34px}
-.hero .cta{display:inline-block;max-width:100%}
-.hero .cta img{width:min(420px,100%)}
-.hero .meta{margin-top:10px;color:var(--dim);font-size:.95rem;display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:center}
-.hero .meta b{color:#fff}
-.shot{margin:56px auto 0;max-width:1040px;border-radius:26px;border:1px solid var(--edge2);box-shadow:0 0 0 6px rgba(190,249,44,.06),0 30px 80px rgba(0,0,0,.55);overflow:hidden;background:#000}
+.hero .si-line{color:var(--muted);font-size:1.08rem;max-width:52ch}
+.hero .cta{display:block;width:min(380px,100%)}
+.hero .cta img{width:100%}
+.hero .meta{display:flex;flex-wrap:wrap;gap:8px;color:var(--dim);font-size:.86rem}
+.hero .meta>*{padding:4px 12px;border:1px solid var(--edge);border-radius:999px;background:var(--surface);line-height:1.5}
+.hero .meta b{color:var(--lime)}
+.hero .meta a{text-decoration:none}
+.hero .meta a:hover{color:#fff}
+.shot{margin:0;border-radius:24px;border:1px solid var(--edge2);box-shadow:0 0 0 6px rgba(190,249,44,.05),0 30px 80px rgba(0,0,0,.55);overflow:hidden;background:#000}
+
+/* creator */
+.sec-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:18px 24px;margin-bottom:34px}
+.sec-head .head{margin:0}
+.creator-card{position:relative;overflow:hidden;background:var(--bg);border:1px solid var(--edge);border-radius:24px;padding:40px;box-shadow:0 24px 64px rgba(0,0,0,.6);display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:36px;align-items:start}
+.creator-card::before{content:"";position:absolute;top:-90px;right:-90px;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(190,249,44,.1),transparent 70%);pointer-events:none}
+.creator-card>*{position:relative}
+.who{display:flex;align-items:center;gap:14px}
+.who .mark{width:48px;height:48px;border-radius:13px;background:var(--surface2);display:grid;place-items:center;flex:none}
+.who .mark svg{width:26px;height:26px;stroke:var(--lime);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.who h3{font-size:1.5rem}
+.who .role{display:block;color:var(--lime);font-size:.9rem;font-weight:600}
+.creator-main{display:grid;gap:20px;justify-items:start}
+.creator-main>p{color:var(--dim);font-size:1.05rem}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:5px 13px;border-radius:999px;background:var(--surface2);border:1px solid var(--edge);font-size:.85rem;color:var(--muted);line-height:1.5}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.stat{background:var(--surface);border:1px solid var(--edge);border-radius:14px;padding:16px;display:grid;gap:4px;align-content:start}
+.stat .lbl{font-family:var(--mono);text-transform:uppercase;letter-spacing:.1em;font-size:.7rem;color:var(--dim)}
+.stat .num{font-size:2.2rem;font-weight:800;line-height:1.15;color:#fff}
+.stat .num.hi{color:var(--lime)}
+.stat .desc{font-size:.85rem;color:var(--dim);line-height:1.45}
+.stat>*,.creator-main>*,.who>div{min-width:0;overflow-wrap:anywhere}
+.links-row{display:flex;flex-wrap:wrap;gap:10px}
 
 /* cards */
 .grid{display:grid;gap:18px}
 .g3{grid-template-columns:repeat(3,1fr)}
 .g2{grid-template-columns:repeat(2,1fr)}
-.card{background:var(--surface);border:1px solid var(--edge);border-radius:var(--radius);padding:26px;transition:border-color .2s,transform .2s}
-.card:hover{border-color:var(--lime);transform:translateY(-2px)}
+.card{background:var(--surface);border:1px solid var(--edge);border-radius:var(--radius);padding:26px;transition:border-color .2s,transform .2s,box-shadow .2s}
+.card:hover{border-color:rgba(190,249,44,.6);transform:translateY(-2px);box-shadow:0 12px 34px rgba(0,0,0,.35)}
 .card h3{margin:14px 0 8px}
 .card p{color:var(--muted);font-size:1rem}
 .ico{width:46px;height:46px;border-radius:13px;background:rgba(190,249,44,.1);display:grid;place-items:center}
@@ -108,8 +143,8 @@ html[data-lang="si"] .nav a{font-size:.9rem}
 /* steps */
 .steps{counter-reset:s;display:grid;grid-template-columns:repeat(4,1fr);gap:18px;list-style:none;margin:0;padding:0}
 .steps li{counter-increment:s;background:var(--surface);border:1px solid var(--edge);border-radius:var(--radius);padding:24px;position:relative}
-.steps li::before{content:counter(s);display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--lime);color:var(--bg);font-weight:800;margin-bottom:14px}
-.steps li>b{display:block;margin-bottom:6px}
+.steps li::before{content:counter(s,decimal-leading-zero);display:grid;place-items:center;width:44px;height:44px;border-radius:13px;background:var(--lime);color:var(--bg);font-family:var(--mono);font-weight:800;margin-bottom:16px}
+.steps li>b{display:block;margin-bottom:6px;font-size:1.08rem}
 .steps span{color:var(--muted);font-size:.98rem}
 
 /* typing */
@@ -119,14 +154,23 @@ html[data-lang="si"] .nav a{font-size:.9rem}
 .rules li::before{content:"";position:absolute;left:0;top:.62em;width:12px;height:12px;border-radius:4px;background:var(--lime)}
 .pairs{display:grid;gap:12px}
 .pair{display:grid;grid-template-columns:minmax(0,1fr) 28px minmax(0,1.1fr);align-items:center;gap:10px;background:var(--surface);border:1px solid var(--edge);border-radius:16px;padding:12px 16px}
-.pair kbd{background:var(--surface2);border:2px solid var(--edge2);border-radius:12px;padding:8px 12px;text-align:center;font-weight:700;font-size:1.05rem}
+.pair kbd{background:var(--surface2);border:1px solid var(--edge2);border-radius:12px;padding:8px 12px;text-align:center;font-weight:700;font-size:1.05rem}
+.pair kbd,.pair .out{min-width:0;overflow-wrap:anywhere}
 .pair .arrow{color:var(--lime);text-align:center;font-weight:800}
 .pair .out{color:var(--lime);font-size:1.7rem;font-weight:700;line-height:1.5}
-details.chart{margin-top:34px}
-details.chart>summary{list-style:none;display:inline-flex}
-details.chart>summary::-webkit-details-marker{display:none}
-.chartbody{margin-top:22px;display:grid;gap:30px}
+
+/* key map */
+.km-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px 20px;margin-bottom:22px}
+.tabs{display:flex;flex-wrap:wrap;gap:2px;padding:4px;border-radius:999px;background:var(--low);border:1px solid var(--edge)}
+.tab{font:inherit;font-size:.9rem;font-weight:700;color:var(--muted);background:transparent;border:0;border-radius:999px;padding:6px 16px;cursor:pointer;line-height:1.3}
+.tab:hover{color:var(--lime)}
+.tab[aria-selected="true"]{background:var(--surface2);color:var(--lime);box-shadow:inset 0 0 0 1px var(--edge2)}
+.search{font:inherit;font-size:.95rem;color:#fff;background:var(--low);border:1px solid var(--edge2);border-radius:999px;padding:8px 18px;min-width:min(280px,100%);line-height:1.4}
+.search::placeholder{color:var(--dim);opacity:1}
+.search:focus{outline:none;border-color:var(--lime);box-shadow:0 0 0 3px rgba(190,249,44,.18)}
+.chartbody{display:grid;gap:30px}
 .chartbody h3{color:var(--lime);margin-bottom:12px;letter-spacing:.06em;text-transform:uppercase;font-size:.95rem}
+.chartbody.tabbed>div>h3{display:none}
 .cells{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px}
 .cells.wide{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
 .cell{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0;background:var(--surface);border:1px solid var(--edge);border-radius:12px;padding:8px 12px}
@@ -138,20 +182,25 @@ details.chart>summary::-webkit-details-marker{display:none}
 /* output + tip */
 .kind h3{display:flex;align-items:center;gap:10px}
 .tag{font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;font-weight:800;padding:3px 10px;border-radius:999px;background:var(--lime);color:var(--bg)}
-.tipcard{margin:0 auto 36px;max-width:640px;background:#000;border:3px solid var(--lime);border-radius:28px;padding:30px 24px 26px;text-align:center}
-.tipcard p{font-size:clamp(1.05rem,2.6vw,1.45rem);font-weight:700;line-height:1.5}
-.tipcard .btn{margin-top:16px;background:var(--lime);color:var(--bg);font-size:1.05rem}
-.tipcard .btn:hover{background:#d2ff5a}
-.why{display:grid;gap:14px;max-width:760px;margin:0 auto 30px;color:var(--muted)}
+.sq-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:44px;align-items:start}
+.sq-left{position:sticky;top:96px}
+.sq-right{display:grid;gap:24px}
+.tipcard{margin:0;background:linear-gradient(180deg,rgba(190,249,44,.07),rgba(190,249,44,0) 60%),var(--surface);border:1px solid rgba(190,249,44,.55);border-radius:22px;padding:28px 24px 26px;text-align:left;box-shadow:0 0 40px rgba(190,249,44,.07)}
+.tipcard p{font-size:clamp(1.05rem,2.2vw,1.35rem);font-weight:700;line-height:1.55}
+.tipcard .btn{margin-top:18px;background:var(--lime);border-color:var(--lime);color:var(--bg);font-size:1.02rem}
+.tipcard .btn:hover{background:var(--lime-hi);border-color:var(--lime-hi);color:var(--bg)}
+.why{display:grid;gap:14px;margin:0;color:var(--muted)}
 .why b{color:#fff}
-.how{display:grid;gap:10px;max-width:760px;margin:0 auto}
-.how div{display:grid;grid-template-columns:170px 1fr;gap:16px;background:var(--surface);border:1px solid var(--edge);border-radius:14px;padding:14px 18px}
+.how{display:grid;gap:10px;margin:0}
+.how div{display:grid;grid-template-columns:150px 1fr;gap:16px;background:var(--surface);border:1px solid var(--edge);border-radius:14px;padding:14px 18px}
 .how dt{font-weight:800;color:var(--lime)}
 .how dd{margin:0;color:var(--muted)}
 
 /* faq */
-.faq{max-width:820px;margin:0 auto;display:grid;gap:12px}
-.faq details{background:var(--surface);border:1px solid var(--edge);border-radius:14px}
+.faq-grid{display:grid;grid-template-columns:minmax(0,.7fr) minmax(0,1.5fr);gap:48px;align-items:start}
+.faq-grid .head{position:sticky;top:96px;margin:0}
+.faq{margin:0;display:grid;gap:12px}
+.faq details{background:var(--surface);border:1px solid var(--edge);border-radius:14px;transition:border-color .2s}
 .faq summary{cursor:pointer;list-style:none;padding:18px 54px 18px 22px;font-weight:700;position:relative}
 .faq summary::-webkit-details-marker{display:none}
 .faq summary::after{content:"+";position:absolute;right:22px;top:50%;transform:translateY(-50%);color:var(--lime);font-size:1.6rem;font-weight:400;line-height:1}
@@ -159,13 +208,26 @@ details.chart>summary::-webkit-details-marker{display:none}
 .faq details[open]{border-color:var(--edge2)}
 .faq details>div{padding:0 22px 20px;color:var(--muted)}
 
-/* privacy + footer */
+/* privacy + download band + footer */
 .two{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
 .list{margin:12px 0 0;padding-left:20px;color:var(--muted);display:grid;gap:8px}
 .list li::marker{color:var(--lime)}
-footer{border-top:1px solid var(--edge);padding:56px 0 64px;text-align:center}
-footer .links{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin:22px 0}
-footer p{color:var(--dim);font-size:.95rem}
+.cta-card{position:relative;overflow:hidden;text-align:center;display:grid;justify-items:center;gap:18px;background:var(--surface);border:1px solid var(--edge2);border-radius:28px;padding:56px 24px;box-shadow:0 0 0 6px rgba(190,249,44,.05),0 30px 80px rgba(0,0,0,.45)}
+.cta-card::before{content:"";position:absolute;left:50%;top:-140px;width:min(560px,100%);height:280px;transform:translateX(-50%);background:radial-gradient(closest-side,rgba(190,249,44,.14),transparent);pointer-events:none}
+.cta-card>*{position:relative}
+.cta-card .cta{display:block;width:min(400px,100%)}
+.cta-card .cta img{width:100%}
+footer{background:var(--band);border-top:1px solid var(--edge);padding:56px 0 36px}
+.foot-grid{display:grid;grid-template-columns:minmax(0,1.9fr) repeat(3,minmax(0,1fr));gap:32px;margin-bottom:34px}
+.foot-brand{display:grid;gap:12px;align-content:start;justify-items:start}
+.foot-brand .brand{font-size:1.2rem}
+.foot-brand p{color:var(--dim);font-size:.95rem;max-width:40ch}
+.badge{font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;padding:3px 10px;border-radius:6px;background:var(--surface2);border:1px solid var(--edge);color:var(--dim)}
+.foot-col h4{margin:0 0 14px;font-family:var(--mono);font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);font-weight:700}
+.foot-col ul{list-style:none;margin:0;padding:0;display:grid;gap:9px}
+.foot-col a{color:var(--muted);text-decoration:none;font-size:.95rem}
+.foot-col a:hover{color:var(--lime)}
+.foot-end{border-top:1px solid var(--edge);padding-top:22px;color:var(--dim);font-size:.92rem;text-align:left}
 
 /* app reel */
 .reel{--w:min(760px,80vw);--gap:24px;overflow:hidden;padding-bottom:18px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
@@ -179,22 +241,30 @@ footer p{color:var(--dim);font-size:.95rem}
 .head .si-line{color:var(--muted);font-size:1.05rem;max-width:62ch}
 .reel-bar{margin-top:30px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:14px 22px;text-align:center}
 .reel-btn[hidden]{display:none}
-.reel-btn svg{width:16px;height:16px;fill:currentColor}
+.reel-btn svg{width:16px;height:16px;fill:currentColor;stroke:none}
 .fine{color:var(--dim);font-size:.88rem;max-width:60ch}
 
 /* two languages: the page holds both, one is shown */
 t-en,t-si{display:inline}
 html:not([data-lang="si"]) t-si,html[data-lang="si"] t-en{display:none}
-.lang{display:flex;gap:2px;padding:3px;border:1px solid var(--edge2);border-radius:999px;flex:none}
+.lang{display:flex;gap:2px;padding:3px;border:1px solid var(--edge2);border-radius:999px;flex:none;background:var(--low)}
 .lang button{font:inherit;font-size:.85rem;font-weight:700;line-height:1.4;color:var(--muted);background:transparent;border:0;border-radius:999px;padding:4px 12px;cursor:pointer}
 .lang button:hover{color:var(--lime)}
 .lang button[aria-pressed="true"]{background:var(--lime);color:var(--bg)}
 html:not([data-lang="si"]) :is(.tipcard,.why,.how,.note,.si-line){font-family:var(--font)}
 html[data-lang="si"] body{line-height:1.8}
 html[data-lang="si"] :is(h1,h2,h3){letter-spacing:0;line-height:1.4}
-html[data-lang="si"] .hero h1{font-size:clamp(2.1rem,6vw,3.8rem);line-height:1.3}
-html[data-lang="si"] :is(.eyebrow,.tag,.chartbody h3){letter-spacing:0}
+html[data-lang="si"] .hero h1{font-size:clamp(2.1rem,5vw,3.6rem);line-height:1.3}
+html[data-lang="si"] :is(.eyebrow,.tag,.chartbody h3,.stat .lbl,.foot-col h4,.badge){letter-spacing:0;font-family:var(--font)}
 
+@media (max-width:980px){
+  .hero-grid{grid-template-columns:1fr;gap:40px}
+  .creator-card{grid-template-columns:minmax(0,1fr);padding:32px}
+  .sq-grid,.faq-grid{grid-template-columns:1fr;gap:34px}
+  .sq-left,.faq-grid .head{position:static}
+  .foot-grid{grid-template-columns:1fr 1fr 1fr}
+  .foot-brand{grid-column:1/-1}
+}
 @media (max-width:900px){
   .g3{grid-template-columns:repeat(2,1fr)}
   .steps{grid-template-columns:repeat(2,1fr)}
@@ -204,38 +274,47 @@ html[data-lang="si"] :is(.eyebrow,.tag,.chartbody h3){letter-spacing:0}
   .nav{display:none}
   .top .wrap{justify-content:space-between;gap:10px}
   .lang button{padding:4px 9px;font-size:.8rem}
-  .top .btn{padding:8px 14px;white-space:nowrap;line-height:1.3;flex:none}
-  .brand{white-space:nowrap;flex:none}
-  section{padding:60px 0}
-  .hero{padding-top:44px}
+  .top .btn{padding:8px 14px}
+  section{padding:56px 0 0}
+  #creator,#key-map{padding-bottom:56px}
+  #how-to-type,.cta-section{padding-bottom:56px}
+  .hero{padding:36px 0 52px}
   .g3,.g2,.two{grid-template-columns:1fr}
   .how div{grid-template-columns:1fr;gap:4px}
+  .creator-card{padding:24px 20px}
+  .cta-card{padding:44px 20px}
 }
 @media (max-width:480px){
-  .brand span.si{display:none}
+  .wrap{padding:0 18px}
+  .top .brand span.si{display:none}
   .top .wrap{gap:8px}
   .lang button{padding:4px 8px;font-size:.78rem}
   .top .btn{padding:7px 12px;font-size:.88rem}
+  .stats{gap:10px}
+  .stat .num{font-size:1.9rem}
+  .foot-grid{grid-template-columns:1fr 1fr}
 }
 @media (max-width:380px){
-  .brand{font-size:1rem;gap:7px}
-  .brand img{width:30px;height:30px}
+  .top .brand{font-size:1rem;gap:7px}
+  .top .brand img{width:30px;height:30px}
   .top .wrap{gap:6px}
   .lang button{padding:4px 7px}
   .top .btn{padding:7px 11px;font-size:.86rem}
 }
 @media (max-width:340px){
-  .brand{font-size:0;gap:0}
+  .top .brand{font-size:0;gap:0}
 }
 @media (max-width:480px){
   body{font-size:16px}
   .steps{grid-template-columns:1fr}
   .pair .out{font-size:1.45rem}
+  .pair{gap:6px;padding:10px 12px}
+  .pair kbd{padding:8px 6px;font-size:.95rem}
   .cells.wide{grid-template-columns:repeat(2,1fr)}
 }
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
-  .card,.card:hover{transition:none;transform:none}
+  .card,.card:hover,.nav a,.btn{transition:none;transform:none}
   .reel{overflow-x:auto;-webkit-mask-image:none;mask-image:none;scroll-snap-type:x proximity}
   .reel-track{animation:none}
   .slide[aria-hidden="true"],.reel-btn{display:none}
@@ -265,7 +344,8 @@ html[data-lang="si"] :is(.eyebrow,.tag,.chartbody h3){letter-spacing:0}
 <main id="top">
 
 <section class="hero">
-  <div class="wrap">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
     <p class="eyebrow"><t-en lang="en">Free &nbsp;·&nbsp; Open source &nbsp;·&nbsp; Windows</t-en><t-si lang="si">නොමිලේ &nbsp;·&nbsp; Open source &nbsp;·&nbsp; Windows</t-si></p>
     <h1><t-en lang="en">Type Singlish.<br><em>Get Sinhala.</em> Live.</t-en><t-si lang="si">Singlish ටයිප් කරන්න.<br><em>සිංහල ලබාගන්න.</em> ඒ මොහොතේම.</t-si></h1>
     <p class="si-line si"><t-en lang="en">A small Windows program that turns what you type in English letters (Singlish) into Sinhala letters, the moment you type it.</t-en><t-si lang="si">ඉංග්&zwj;රීසි අකුරින් (Singlish) ටයිප් කරන දේ ඒ මොහොතේම සිංහල අකුරු බවට හරවන කුඩා Windows වැඩසටහනකි.</t-si></p>
@@ -279,8 +359,43 @@ html[data-lang="si"] :is(.eyebrow,.tag,.chartbody h3){letter-spacing:0}
       <span><t-en lang="en">Built using <a href="https://www.rust-lang.org">Rust</a></t-en><t-si lang="si"><a href="https://www.rust-lang.org">Rust</a> භාවිතයෙන් නිර්මාණය කර ඇත</t-si></span>
       <a href="https://github.com/sanjaya3d/LIPI/releases"><t-en lang="en">All releases</t-en><t-si lang="si">සියලුම නිකුතු</t-si></a>
     </p>
+    </div>
     <div class="shot">
       <img data-en-alt="Four example words, ammaa, aayuboovan, sixhala and koLaBa, turning into Sinhala, next to the LIPI window" data-si-alt="ammaa, aayuboovan, sixhala සහ koLaBa යන උදාහරණ වචන හතර LIPI window එක අසලින් සිංහල අකුරු බවට හැරෙන ආකාරය" src="assets/hero.png" width="2200" height="1248" alt="Four example words, ammaa, aayuboovan, sixhala and koLaBa, turning into Sinhala, next to the LIPI window">
+    </div>
+  </div>
+</section>
+
+<section id="creator" aria-labelledby="creator-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="head">
+        <p class="eyebrow">Meet the creator</p>
+        <h2 id="creator-title">Made by SANJAYA3D</h2>
+        <p class="lead">The developer behind LIPI.</p>
+      </div>
+      <a class="btn solid" href="https://sanjaya3d.github.io/portfolio/">Visit the portfolio</a>
+    </div>
+    <div class="creator-card">
+      <div class="creator-main">
+        <div class="who">
+          <div class="mark"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 10l3 2-3 2M12 15h5"/></svg></div>
+          <div><h3 data-i18n-skip>SANJAYA3D</h3><span class="role">Software developer and 3D artist</span></div>
+        </div>
+        <p>Independent developer, 3D animator and toolmaker from Sri Lanka. He builds small, fast tools for creative work, such as LIPI, and Blender add-ons such as Mat-Baker.</p>
+        <div class="chips"><span class="chip">3D animation</span><span class="chip">Blender add-ons</span><span class="chip">Rust and Windows tools</span></div>
+        <div class="links-row">
+          <a class="btn" href="https://github.com/sanjaya3d">GitHub</a>
+          <a class="btn" href="https://facebook.com/sanjaya3d">Facebook</a>
+          <a class="btn" href="https://www.youtube.com/@SANJAYA3D/">YouTube</a>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat"><span class="lbl">Experience</span><span class="num">6+</span><span class="desc">Years in 3D and software development</span></div>
+        <div class="stat"><span class="lbl">Projects</span><span class="num">130+</span><span class="desc">Projects completed</span></div>
+        <div class="stat"><span class="lbl">Mat-Baker</span><span class="num hi">2.3k+</span><span class="desc">Blender add-on downloads</span></div>
+        <div class="stat"><span class="lbl">Open source</span><span class="num hi" data-i18n-skip>LIPI</span><span class="desc">Written in Rust, free for everyone</span></div>
+      </div>
     </div>
   </div>
 </section>
@@ -303,7 +418,7 @@ html[data-lang="si"] :is(.eyebrow,.tag,.chartbody h3){letter-spacing:0}
   </div>
 </section>
 
-<section id="quick-start" style="padding-top:0">
+<section id="quick-start">
   <div class="wrap">
     <div class="head">
       <p class="eyebrow"><t-en lang="en">Quick start</t-en><t-si lang="si">ඉක්මන් ආරම්භය</t-si></p>
@@ -318,7 +433,7 @@ html[data-lang="si"] :is(.eyebrow,.tag,.chartbody h3){letter-spacing:0}
   </div>
 </section>
 
-<section id="in-apps" style="padding-top:0" aria-labelledby="in-apps-title">
+<section id="in-apps" aria-labelledby="in-apps-title">
   <div class="wrap">
     <div class="head">
       <p class="eyebrow"><t-en lang="en">In real apps</t-en><t-si lang="si">සැබෑ මෘදුකාංගවල</t-si></p>
@@ -344,7 +459,7 @@ html[data-lang="si"] :is(.eyebrow,.tag,.chartbody h3){letter-spacing:0}
   </div>
 </section>
 
-<section id="how-to-type" style="padding-top:0">
+<section id="how-to-type">
   <div class="wrap">
     <div class="head">
       <p class="eyebrow"><t-en lang="en">How to type</t-en><t-si lang="si">ටයිප් කරන ආකාරය</t-si></p>
@@ -367,19 +482,30 @@ html[data-lang="si"] :is(.eyebrow,.tag,.chartbody h3){letter-spacing:0}
       </div>
     </div>
 
-    <details class="chart">
-      <summary class="btn"><t-en lang="en">Show the full key chart</t-en><t-si lang="si">සම්පූර්ණ යතුරු වගුව පෙන්වන්න</t-si></summary>
-      <div class="chartbody">
+  </div>
+</section>
+
+<section id="key-map" aria-labelledby="key-map-title">
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow">Key map</p>
+      <h2 id="key-map-title">Find the key for every letter</h2>
+      <p class="lead">Pick a group, or search for a letter or a key.</p>
+    </div>
+    <div class="km-bar" data-km-bar>
+      <input class="search" type="search" data-keysearch aria-label="Search for a letter or a key" autocomplete="off" spellcheck="false" hidden>
+    </div>
+    <div class="chartbody" data-keymap>
         <div><h3><t-en lang="en">Vowels</t-en><t-si lang="si">ස්වර</t-si></h3><div class="cells"><div class="cell"><span class="g si">අ</span><kbd>a</kbd></div><div class="cell"><span class="g si">ආ</span><kbd>aa</kbd></div><div class="cell"><span class="g si">ඇ</span><kbd>A</kbd></div><div class="cell"><span class="g si">ඈ</span><kbd>Aa</kbd></div><div class="cell"><span class="g si">ඉ</span><kbd>i</kbd></div><div class="cell"><span class="g si">ඊ</span><kbd>ii</kbd></div><div class="cell"><span class="g si">උ</span><kbd>u</kbd></div><div class="cell"><span class="g si">ඌ</span><kbd>uu</kbd></div><div class="cell"><span class="g si">ඍ</span><kbd>R</kbd></div><div class="cell"><span class="g si">ඎ</span><kbd>Ru</kbd></div><div class="cell"><span class="g si">එ</span><kbd>e</kbd></div><div class="cell"><span class="g si">ඒ</span><kbd>ee</kbd></div><div class="cell"><span class="g si">ඓ</span><kbd>ai</kbd></div><div class="cell"><span class="g si">ඔ</span><kbd>o</kbd></div><div class="cell"><span class="g si">ඕ</span><kbd>oo</kbd></div><div class="cell"><span class="g si">ඖ</span><kbd>au</kbd></div></div><p class="note"><t-en lang="en">Also: AA = ඈ, ou = ඖ. Straight after a consonant, see Signs below.</t-en><t-si lang="si">තවත්: AA = ඈ, ou = ඖ. ව්&zwj;යංජනයකට කෙලින්ම පසුව ටයිප් කළ විට ලැබෙන්නේ පහත ඇති ස්වර ලකුණු ය.</t-si></p></div>
         <div><h3><t-en lang="en">Consonants</t-en><t-si lang="si">ව්&zwj;යංජන</t-si></h3><div class="cells"><div class="cell"><span class="g si">ක</span><kbd>ka</kbd></div><div class="cell"><span class="g si">ඛ</span><kbd>kha</kbd></div><div class="cell"><span class="g si">ග</span><kbd>ga</kbd></div><div class="cell"><span class="g si">ඝ</span><kbd>gha</kbd></div><div class="cell"><span class="g si">ඟ</span><kbd>zga</kbd></div><div class="cell"><span class="g si">ච</span><kbd>cha</kbd></div><div class="cell"><span class="g si">ඡ</span><kbd>chha</kbd></div><div class="cell"><span class="g si">ජ</span><kbd>ja</kbd></div><div class="cell"><span class="g si">ඦ</span><kbd>zja</kbd></div><div class="cell"><span class="g si">ඤ</span><kbd>zka</kbd></div><div class="cell"><span class="g si">ඥ</span><kbd>zha</kbd></div><div class="cell"><span class="g si">ට</span><kbd>ta</kbd></div><div class="cell"><span class="g si">ඨ</span><kbd>Ta</kbd></div><div class="cell"><span class="g si">ඩ</span><kbd>da</kbd></div><div class="cell"><span class="g si">ඪ</span><kbd>Da</kbd></div><div class="cell"><span class="g si">ණ</span><kbd>Na</kbd></div><div class="cell"><span class="g si">ඬ</span><kbd>zda</kbd></div><div class="cell"><span class="g si">ත</span><kbd>tha</kbd></div><div class="cell"><span class="g si">ථ</span><kbd>thha</kbd></div><div class="cell"><span class="g si">ද</span><kbd>dha</kbd></div><div class="cell"><span class="g si">ධ</span><kbd>dhha</kbd></div><div class="cell"><span class="g si">න</span><kbd>na</kbd></div><div class="cell"><span class="g si">ඳ</span><kbd>zdha</kbd></div><div class="cell"><span class="g si">ප</span><kbd>pa</kbd></div><div class="cell"><span class="g si">ඵ</span><kbd>pha</kbd></div><div class="cell"><span class="g si">බ</span><kbd>ba</kbd></div><div class="cell"><span class="g si">භ</span><kbd>bha</kbd></div><div class="cell"><span class="g si">ම</span><kbd>ma</kbd></div><div class="cell"><span class="g si">ඹ</span><kbd>Ba</kbd></div><div class="cell"><span class="g si">ය</span><kbd>ya</kbd></div><div class="cell"><span class="g si">ර</span><kbd>ra</kbd></div><div class="cell"><span class="g si">ල</span><kbd>la</kbd></div><div class="cell"><span class="g si">ළ</span><kbd>La</kbd></div><div class="cell"><span class="g si">ව</span><kbd>wa</kbd></div><div class="cell"><span class="g si">ශ</span><kbd>sha</kbd></div><div class="cell"><span class="g si">ෂ</span><kbd>Sha</kbd></div><div class="cell"><span class="g si">ස</span><kbd>sa</kbd></div><div class="cell"><span class="g si">හ</span><kbd>ha</kbd></div><div class="cell"><span class="g si">ෆ</span><kbd>fa</kbd></div></div><p class="note"><t-en lang="en">Also: q = ද, zq = ඳ, v = ව, S = ෂ. A letter on its own gets a hal: k = ක්</t-en><t-si lang="si">තවත්: q = ද, zq = ඳ, v = ව, S = ෂ. තනි අකුරකට හල් ලකුණ ලැබේ: k = ක්</t-si></p></div>
         <div><h3><t-en lang="en">Signs</t-en><t-si lang="si">ස්වර ලකුණු</t-si></h3><div class="cells"><div class="cell"><span class="g si">ක</span><kbd>ka</kbd></div><div class="cell"><span class="g si">කා</span><kbd>kaa</kbd></div><div class="cell"><span class="g si">කැ</span><kbd>kA</kbd></div><div class="cell"><span class="g si">කෑ</span><kbd>kAa</kbd></div><div class="cell"><span class="g si">කි</span><kbd>ki</kbd></div><div class="cell"><span class="g si">කී</span><kbd>kii</kbd></div><div class="cell"><span class="g si">කු</span><kbd>ku</kbd></div><div class="cell"><span class="g si">කූ</span><kbd>kuu</kbd></div><div class="cell"><span class="g si">කෘ</span><kbd>kru</kbd></div><div class="cell"><span class="g si">කෲ</span><kbd>kruu</kbd></div><div class="cell"><span class="g si">කෙ</span><kbd>ke</kbd></div><div class="cell"><span class="g si">කේ</span><kbd>kee</kbd></div><div class="cell"><span class="g si">කෛ</span><kbd>kai</kbd></div><div class="cell"><span class="g si">කො</span><kbd>ko</kbd></div><div class="cell"><span class="g si">කෝ</span><kbd>koo</kbd></div><div class="cell"><span class="g si">කෞ</span><kbd>kau</kbd></div></div><p class="note"><t-en lang="en">Type them after a consonant. Also: AA = කෑ</t-en><t-si lang="si">මේවා ව්&zwj;යංජනයකට පසුව ටයිප් කරන්න. තවත්: AA = කෑ</t-si></p></div>
         <div><h3><t-en lang="en">Examples</t-en><t-si lang="si">උදාහරණ</t-si></h3><div class="cells wide"><div class="cell"><span class="g si">ක්</span><kbd>k</kbd></div><div class="cell"><span class="g si">කං</span><kbd>kax</kbd></div><div class="cell"><span class="g si">කං</span><kbd>kazn</kbd></div><div class="cell"><span class="g si">කඃ</span><kbd>kaH</kbd></div><div class="cell"><span class="g si">කඞ</span><kbd>kaX</kbd></div><div class="cell"><span class="g si">ක්‍ය</span><kbd>kya</kbd></div><div class="cell"><span class="g si">ක්‍ර</span><kbd>kra</kbd></div><div class="cell"><span class="g si">මම</span><kbd>mama</kbd></div><div class="cell"><span class="g si">අම්මා</span><kbd>ammaa</kbd></div><div class="cell"><span class="g si">ගෙදර</span><kbd>gedhara</kbd></div><div class="cell"><span class="g si">නුවර</span><kbd>nuwara</kbd></div><div class="cell"><span class="g si">කොළඹ</span><kbd>koLaBa</kbd></div><div class="cell"><span class="g si">සිංහල</span><kbd>sixhala</kbd></div><div class="cell"><span class="g si">ප්‍රශ්න</span><kbd>prashna</kbd></div></div><p class="note"><t-en lang="en">Capitals matter: ta = ට, Ta = ඨ. x, zn, H and X are typed after a letter.</t-en><t-si lang="si">ලොකු අකුරු වැදගත් වේ: ta = ට, Ta = ඨ. x, zn, H සහ X ටයිප් කරන්නේ අකුරකට පසුවය.</t-si></p></div>
-      </div>
-    </details>
+    </div>
+    <p class="note" data-nokey hidden>No matching key found.</p>
   </div>
 </section>
 
-<section id="output" style="padding-top:0">
+<section id="output">
   <div class="wrap">
     <div class="head">
       <p class="eyebrow"><t-en lang="en">Output types</t-en><t-si lang="si">ප්&zwj;රතිදාන වර්ග</t-si></p>
@@ -394,9 +520,10 @@ html[data-lang="si"] :is(.eyebrow,.tag,.chartbody h3){letter-spacing:0}
   </div>
 </section>
 
-<section id="smart-quotes" style="padding-top:0">
-  <div class="wrap">
-    <div class="head" style="text-align:center;justify-items:center">
+<section id="smart-quotes">
+  <div class="wrap sq-grid">
+    <div class="sq-left">
+    <div class="head">
       <p class="eyebrow">Legacy (FM Abhaya)</p>
       <h2><t-en lang="en">Smart quotes (Adobe and Microsoft apps)</t-en><t-si lang="si">Smart quotes (Adobe සහ Microsoft මෘදුකාංග)</t-si></h2>
     </div>
@@ -405,6 +532,8 @@ html[data-lang="si"] :is(.eyebrow,.tag,.chartbody h3){letter-spacing:0}
       <p><t-en lang="en">turn off the "smart quotes" feature</t-en><t-si lang="si">"smart quotes" විශේෂාංගය ක්&zwj;රියා විරහිත කරන්න</t-si></p>
       <a class="btn" href="#smart-quotes-steps"><t-en lang="en">More details</t-en><t-si lang="si">වැඩි විස්තර</t-si></a>
     </div>
+    </div>
+    <div class="sq-right">
     <div class="why si" id="smart-quotes-steps">
       <p><t-en lang="en">In legacy (FM Abhaya) mode, some software may show a strange curl instead of the full stop (.). LIPI types the correct character, but the software then changes it automatically afterwards. You can fix this by turning off one setting.</t-en><t-si lang="si">Legacy (FM Abhaya) මාදිලියේදී, සමහර මෘදුකාංගවල තිත (.) වෙනුවට අමුතු වක්‍ර සලකුණක් දිස්විය හැකියි. LIPI මඟින් නිවැරදි අක්ෂරය ඇතුළත් කළත්, මෘදුකාංගය විසින් එය පසුව ස්වයංක්‍රීයව වෙනස් කරයි. එක් සැකසුමක් අක්‍රිය කිරීමෙන් මෙම ගැටලුව විසඳාගත හැකියි.</t-si></p>
       <p><t-en lang="en"><b>Why does this happen?</b> In the FM Abhaya font, the full stop (.) uses the character code of the plain straight apostrophe (<code>'</code>). So when you press the <code>.</code> key, LIPI types that character. The "Smart Quotes" feature in Photoshop, Premiere Pro, Word, PowerPoint and some other software automatically changes the straight apostrophe (<code>'</code>) you type into a curly apostrophe (<code>‘</code> or <code>’</code>). In the FM Abhaya font those curly apostrophe codes have a different shape, so a curl appears in place of the full stop. This problem does not happen in Notepad and most plain text boxes. It does not affect Unicode output either.</t-en><t-si lang="si"><b>මෙය සිදුවන්නේ ඇයි?</b> FM Abhaya අකුරු රටාවේදී තිත (.) සඳහා භාවිත වන්නේ සාමාන්‍ය සෘජු apostrophe (<code>'</code>) සලකුණට අදාළ අක්ෂර කේතයයි. ඒ නිසා LIPI මඟින් <code>.</code> යතුර එබූ විට එම අක්ෂරය ඇතුළත් වේ. Photoshop, Premiere Pro, Word, PowerPoint සහ තවත් සමහර මෘදුකාංගවල ඇති "Smart Quotes" විශේෂාංගය මඟින් ඔබ ටයිප් කරන සෘජු apostrophe (<code>'</code>) සලකුණ වක්‍ර apostrophe (<code>‘</code> හෝ <code>’</code>) සලකුණක් බවට ස්වයංක්‍රීයව වෙනස් කරයි. FM Abhaya අකුරු රටාවේදී එම වක්‍ර apostrophe කේතයට වෙනත් හැඩයක් ලබා දී ඇති නිසා, තිත වෙනුවට වක්‍ර සලකුණක් දිස්වේ. Notepad සහ බොහෝ සාමාන්‍ය පෙළ ඇතුළත් කරන ස්ථානවල මෙම ගැටලුව ඇති නොවේ. Unicode ප්‍රතිදානයට මෙය බලපාන්නේද නැත.</t-si></p>
@@ -416,13 +545,14 @@ html[data-lang="si"] :is(.eyebrow,.tag,.chartbody h3){letter-spacing:0}
       <div><dt><t-en lang="en">Word and PowerPoint</t-en><t-si lang="si">Word සහ PowerPoint</t-si></dt><dd><t-en lang="en">Go to File → Options → Proofing → AutoCorrect Options → <b>AutoFormat As You Type</b> and untick <b>"Straight quotes" with "smart quotes"</b>. In Word, also turn this setting off in the <b>AutoFormat</b> tab.</t-en><t-si lang="si">File → Options → Proofing → AutoCorrect Options → <b>AutoFormat As You Type</b> වෙත ගොස් <b>"Straight quotes" with "smart quotes"</b> යන්නෙහි සලකුණ ඉවත් කරන්න. Word හි <b>AutoFormat</b> ටැබය තුළද එම සැකසුම අක්‍රිය කරන්න.</t-si></dd></div>
       <div><dt><t-en lang="en">Other software</t-en><t-si lang="si">වෙනත් මෘදුකාංග</t-si></dt><dd><t-en lang="en">Look for "Smart Quotes" or "Typographer's Quotes" in the Text or Type settings.</t-en><t-si lang="si">Text හෝ Type සැකසුම් තුළ "Smart Quotes" හෝ "Typographer's Quotes" යන සැකසුම් සොයා බලන්න.</t-si></dd></div>
     </dl>
-    <p class="note si" style="text-align:center;margin-top:18px"><t-en lang="en">After you change the setting, type the full stop again. Wrong marks that are already in the document are not corrected automatically. So delete the wrong curl and type the full stop again.</t-en><t-si lang="si">සැකසුම වෙනස් කළ පසු තිත නැවත ටයිප් කරන්න. දැනටමත් ලේඛනයේ ඇති වැරදි සලකුණු ස්වයංක්‍රීයව නිවැරදි නොවේ. එම නිසා වැරදි වක්‍ර සලකුණ මකා දමා තිත නැවත ඇතුළත් කරන්න.</t-si></p>
+    <p class="note si"><t-en lang="en">After you change the setting, type the full stop again. Wrong marks that are already in the document are not corrected automatically. So delete the wrong curl and type the full stop again.</t-en><t-si lang="si">සැකසුම වෙනස් කළ පසු තිත නැවත ටයිප් කරන්න. දැනටමත් ලේඛනයේ ඇති වැරදි සලකුණු ස්වයංක්‍රීයව නිවැරදි නොවේ. එම නිසා වැරදි වක්‍ර සලකුණ මකා දමා තිත නැවත ඇතුළත් කරන්න.</t-si></p>
+    </div>
   </div>
 </section>
 
-<section id="faq" style="padding-top:0">
-  <div class="wrap">
-    <div class="head" style="text-align:center;justify-items:center">
+<section id="faq">
+  <div class="wrap faq-grid">
+    <div class="head">
       <p class="eyebrow"><t-en lang="en">FAQ</t-en><t-si lang="si">නිතර අසන ප්&zwj;රශ්න</t-si></p>
       <h2><t-en lang="en">Questions people ask</t-en><t-si lang="si">මිනිසුන් අසන ප්&zwj;රශ්න</t-si></h2>
     </div>
@@ -442,7 +572,7 @@ html[data-lang="si"] :is(.eyebrow,.tag,.chartbody h3){letter-spacing:0}
   </div>
 </section>
 
-<section id="privacy" style="padding-top:0">
+<section id="privacy">
   <div class="wrap">
     <div class="two">
       <div class="card"><h3 style="margin-top:0"><t-en lang="en">Privacy</t-en><t-si lang="si">පෞද්ගලිකත්වය</t-si></h3><p style="margin-top:10px"><t-en lang="en">LIPI has no network code and sends nothing anywhere. The Show Logs window keeps its lines in memory only, and nothing is saved to a file. The only file the program writes is <code>settings.txt</code>. If you turn on <b>Run on startup</b>, it also adds one entry to your Windows startup list. The <b>Check for updates</b> button only opens a web page in your browser. LIPI itself never goes online.</t-en><t-si lang="si">LIPI හි network කේත නැත, එය කිසිවක් කිසිතැනකට නොයවයි. Show Logs window එක එහි පේළි තබාගන්නේ memory එකේ පමණක් වන අතර, ගොනුවකට කිසිවක් save නොකෙරේ. වැඩසටහන ලියන එකම ගොනුව <code>settings.txt</code> වේ. ඔබ <b>Run on startup</b> on කළහොත්, එය ඔබේ Windows startup ලැයිස්තුවට එක් entry එකක් ද එක් කරයි. <b>Check for updates</b> බොත්තම කරන්නේ ඔබේ browser එකේ වෙබ් පිටුවක් විවෘත කිරීම පමණි. LIPI කිසිවිටෙක තනිවම online නොයයි.</t-si></p></div>
@@ -459,7 +589,7 @@ html[data-lang="si"] :is(.eyebrow,.tag,.chartbody h3){letter-spacing:0}
   </div>
 </section>
 
-<section id="is-the-download-safe" style="padding-top:0">
+<section id="is-the-download-safe">
   <div class="wrap">
     <div class="card">
       <h3 style="margin-top:0"><t-en lang="en">Is the download safe?</t-en><t-si lang="si">බාගත කිරීම ආරක්ෂිතද?</t-si></h3>
@@ -478,17 +608,57 @@ html[data-lang="si"] :is(.eyebrow,.tag,.chartbody h3){letter-spacing:0}
   </div>
 </section>
 
+<section class="cta-section">
+  <div class="wrap">
+    <div class="cta-card">
+      <p class="eyebrow"><t-en lang="en">Free &nbsp;·&nbsp; Open source &nbsp;·&nbsp; Windows</t-en><t-si lang="si">නොමිලේ &nbsp;·&nbsp; Open source &nbsp;·&nbsp; Windows</t-si></p>
+      <h2>Ready to type Sinhala?</h2>
+      <p class="lead"><t-en lang="en">LIPI works in the background. You type, and the Sinhala appears.</t-en><t-si lang="si">LIPI පසුබිමේ ක්&zwj;රියාත්මක වෙයි. ඔබ ටයිප් කරන්න, සිංහල අකුරු ඒ මොහොතේම දිස්වේ.</t-si></p>
+      <a class="cta" href="https://github.com/sanjaya3d/LIPI/releases/latest/download/lipi.exe"><img data-en-alt="Download the latest LIPI release for Windows" data-si-alt="Windows සඳහා නවතම LIPI නිකුතුව බාගත කරන්න" src="assets/download-button.svg" width="420" height="106" alt="Download the latest LIPI release for Windows"></a>
+    </div>
+  </div>
+</section>
+
 </main>
 
 <footer>
   <div class="wrap">
-    <a class="cta" href="https://github.com/sanjaya3d/LIPI/releases/latest/download/lipi.exe"><img data-en-alt="Download the latest LIPI release for Windows" data-si-alt="Windows සඳහා නවතම LIPI නිකුතුව බාගත කරන්න" src="assets/download-button.svg" width="340" height="86" alt="Download the latest LIPI release for Windows" style="margin:0 auto"></a>
-    <div class="links">
-      <a class="btn" href="https://github.com/sanjaya3d/LIPI">GitHub</a>
-      <a class="btn" href="https://facebook.com/sanjaya3d">Facebook</a>
-      <a class="btn" href="https://www.youtube.com/@SANJAYA3D/">YouTube</a>
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a data-en-aria-label="LIPI home" data-si-aria-label="LIPI මුල් පිටුව" class="brand" href="#top" aria-label="LIPI home"><img src="assets/logo.png" alt="" width="34" height="34">LIPI <span class="si" data-i18n-skip>ලිපි</span></a>
+        <p><t-en lang="en">LIPI works in the background. You type, and the Sinhala appears.</t-en><t-si lang="si">LIPI පසුබිමේ ක්&zwj;රියාත්මක වෙයි. ඔබ ටයිප් කරන්න, සිංහල අකුරු ඒ මොහොතේම දිස්වේ.</t-si></p>
+        <span class="badge" data-i18n-skip>GNU GPL-3.0</span>
+      </div>
+      <nav class="foot-col" aria-label="Explore">
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="#features"><t-en lang="en">Features</t-en><t-si lang="si">විශේෂාංග</t-si></a></li>
+          <li><a href="#how-to-type"><t-en lang="en">How to type</t-en><t-si lang="si">ටයිප් කරන ආකාරය</t-si></a></li>
+          <li><a href="#smart-quotes">Smart quotes</a></li>
+          <li><a href="#faq"><t-en lang="en">FAQ</t-en><t-si lang="si">නිතර අසන ප්&zwj;රශ්න</t-si></a></li>
+        </ul>
+      </nav>
+      <nav class="foot-col" aria-label="Project">
+        <h4>Project</h4>
+        <ul>
+          <li><a href="https://github.com/sanjaya3d/LIPI">GitHub</a></li>
+          <li><a href="https://github.com/sanjaya3d/LIPI/releases"><t-en lang="en">All releases</t-en><t-si lang="si">සියලුම නිකුතු</t-si></a></li>
+          <li><a href="#is-the-download-safe"><t-en lang="en">Is the download safe?</t-en><t-si lang="si">බාගත කිරීම ආරක්ෂිතද?</t-si></a></li>
+          <li><a href="#privacy"><t-en lang="en">Privacy</t-en><t-si lang="si">පෞද්ගලිකත්වය</t-si></a></li>
+        </ul>
+      </nav>
+      <nav class="foot-col" aria-label="Creator">
+        <h4>Creator</h4>
+        <ul>
+          <li><a href="https://sanjaya3d.github.io/portfolio/">Portfolio</a></li>
+          <li><a href="https://facebook.com/sanjaya3d">Facebook</a></li>
+          <li><a href="https://www.youtube.com/@SANJAYA3D/">YouTube</a></li>
+        </ul>
+      </nav>
     </div>
-    <p><t-en lang="en">Made by <b style="color:var(--lime)">SANJAYA3D</b> &nbsp;·&nbsp; Free software under the <a href="https://github.com/sanjaya3d/LIPI/blob/main/LICENSE">GNU GPL v3.0 or later</a> &nbsp;·&nbsp; Built using <a href="https://www.rust-lang.org">Rust</a> &nbsp;·&nbsp; <a href="#is-the-download-safe">Is the download safe?</a></t-en><t-si lang="si"><b style="color:var(--lime)">SANJAYA3D</b> විසින් සාදන ලදී &nbsp;·&nbsp; <a href="https://github.com/sanjaya3d/LIPI/blob/main/LICENSE">GNU GPL v3.0 හෝ ඊට පසු</a> අනුවාදය යටතේ නිදහස් මෘදුකාංගයකි &nbsp;·&nbsp; <a href="https://www.rust-lang.org">Rust</a> භාවිතයෙන් නිර්මාණය කර ඇත &nbsp;·&nbsp; <a href="#is-the-download-safe">බාගත කිරීම ආරක්ෂිතද?</a></t-si></p>
+    <div class="foot-end">
+      <p><t-en lang="en">Made by <b style="color:var(--lime)">SANJAYA3D</b> &nbsp;·&nbsp; Free software under the <a href="https://github.com/sanjaya3d/LIPI/blob/main/LICENSE">GNU GPL v3.0 or later</a> &nbsp;·&nbsp; Built using <a href="https://www.rust-lang.org">Rust</a> &nbsp;·&nbsp; <a href="#is-the-download-safe">Is the download safe?</a></t-en><t-si lang="si"><b style="color:var(--lime)">SANJAYA3D</b> විසින් සාදන ලදී &nbsp;·&nbsp; <a href="https://github.com/sanjaya3d/LIPI/blob/main/LICENSE">GNU GPL v3.0 හෝ ඊට පසු</a> අනුවාදය යටතේ නිදහස් මෘදුකාංගයකි &nbsp;·&nbsp; <a href="https://www.rust-lang.org">Rust</a> භාවිතයෙන් නිර්මාණය කර ඇත &nbsp;·&nbsp; <a href="#is-the-download-safe">බාගත කිරීම ආරක්ෂිතද?</a></t-si></p>
+    </div>
   </div>
 </footer>
 
@@ -588,6 +758,74 @@ html[data-lang="si"] :is(.eyebrow,.tag,.chartbody h3){letter-spacing:0}
   document.addEventListener("lipilangchange", queue);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(queue);
   fit();
+})();
+</script>
+<script>
+// Key map: tabs for the four groups and a search box. Without scripts, all groups show.
+(function () {
+  try {
+    var body = document.querySelector("[data-keymap]");
+    var bar = document.querySelector("[data-km-bar]");
+    var input = document.querySelector("[data-keysearch]");
+    var empty = document.querySelector("[data-nokey]");
+    if (!body || !bar || !input) return;
+    var panels = Array.prototype.slice.call(body.children);
+    var list = document.createElement("div");
+    var tabs = [];
+    var current = 0;
+    list.className = "tabs";
+    list.setAttribute("role", "tablist");
+    panels.forEach(function (p, i) {
+      var h = p.querySelector("h3");
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "tab";
+      b.setAttribute("role", "tab");
+      b.innerHTML = h ? h.innerHTML : "";
+      b.addEventListener("click", function () { current = i; input.value = ""; render(); });
+      b.addEventListener("keydown", function (e) {
+        var n = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+        if (!n) return;
+        e.preventDefault();
+        current = (i + n + panels.length) % panels.length;
+        input.value = "";
+        render();
+        tabs[current].focus();
+      });
+      list.appendChild(b);
+      tabs.push(b);
+    });
+    bar.insertBefore(list, input);
+    input.hidden = false;
+    function each(nodes, fn) { Array.prototype.forEach.call(nodes, fn); }
+    function render() {
+      var q = input.value.trim().toLowerCase();
+      var found = 0;
+      body.classList.toggle("tabbed", !q);
+      panels.forEach(function (p, i) {
+        var any = 0;
+        each(p.querySelectorAll(".cell"), function (c) {
+          var hit = !q || c.textContent.toLowerCase().indexOf(q) !== -1;
+          c.hidden = !hit;
+          if (hit) any++;
+        });
+        each(p.querySelectorAll(".note"), function (n) { n.hidden = !!q; });
+        p.hidden = q ? !any : i !== current;
+        found += q ? any : 1;
+      });
+      tabs.forEach(function (b, i) {
+        var on = !q && i === current;
+        b.setAttribute("aria-selected", on ? "true" : "false");
+        b.tabIndex = on || (q && i === 0) ? 0 : -1;
+      });
+      if (empty) empty.hidden = !q || found > 0;
+    }
+    function holder() { input.placeholder = input.getAttribute("aria-label") || ""; }
+    input.addEventListener("input", render);
+    document.addEventListener("lipilangchange", holder);
+    holder();
+    render();
+  } catch (e) {}
 })();
 </script>
 <script>
