@@ -1,9 +1,9 @@
 //! Windows only. The main window and the "Show Logs" popup.
 //!
 //! The main window has its own title bar, cards, buttons and icons, all drawn by hand
-//! with only the five colours in `theme.rs` (black, lime, white and two greys). No image files, no extra libraries.
-//! Edges are made smooth by drawing each shape three times bigger in a small hidden
-//! bitmap and shrinking it, so the program still uses very little memory.
+//! with only the colours in `theme.rs` (near black, lime, white and a few greys). No image files, no extra libraries.
+//! Edges are made smooth by drawing the rounded corners (and the small icons) three times bigger
+//! in a tiny hidden bitmap and shrinking them, so the program still uses very little memory.
 //! The only other window is the log popup.
 //! The Win32 functions are declared by hand below.
 
@@ -19,11 +19,11 @@ use crate::about;
 use crate::autostart;
 use crate::hints::{self, Tab};
 use crate::icons::{self, Icon, Ink, Piece};
-use crate::layout::{Hit, Layout, Rect, View};
+use crate::layout::{Hit, Layout, Rect, SettingCard, View};
 use crate::legacy::LegacyMap;
 use crate::settings;
 use crate::state;
-use crate::theme::{ACCENT, BG, EDGE, MUTED, TEXT};
+use crate::theme::{ACCENT, ACCENT_DIM, ACCENT_TINT, BG, CARD, CHIP, DIM, EDGE, LINE, MUTED, TEXT, WELL};
 
 // ---------------------------------------------------------------- Win32 bits
 
@@ -415,20 +415,21 @@ static DPI: AtomicI32 = AtomicI32::new(96);
 static LOG_WINDOW: AtomicIsize = AtomicIsize::new(0);
 static LOG_EDIT: AtomicIsize = AtomicIsize::new(0);
 static BG_BRUSH: AtomicIsize = AtomicIsize::new(0);
-static FONT_TITLE: AtomicIsize = AtomicIsize::new(0);
-static FONT_TITLE_SI: AtomicIsize = AtomicIsize::new(0);
 static FONT_LABEL: AtomicIsize = AtomicIsize::new(0);
-static FONT_SMALL: AtomicIsize = AtomicIsize::new(0);
 static FONT_SMALL_BOLD: AtomicIsize = AtomicIsize::new(0);
-static FONT_LOGO: AtomicIsize = AtomicIsize::new(0);
 static FONT_LOGO_SMALL: AtomicIsize = AtomicIsize::new(0);
-static FONT_HEAD: AtomicIsize = AtomicIsize::new(0);
 static FONT_HINT: AtomicIsize = AtomicIsize::new(0);
 static FONT_HINT_SI: AtomicIsize = AtomicIsize::new(0);
 static FONT_NOTE: AtomicIsize = AtomicIsize::new(0);
+/// Consolas, for key chips and the version badge.
+static FONT_MONO: AtomicIsize = AtomicIsize::new(0);
+/// Nirmala UI 13, for the Sinhala line and the status line on the main page.
+static FONT_SUB: AtomicIsize = AtomicIsize::new(0);
 static FONT_LOG: AtomicIsize = AtomicIsize::new(0);
-static FONT_TIP: AtomicIsize = AtomicIsize::new(0);
+/// Nirmala UI 12 bold, for the smart quotes text and its button.
 static FONT_TIP_SMALL: AtomicIsize = AtomicIsize::new(0);
+/// Nirmala UI 11, the smallest text. Used only when a line would not fit in its place at the normal size.
+static FONT_NOTE_SMALL: AtomicIsize = AtomicIsize::new(0);
 /// 0 is the main page, 1 is the key hint page, 2 is the Settings page.
 static VIEW: AtomicU8 = AtomicU8::new(0);
 /// Settings page: true while Windows will start LIPI at sign in. Read from the registry
@@ -562,6 +563,41 @@ unsafe fn smooth_shape(
     });
 }
 
+/// A rounded card with an optional fill and an optional border (colour, width).
+///
+/// The whole shape is drawn with plain Windows calls first. Then only the four corners, small
+/// squares, are drawn three times bigger and shrunk, which makes them smooth. A big card
+/// never needs a big hidden bitmap, so the program keeps using very little memory.
+/// `behind` is the colour already under the card. Without a fill, the inside of each
+/// corner square is painted with `behind` too, so only use that where the card sits on `behind`.
+unsafe fn card(hdc: isize, rect: Rect, radius: i32, fill_colour: Option<u32>, border: Option<(u32, i32)>, behind: u32) {
+    // Windows leaves out the last row and column of a filled shape that has no border.
+    let extra = if border.is_none() && fill_colour.is_some() { 1 } else { 0 };
+    let plain = Rect { right: rect.right + extra, bottom: rect.bottom + extra, ..rect };
+    shape(hdc, plain, radius, fill_colour, border);
+
+    let stroke = border.map_or(0, |(_, w)| w);
+    let size = radius + stroke.max(1) + 1;
+    for (left, top) in [
+        (rect.left, rect.top),
+        (rect.right - size, rect.top),
+        (rect.left, rect.bottom - size),
+        (rect.right - size, rect.bottom - size),
+    ] {
+        let dest = Rect { left, top, right: left + size, bottom: top + size };
+        smooth(hdc, dest, behind, |m| {
+            // The whole card, moved so that this corner lands on the small bitmap.
+            let area = Rect {
+                left: (rect.left - left) * SS,
+                top: (rect.top - top) * SS,
+                right: (rect.right - left) * SS + extra,
+                bottom: (rect.bottom - top) * SS + extra,
+            };
+            shape(m, area, radius * SS, fill_colour, border.map(|(c, w)| (c, w * SS)));
+        });
+    }
+}
+
 /// Draws an icon from `icons.rs`, centred in `slot`, with smooth edges.
 /// `main` is the icon colour, `back` the colour for marks cut out of it,
 /// `background` the colour under the icon.
@@ -625,6 +661,17 @@ unsafe fn text_size(hdc: isize, font: isize, s: &str) -> (i32, i32, i32) {
     (size.cx, metrics.ascent, metrics.descent)
 }
 
+/// The first font in `fonts` in which `s` is no wider than `width`. When none is narrow enough,
+/// the last one (the smallest) is used.
+unsafe fn fit_font(hdc: isize, s: &str, width: i32, fonts: &[isize]) -> isize {
+    for &font in fonts {
+        if text_size(hdc, font, s).0 <= width {
+            return font;
+        }
+    }
+    fonts.last().copied().unwrap_or(0)
+}
+
 /// One piece of a line of text.
 struct Part<'a> {
     text: &'a str,
@@ -659,31 +706,96 @@ unsafe fn rich(hdc: isize, area: Rect, parts: &[Part], centred: bool) {
     SetTextAlign(hdc, TA_TOP);
 }
 
-/// A rounded button. The chosen one is filled, the others are outlines.
-/// Used for the output choice and for the tabs of the key hint page.
-unsafe fn pill(hdc: isize, rect: Rect, label: &str, selected: bool, font: isize, lay: &Layout) {
+/// A rounded button on a surface of the colour `behind` (a card, for example), so the smooth
+/// corners blend into that surface. A chosen one is filled lime. Used for "Check for updates".
+unsafe fn pill_on(hdc: isize, rect: Rect, label: &str, selected: bool, font: isize, behind: u32, lay: &Layout) {
     let radius = rect.height() / 2;
     let flags = DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS;
     if selected {
-        smooth_shape(hdc, rect, radius, Some(ACCENT), None, BG);
+        card(hdc, rect, radius, Some(ACCENT), None, behind);
         text(hdc, label, rect, font, BG, flags);
     } else {
-        smooth_shape(hdc, rect, radius, None, Some((ACCENT, lay.scale(2))), BG);
+        card(hdc, rect, radius, None, Some((ACCENT, lay.scale(2))), behind);
         text(hdc, label, rect, font, TEXT, flags);
     }
 }
 
-/// An outlined button with an icon and a label side by side. The pair is centred in the button.
-unsafe fn icon_button(hdc: isize, rect: Rect, icon: &Icon, label: &str, font: isize, radius: i32, lay: &Layout) {
-    smooth_shape(hdc, rect, radius, None, Some((ACCENT, lay.scale(2))), BG);
+/// A tab of the key hint page. The chosen one is lime with dark text. The others are dark cards
+/// with a thin line and light text.
+unsafe fn tab_pill(hdc: isize, rect: Rect, label: &str, chosen: bool, font: isize, lay: &Layout) {
+    let radius = rect.height() / 2;
+    let flags = DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS;
+    if chosen {
+        card(hdc, rect, radius, Some(ACCENT), None, BG);
+        text(hdc, label, rect, font, BG, flags);
+    } else {
+        card(hdc, rect, radius, Some(CARD), Some((LINE, lay.scale(1).max(1))), BG);
+        text(hdc, label, rect, font, MUTED, flags);
+    }
+}
+
+/// The Show Logs and Keys buttons: a dark card with a thin line, a lime icon and a white label.
+unsafe fn tool_button(hdc: isize, rect: Rect, icon: &Icon, label: &str, font: isize, lay: &Layout) {
+    card(hdc, rect, lay.scale(12), Some(CARD), Some((LINE, lay.scale(1))), BG);
     let label_width = text_size(hdc, font, label).0;
     let icon_width = lay.scale(icon.w);
     let gap = lay.scale(10);
     let left = rect.left + (rect.width() - (icon_width + gap + label_width)) / 2;
     let icon_slot = Rect { left, top: rect.top, right: left + icon_width, bottom: rect.bottom };
-    draw_icon(hdc, icon, icon_slot, ACCENT, BG, BG, lay);
+    draw_icon(hdc, icon, icon_slot, ACCENT, CARD, CARD, lay);
     let label_area = Rect { left: left + icon_width + gap, top: rect.top, right: rect.right, bottom: rect.bottom };
     text(hdc, label, label_area, font, TEXT, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
+}
+
+/// One of the two output buttons on the Target Encoding card. The chosen one is lime with dark
+/// text. The other one is a dark well with a thin line. An icon and the name on the first line,
+/// what the output is for on the second line.
+unsafe fn encoding_button(hdc: isize, rect: Rect, icon: &Icon, name: &str, note: &str, chosen: bool, lay: &Layout) {
+    let (fill_colour, border, name_colour, note_colour) = if chosen {
+        (ACCENT, None, BG, BG)
+    } else {
+        (WELL, Some((LINE, lay.scale(1))), TEXT, DIM)
+    };
+    card(hdc, rect, lay.scale(12), Some(fill_colour), border, CARD);
+
+    let name_font = FONT_LABEL.load(Relaxed);
+    let pad = lay.scale(8);
+    let first = Rect { left: rect.left, top: rect.top + pad, right: rect.right, bottom: rect.top + pad + lay.scale(24) };
+    let second = Rect { left: rect.left, top: first.bottom, right: rect.right, bottom: rect.bottom - pad };
+
+    let name_width = text_size(hdc, name_font, name).0;
+    let icon_width = lay.scale(icon.w);
+    let gap = lay.scale(8);
+    let left = rect.left + (rect.width() - (icon_width + gap + name_width)) / 2;
+    let icon_slot = Rect { left, top: first.top, right: left + icon_width, bottom: first.bottom };
+    draw_icon(hdc, icon, icon_slot, name_colour, fill_colour, fill_colour, lay);
+    let name_area = Rect { left: left + icon_width + gap, ..first };
+    text(hdc, name, name_area, name_font, name_colour, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
+    // The line under the name uses the normal small size, and the smaller one when it would not fit.
+    let note_area = Rect { left: rect.left + pad, right: rect.right - pad, ..second };
+    let note_font = fit_font(hdc, note, note_area.width(), &[FONT_NOTE.load(Relaxed), FONT_NOTE_SMALL.load(Relaxed)]);
+    text(hdc, note, note_area, note_font, note_colour, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
+}
+
+/// A key chip ("Right Ctrl") followed by a small word ("toggle"), the pair right-aligned so that
+/// it ends at `right`, on the middle line of `row`. Returns the left edge of the pair, so the
+/// text on the left knows how far it may go. `behind` is the colour under the chip.
+unsafe fn key_group(hdc: isize, row: Rect, right: i32, key: &str, word: &str, behind: u32, lay: &Layout) -> i32 {
+    let mono = FONT_MONO.load(Relaxed);
+    let word_font = FONT_HINT.load(Relaxed);
+    let word_width = text_size(hdc, word_font, word).0;
+    let chip_width = text_size(hdc, mono, key).0 + lay.scale(12);
+    let chip_height = lay.scale(22);
+    let gap = lay.scale(6);
+
+    let word_area = Rect { left: right - word_width, top: row.top, right, bottom: row.bottom };
+    let chip_left = right - word_width - gap - chip_width;
+    let chip_top = (row.top + row.bottom - chip_height) / 2;
+    let chip = Rect { left: chip_left, top: chip_top, right: chip_left + chip_width, bottom: chip_top + chip_height };
+    card(hdc, chip, lay.scale(6), Some(CHIP), Some((LINE, lay.scale(1))), behind);
+    text(hdc, key, chip, mono, TEXT, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+    text(hdc, word, word_area, word_font, DIM, DT_RIGHT | DT_VCENTER | DT_SINGLELINE);
+    chip_left
 }
 
 /// Smooths the four rounded corners of the window outline. The straight parts of the
@@ -721,22 +833,37 @@ unsafe fn draw_frame(hdc: isize, width: i32, height: i32, lay: &Layout) {
     shape(hdc, full, lay.scale(8), None, Some((ACCENT, lay.scale(2))));
     outline_corners(hdc, width, height, lay);
 
-    // Small logo, name, settings gear, minimise and close, then a lime line under the bar.
+    // Small logo, name, settings gear, minimise and close, then a thin line under the bar.
     // The gear is lime while the Settings page is open.
-    smooth_shape(hdc, lay.title_logo, lay.scale(6), Some(ACCENT), None, BG);
-    text(hdc, "\u{0D85}", lay.title_logo, FONT_LOGO_SMALL.load(Relaxed), BG, centred);
-    text(hdc, about::NAME, lay.title_text, FONT_SMALL_BOLD.load(Relaxed), TEXT, left_middle);
+    if view() != View::Main {
+        // The Settings page and the key hint page: a back arrow, then the logo, the name and the name of the page.
+        draw_icon(hdc, &icons::BACK, lay.title_back, TEXT, BG, BG, lay);
+        smooth_shape(hdc, lay.crumb_logo, lay.scale(6), Some(ACCENT), None, BG);
+        text(hdc, "\u{0D85}", lay.crumb_logo, FONT_LOGO_SMALL.load(Relaxed), BG, centred);
+        text(hdc, about::NAME, lay.crumb_text, FONT_SMALL_BOLD.load(Relaxed), TEXT, left_middle);
+        let page_name = if view() == View::Keys { about::KEYS_PAGE_NAME } else { about::PAGE_NAME };
+        let page = format!("\u{00B7}  {page_name}");
+        text(hdc, &page, lay.crumb_page, FONT_HINT.load(Relaxed), MUTED, left_middle | DT_END_ELLIPSIS);
+    } else {
+        smooth_shape(hdc, lay.title_logo, lay.scale(6), Some(ACCENT), None, BG);
+        text(hdc, "\u{0D85}", lay.title_logo, FONT_LOGO_SMALL.load(Relaxed), BG, centred);
+        text(hdc, about::NAME, lay.title_text, FONT_SMALL_BOLD.load(Relaxed), TEXT, left_middle);
+        // The version badge: lime text on a faint lime fill with a thin lime line.
+        card(hdc, lay.title_badge, lay.scale(6), Some(ACCENT_TINT), Some((ACCENT_DIM, lay.scale(1))), BG);
+        text(hdc, &about::short_version(), lay.title_badge, FONT_MONO.load(Relaxed), ACCENT, centred);
+    }
     let gear_colour = if view() == View::Settings { ACCENT } else { TEXT };
     draw_icon(hdc, &icons::GEAR, lay.settings_button, gear_colour, BG, BG, lay);
     draw_icon(hdc, &icons::MINIMISE, lay.minimise_button, TEXT, BG, BG, lay);
     draw_icon(hdc, &icons::CLOSE, lay.close_button, TEXT, BG, BG, lay);
-    fill(hdc, lay.title_rule, ACCENT);
+    fill(hdc, lay.title_rule, LINE);
 }
 
 /// An on/off switch: a lime track and a knob on the right when on, a grey track and a knob on the left when off.
-unsafe fn draw_switch(hdc: isize, track: Rect, on: bool, lay: &Layout) {
+/// `behind` is the colour under the switch (the card it sits on).
+unsafe fn draw_switch(hdc: isize, track: Rect, on: bool, behind: u32, lay: &Layout) {
     let track_colour = if on { ACCENT } else { EDGE };
-    smooth_shape(hdc, track, track.height() / 2, Some(track_colour), None, BG);
+    smooth_shape(hdc, track, track.height() / 2, Some(track_colour), None, behind);
     let pad = lay.scale(4);
     let knob = track.height() - 2 * pad;
     let knob_left = if on { track.right - pad - knob } else { track.left + pad };
@@ -745,109 +872,123 @@ unsafe fn draw_switch(hdc: isize, track: Rect, on: bool, lay: &Layout) {
 }
 
 unsafe fn draw_main(hdc: isize, lay: &Layout) {
-    let title_font = FONT_TITLE.load(Relaxed);
-    let title_si_font = FONT_TITLE_SI.load(Relaxed);
     let label_font = FONT_LABEL.load(Relaxed);
-    let small_font = FONT_SMALL.load(Relaxed);
+    let hint_font = FONT_HINT.load(Relaxed);
+    let sub_font = FONT_SUB.load(Relaxed);
+    let small_font = FONT_TIP_SMALL.load(Relaxed);
     let bold_font = FONT_SMALL_BOLD.load(Relaxed);
     let left_middle = DT_LEFT | DT_VCENTER | DT_SINGLELINE;
-    let centred = DT_CENTER | DT_VCENTER | DT_SINGLELINE;
     let enabled = state::enabled();
     let legacy = state::legacy();
-    let card_radius = lay.scale(12);
-    let button_radius = lay.scale(14);
-    let stroke = lay.scale(2);
-    let part = |text: &'static str, font: isize, colour: u32| Part { text, font, colour };
+    let chosen = settings::get();
+    let card_radius = lay.scale(14);
+    let inner_radius = lay.scale(10);
+    let thin = lay.scale(1).max(1);
 
-    // Header: logo tile, a thin divider, the name, and one line about what it does
-    smooth_shape(hdc, lay.logo_tile, lay.scale(14), Some(ACCENT), None, BG);
-    text(hdc, "\u{0D85}", lay.logo_tile, FONT_LOGO.load(Relaxed), BG, centred);
-    fill(hdc, lay.logo_divider, ACCENT);
-    rich(
-        hdc,
-        lay.name,
-        &[
-            part(about::NAME, title_font, TEXT),
-            part(" ", title_font, TEXT),
-            part(about::NAME_SINHALA, title_si_font, TEXT),
-        ],
-        false,
-    );
-    text(hdc, about::TAGLINE, lay.tagline, small_font, TEXT, left_middle | DT_END_ELLIPSIS);
-    fill(hdc, lay.rule, ACCENT);
-
-    // Sinhala typing on or off
-    smooth_shape(hdc, lay.typing_card, card_radius, None, Some((ACCENT, stroke)), BG);
-    draw_icon(hdc, &icons::KEYBOARD, lay.typing_icon, ACCENT, BG, BG, lay);
-    text(hdc, "Sinhala typing", lay.typing_label, label_font, TEXT, left_middle);
+    // ---- Sinhala Typing: a tile, the name, a Sinhala line, ON or OFF, the switch,
+    // and under them a row that names the key which turns typing on and off.
+    card(hdc, lay.typing_card, card_radius, Some(CARD), Some((LINE, thin)), BG);
+    card(hdc, lay.typing_icon, inner_radius, Some(CHIP), Some((LINE, thin)), CARD);
+    draw_icon(hdc, &icons::KEYBOARD, lay.typing_icon, ACCENT, CHIP, CHIP, lay);
+    text(hdc, "Sinhala Typing", lay.typing_label, label_font, TEXT, left_middle | DT_END_ELLIPSIS);
+    // Drawn with TextOut (inside `rich`), so tall Sinhala marks are never cut off.
+    let typing_line = if enabled { about::TYPING_ON_SI } else { about::TYPING_OFF_SI };
+    rich(hdc, lay.typing_sub, &[Part { text: typing_line, font: sub_font, colour: DIM }], false);
     text(
         hdc,
         if enabled { "ON" } else { "OFF" },
         lay.typing_state,
         label_font,
-        if enabled { ACCENT } else { MUTED },
+        if enabled { ACCENT } else { DIM },
         DT_RIGHT | DT_VCENTER | DT_SINGLELINE,
     );
-    draw_switch(hdc, lay.switch_track, enabled, lay);
+    draw_switch(hdc, lay.switch_track, enabled, CARD, lay);
 
-    // Output type
-    draw_icon(hdc, &icons::OUTPUT, lay.output_icon, ACCENT, BG, BG, lay);
-    text(hdc, "Output", lay.output_label, label_font, TEXT, left_middle);
-    pill(hdc, lay.unicode_button, "Unicode", !legacy, label_font, lay);
-    pill(hdc, lay.legacy_button, "Legacy (FM Abhaya)", legacy, label_font, lay);
+    card(hdc, lay.shortcut_row, inner_radius, Some(WELL), Some((LINE, thin)), CARD);
+    draw_icon(hdc, &icons::LINK, lay.shortcut_icon, ACCENT, WELL, WELL, lay);
+    let group_left = key_group(
+        hdc,
+        lay.shortcut_row,
+        lay.shortcut_row.right - lay.scale(12),
+        settings::key_name(chosen.on_off_key),
+        "toggle",
+        WELL,
+        lay,
+    );
+    let label_area = Rect { right: group_left - lay.scale(8), ..lay.shortcut_label };
+    let label_font = fit_font(
+        hdc,
+        "Global switch shortcut",
+        label_area.width(),
+        &[hint_font, FONT_NOTE.load(Relaxed), FONT_NOTE_SMALL.load(Relaxed)],
+    );
+    text(hdc, "Global switch shortcut", label_area, label_font, TEXT, left_middle | DT_END_ELLIPSIS);
 
-    // Smart quotes warning. In legacy mode the full stop is a straight apostrophe, and Adobe
+    // ---- Target Encoding: a heading with the key that switches the output, two buttons,
+    // and one line about what LIPI is sending now.
+    card(hdc, lay.encoding_card, card_radius, Some(CARD), Some((LINE, thin)), BG);
+    draw_icon(hdc, &icons::OUTPUT, lay.encoding_icon, ACCENT, CARD, CARD, lay);
+    let group_left = key_group(
+        hdc,
+        lay.encoding_row,
+        lay.encoding_row.right,
+        settings::key_name(chosen.output_key),
+        "to switch",
+        CARD,
+        lay,
+    );
+    let heading_area = Rect { right: group_left - lay.scale(8), ..lay.encoding_label };
+    text(hdc, "Target Encoding", heading_area, label_font, TEXT, left_middle | DT_END_ELLIPSIS);
+    encoding_button(hdc, lay.unicode_button, &icons::GLOBE, about::UNICODE_NAME, about::UNICODE_FOR, !legacy, lay);
+    encoding_button(hdc, lay.legacy_button, &icons::LETTER_A, about::LEGACY_NAME, about::LEGACY_FOR, legacy, lay);
+    let tick_colour = if enabled { ACCENT } else { DIM };
+    draw_icon(hdc, &icons::CHECK_CIRCLE, lay.encoding_status_icon, tick_colour, CARD, CARD, lay);
+    text(hdc, about::encoding_status(enabled, legacy), lay.encoding_status, sub_font, MUTED, DT_LEFT | DT_WORDBREAK);
+
+    // ---- Smart quotes warning. In legacy mode the full stop is a straight apostrophe, and Adobe
     // and Microsoft apps turn it into a curly quote. The button opens the page that explains it.
-    // Both lines are centred and drawn with TextOut, so tall Sinhala marks are never cut off.
-    smooth_shape(hdc, lay.tip_card, card_radius, None, Some((ACCENT, stroke)), BG);
-    let tip_small = FONT_TIP_SMALL.load(Relaxed);
-    let mut tip_font = FONT_TIP.load(Relaxed);
-    let widest = text_size(hdc, tip_font, about::TIP_LINE1).0.max(text_size(hdc, tip_font, about::TIP_LINE2).0);
-    if widest > lay.tip_text.width() {
-        tip_font = tip_small; // the normal size would not fit the card, so use the smaller one
+    // The text is wrapped by measuring it, so it never runs under the button, and it takes three
+    // lines of 20 pixels. Each line is drawn with TextOut (inside `rich`), so tall Sinhala
+    // marks are never cut off. The words "smart quotes" are lime.
+    card(hdc, lay.tip_card, lay.scale(12), Some(CARD), Some((ACCENT_DIM, thin)), BG);
+    let full = about::tip_full();
+    let phrase = full.find(about::TIP_PHRASE).map_or((0, 0), |at| (at, at + about::TIP_PHRASE.len()));
+    let room = lay.tip_text;
+    let fonts = [small_font, FONT_NOTE_SMALL.load(Relaxed)];
+    let mut tip_font = fonts[0];
+    let mut lines = about::wrap_words(&full, room.width(), |t| text_size(hdc, fonts[0], t).0);
+    if lines.len() > 3 {
+        // Wider letters than expected on this computer: try the smaller size.
+        tip_font = fonts[1];
+        lines = about::wrap_words(&full, room.width(), |t| text_size(hdc, fonts[1], t).0);
     }
-    let half = lay.tip_text.height() / 2;
-    let line1 = Rect { bottom: lay.tip_text.top + half, ..lay.tip_text };
-    let line2 = Rect { top: lay.tip_text.top + half, ..lay.tip_text };
-    rich(hdc, line1, &[part(about::TIP_LINE1, tip_font, TEXT)], true);
-    rich(hdc, line2, &[part(about::TIP_LINE2, tip_font, TEXT)], true);
-    smooth_shape(hdc, lay.tip_button, lay.tip_button.height() / 2, Some(ACCENT), None, BG);
-    rich(hdc, lay.tip_button, &[part(about::TIP_BUTTON, tip_small, BG)], true);
+    let line_height = room.height() / 3;
+    let shown = lines.len().min(3) as i32;
+    let block_top = room.top + (room.height() - shown * line_height) / 2;
+    for (i, &line) in lines.iter().take(3).enumerate() {
+        let area = Rect {
+            left: room.left,
+            top: block_top + i as i32 * line_height,
+            right: room.right,
+            bottom: block_top + (i as i32 + 1) * line_height,
+        };
+        let parts: Vec<Part> = about::pieces(line, phrase)
+            .into_iter()
+            .map(|(from, to, lime)| Part { text: &full[from..to], font: tip_font, colour: if lime { ACCENT } else { MUTED } })
+            .collect();
+        rich(hdc, area, &parts, false);
+    }
+    card(hdc, lay.tip_button, lay.tip_button.height() / 2, Some(ACCENT), None, CARD);
+    rich(hdc, lay.tip_button, &[Part { text: about::TIP_BUTTON, font: small_font, colour: BG }], true);
 
-    // Key hints. They name the keys chosen in settings.txt.
-    smooth_shape(hdc, lay.info_panel, card_radius, None, Some((EDGE, stroke)), BG);
-    draw_icon(hdc, &icons::INFO, lay.info_icon, ACCENT, BG, BG, lay);
-    let chosen = settings::get();
-    let on_off_key = settings::key_name(chosen.on_off_key);
-    let output_key = settings::key_name(chosen.output_key);
-    rich(
-        hdc,
-        lay.info_line1,
-        &[
-            part("Tap ", small_font, MUTED),
-            part(on_off_key, bold_font, ACCENT),
-            part(": Sinhala typing on or off", small_font, MUTED),
-        ],
-        false,
-    );
-    rich(
-        hdc,
-        lay.info_line2,
-        &[
-            part("Tap ", small_font, MUTED),
-            part(output_key, bold_font, ACCENT),
-            part(": Unicode or Legacy output", small_font, MUTED),
-        ],
-        false,
-    );
+    // ---- Show Logs and Keys
+    tool_button(hdc, lay.logs_button, &icons::DOCUMENT, "Show Logs", label_font, lay);
+    tool_button(hdc, lay.keys_button, &icons::KEYBOARD_SOLID, "Keys", label_font, lay);
 
-    // Show Logs and Keys
-    icon_button(hdc, lay.logs_button, &icons::DOCUMENT, "Show Logs", label_font, button_radius, lay);
-    icon_button(hdc, lay.keys_button, &icons::KEYBOARD_SOLID, "Keys", label_font, button_radius, lay);
-
-    // Footer: a line, the developer name with a cube, a line
+    // ---- Footer: a thin line, then a line, the developer name with a cube, a line
+    fill(hdc, lay.footer_rule, LINE);
     let dev = lay.dev_row;
-    let dev_label_width = text_size(hdc, small_font, "DEV: ").0;
+    let dev_label_width = text_size(hdc, hint_font, "DEV: ").0;
     let dev_name_width = text_size(hdc, bold_font, about::DEVELOPER).0;
     let cube_width = lay.scale(icons::CUBE.w);
     let cube_gap = lay.scale(8);
@@ -859,25 +1000,39 @@ unsafe fn draw_main(hdc: isize, lay: &Layout) {
     rich(
         hdc,
         dev_text_area,
-        &[part("DEV: ", small_font, MUTED), part(about::DEVELOPER, bold_font, ACCENT)],
+        &[Part { text: "DEV: ", font: hint_font, colour: DIM }, Part { text: about::DEVELOPER, font: bold_font, colour: ACCENT }],
         false,
     );
-    let line_top = (dev.top + dev.bottom - stroke) / 2;
+    let line_top = (dev.top + dev.bottom - thin) / 2;
     let margin = lay.scale(12);
-    fill(hdc, Rect { left: dev.left, top: line_top, right: dev_left - margin, bottom: line_top + stroke }, ACCENT);
-    fill(hdc, Rect { left: dev_left + dev_group + margin, top: line_top, right: dev.right, bottom: line_top + stroke }, ACCENT);
+    fill(hdc, Rect { left: dev.left, top: line_top, right: dev_left - margin, bottom: line_top + thin }, LINE);
+    fill(hdc, Rect { left: dev_left + dev_group + margin, top: line_top, right: dev.right, bottom: line_top + thin }, LINE);
 
-    // Contact buttons: GitHub, Facebook and YouTube. Clicking one opens its page in the browser.
+    // Contact buttons: GitHub, Facebook, YouTube and the portfolio. Clicking one opens its page in the browser.
     for (button, icon) in [
         (lay.github_button, &icons::GITHUB),
         (lay.facebook_button, &icons::FACEBOOK),
         (lay.youtube_button, &icons::YOUTUBE),
+        (lay.portfolio_button, &icons::PORTFOLIO),
     ] {
         draw_icon(hdc, icon, button, ACCENT, BG, BG, lay);
     }
 }
 
-/// The key hint page: a Back button, four tabs, a grid of letters with their keys, a note.
+/// The heading of the Settings page and the key hint page: a lime dot and the section name on
+/// the left, a small grey tag on the right.
+unsafe fn page_heading(hdc: isize, lay: &Layout, name: &str, tag: &str) {
+    let bold_font = FONT_SMALL_BOLD.load(Relaxed);
+    let heading = lay.page_title;
+    let dot_size = lay.scale(6);
+    let dot_top = (heading.top + heading.bottom - dot_size) / 2;
+    let dot = Rect { left: heading.left + lay.scale(2), top: dot_top, right: heading.left + lay.scale(2) + dot_size, bottom: dot_top + dot_size };
+    smooth_shape(hdc, dot, dot_size / 2, Some(ACCENT), None, BG);
+    text(hdc, name, Rect { left: heading.left + lay.scale(16), ..heading }, bold_font, ACCENT, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
+    text(hdc, tag, lay.page_tag, bold_font, DIM, DT_RIGHT | DT_VCENTER | DT_SINGLELINE);
+}
+
+/// The key hint page: a heading, four tabs, a grid of letters with their keys, a note.
 unsafe fn draw_keys(hdc: isize, lay: &Layout) {
     let tab = Tab::from_index(HINT_TAB.load(Relaxed));
     let page = hints::page(tab);
@@ -885,18 +1040,17 @@ unsafe fn draw_keys(hdc: isize, lay: &Layout) {
     let glyph_font = FONT_HINT_SI.load(Relaxed);
     let thin = lay.scale(1).max(1);
 
-    icon_button(hdc, lay.back_button, &icons::BACK, "Back", FONT_LABEL.load(Relaxed), lay.back_button.height() / 2, lay);
-    text(hdc, "Key hints", lay.hint_title, FONT_HEAD.load(Relaxed), TEXT, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
-
+    page_heading(hdc, lay, about::KEYS_HEADING, about::KEYS_TAG);
     for (i, t) in hints::TABS.iter().enumerate() {
-        pill(hdc, lay.hint_tab(i), t.label(), *t == tab, key_font, lay);
+        tab_pill(hdc, lay.hint_tab(i), t.label(), *t == tab, key_font, lay);
     }
 
+    // The grid: every letter in a dark card with a thin line, the Sinhala in lime and its keys in white.
     let rows = page.rows();
     let radius = lay.scale(8);
     for (i, c) in page.cells.iter().enumerate() {
         let cell = lay.hint_cell(page.columns, rows, i);
-        smooth_shape(hdc, cell, radius, None, Some((EDGE, thin)), BG);
+        card(hdc, cell, radius, Some(CARD), Some((LINE, thin)), BG);
         let wide = cell.width() > lay.scale(120);
         let pad = lay.scale(if wide { 10 } else { 4 });
         let inner = Rect { left: cell.left + pad, top: cell.top, right: cell.right - pad, bottom: cell.bottom };
@@ -920,54 +1074,115 @@ unsafe fn draw_keys(hdc: isize, lay: &Layout) {
     }
 
     let note_area = lay.hint_note_at(page.columns, rows);
-    text(hdc, &page.note, note_area, FONT_NOTE.load(Relaxed), MUTED, DT_LEFT | DT_WORDBREAK);
+    text(hdc, &page.note, note_area, FONT_NOTE.load(Relaxed), DIM, DT_LEFT | DT_WORDBREAK);
 }
 
-/// The Settings page: a Back button, then one card for each switch.
+/// One switch card on the Settings page: a tile with an icon, the name, a short note and the
+/// switch, then a thin line and a detail row with a tick, a line of text and a status word.
+/// The icon and the tick are lime while the setting is on, grey while it is off.
+unsafe fn setting_card(
+    hdc: isize,
+    c: &SettingCard,
+    icon: &Icon,
+    (title, note, detail, status): (&str, &str, &str, &str),
+    on: bool,
+    lay: &Layout,
+) {
+    let left_middle = DT_LEFT | DT_VCENTER | DT_SINGLELINE;
+    let thin = lay.scale(1).max(1);
+    let tint = if on { ACCENT } else { DIM };
+
+    card(hdc, c.card, lay.scale(14), Some(CARD), Some((LINE, thin)), BG);
+    card(hdc, c.tile, lay.scale(10), Some(CHIP), Some((LINE, thin)), CARD);
+    draw_icon(hdc, icon, c.tile, tint, CHIP, CHIP, lay);
+    text(hdc, title, c.title, FONT_LABEL.load(Relaxed), TEXT, left_middle | DT_END_ELLIPSIS);
+    text(hdc, note, c.note, FONT_NOTE.load(Relaxed), DIM, DT_LEFT | DT_WORDBREAK);
+    draw_switch(hdc, c.control, on, CARD, lay);
+
+    fill(hdc, c.rule, LINE);
+    draw_icon(hdc, &icons::CHECK_CIRCLE, c.detail_icon, tint, CARD, CARD, lay);
+    text(hdc, detail, c.detail_text, FONT_HINT.load(Relaxed), DIM, left_middle | DT_END_ELLIPSIS);
+    text(hdc, status, c.detail_state, FONT_SMALL_BOLD.load(Relaxed), tint, DT_RIGHT | DT_VCENTER | DT_SINGLELINE);
+}
+
+/// The Settings page: a heading, one card for each switch, the update card,
+/// a bar that says changes are saved, and a footer.
 unsafe fn draw_settings(hdc: isize, lay: &Layout) {
     let label_font = FONT_LABEL.load(Relaxed);
     let note_font = FONT_NOTE.load(Relaxed);
+    let hint_font = FONT_HINT.load(Relaxed);
+    let bold_font = FONT_SMALL_BOLD.load(Relaxed);
     let left_middle = DT_LEFT | DT_VCENTER | DT_SINGLELINE;
-    let card_radius = lay.scale(12);
-    let stroke = lay.scale(2);
+    let thin = lay.scale(1).max(1);
+    let card_radius = lay.scale(14);
 
-    icon_button(hdc, lay.back_button, &icons::BACK, "Back", label_font, lay.back_button.height() / 2, lay);
-    text(hdc, "Settings", lay.page_title, FONT_HEAD.load(Relaxed), TEXT, left_middle);
+    // ---- Heading (the same one the key hint page has), and one line of text under it.
+    page_heading(hdc, lay, about::SETTINGS_HEADING, about::SETTINGS_TAG);
+    text(hdc, about::SETTINGS_LEAD, lay.page_lead, note_font, DIM, left_middle | DT_END_ELLIPSIS);
 
-    let cards = [
-        (
-            [lay.startup_card, lay.startup_label, lay.startup_state, lay.startup_note, lay.startup_switch],
-            "Run on startup",
-            "Start LIPI when Windows starts",
-            STARTUP_ON.load(Relaxed),
-        ),
-        (
-            [lay.tray_card, lay.tray_label, lay.tray_state, lay.tray_note, lay.tray_switch],
-            "Start in tray",
-            "Hide the window when LIPI starts",
-            TRAY_START_ON.load(Relaxed),
-        ),
-    ];
-    for ([card, label, state_rect, note, switch], name, hint, on) in cards {
-        smooth_shape(hdc, card, card_radius, None, Some((ACCENT, stroke)), BG);
-        text(hdc, name, label, label_font, TEXT, left_middle);
-        text(
-            hdc,
-            if on { "ON" } else { "OFF" },
-            state_rect,
-            label_font,
-            if on { ACCENT } else { MUTED },
-            DT_RIGHT | DT_VCENTER | DT_SINGLELINE,
-        );
-        text(hdc, hint, note, note_font, MUTED, left_middle);
-        draw_switch(hdc, switch, on, lay);
-    }
+    // ---- The two switches
+    let startup_on = STARTUP_ON.load(Relaxed);
+    let tray_on = TRAY_START_ON.load(Relaxed);
+    setting_card(
+        hdc,
+        &lay.startup,
+        &icons::POWER,
+        (about::STARTUP_TITLE, about::STARTUP_NOTE, about::STARTUP_DETAIL, about::startup_status(startup_on)),
+        startup_on,
+        lay,
+    );
+    setting_card(
+        hdc,
+        &lay.tray,
+        &icons::TRAY,
+        (about::TRAY_TITLE, about::TRAY_NOTE, about::TRAY_DETAIL, about::tray_status(tray_on)),
+        tray_on,
+        lay,
+    );
 
-    // The version, and a button that opens the newest release on GitHub in the browser.
-    smooth_shape(hdc, lay.about_card, card_radius, None, Some((ACCENT, stroke)), BG);
-    text(hdc, &format!("Version {}", about::VERSION), lay.about_version, label_font, TEXT, left_middle);
-    text(hdc, "Compare it with the newest one on GitHub", lay.about_note, note_font, MUTED, left_middle);
-    pill(hdc, lay.update_button, "Check for updates", true, label_font, lay);
+    // ---- Updates: the version in a chip, and a button that opens the newest release on GitHub
+    // in the browser. LIPI itself never goes online. This card has a lime line, like the
+    // card that stands out in the design.
+    let u = &lay.update;
+    card(hdc, u.card, card_radius, Some(CARD), Some((ACCENT_DIM, thin)), BG);
+    card(hdc, u.tile, lay.scale(10), Some(CHIP), Some((ACCENT_DIM, thin)), CARD);
+    draw_icon(hdc, &icons::DOWNLOAD, u.tile, ACCENT, CHIP, CHIP, lay);
+    text(hdc, about::UPDATE_TITLE, u.title, label_font, TEXT, left_middle | DT_END_ELLIPSIS);
+    text(hdc, about::UPDATE_NOTE, u.note, note_font, DIM, DT_LEFT | DT_WORDBREAK);
+    card(hdc, u.chip, lay.scale(6), Some(ACCENT_TINT), Some((ACCENT_DIM, thin)), CARD);
+    text(hdc, &about::version_chip(), u.chip, FONT_MONO.load(Relaxed), ACCENT, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+    fill(hdc, u.rule, LINE);
+    pill_on(hdc, u.button, about::UPDATE_BUTTON, true, label_font, CARD, lay);
+
+    // ---- A bar: changes are saved by themselves, and where the file is
+    card(hdc, lay.saved_bar, lay.scale(12), Some(CARD), Some((LINE, thin)), BG);
+    smooth_shape(hdc, lay.saved_dot, lay.saved_dot.width() / 2, Some(ACCENT), None, CARD);
+    text(hdc, about::SAVED_NOTE, lay.saved_text, hint_font, TEXT, left_middle | DT_END_ELLIPSIS);
+    text(hdc, about::SAVED_PATH, lay.saved_path, FONT_MONO.load(Relaxed), DIM, DT_RIGHT | DT_VCENTER | DT_SINGLELINE);
+
+    // ---- Footer: a lime dot, the engine version and the developer on the left, a GitHub link on the right.
+    let dot_size = lay.footer_dot.width();
+    smooth_shape(hdc, lay.footer_dot, dot_size / 2, Some(ACCENT), None, BG);
+    let engine = about::engine_line();
+    rich(
+        hdc,
+        lay.footer_text,
+        &[
+            Part { text: &engine, font: hint_font, colour: DIM },
+            Part { text: "  \u{00B7}  ", font: hint_font, colour: DIM },
+            Part { text: "DEV: ", font: hint_font, colour: DIM },
+            Part { text: about::DEVELOPER, font: bold_font, colour: MUTED },
+        ],
+        false,
+    );
+    let link = lay.footer_github;
+    let label_width = text_size(hdc, hint_font, about::GITHUB_LABEL).0;
+    let icon_width = lay.scale(icons::CODE.w);
+    let gap = lay.scale(6);
+    let left = link.right - (icon_width + gap + label_width);
+    let icon_slot = Rect { left, top: link.top, right: left + icon_width, bottom: link.bottom };
+    draw_icon(hdc, &icons::CODE, icon_slot, ACCENT, BG, BG, lay);
+    text(hdc, about::GITHUB_LABEL, Rect { left: left + icon_width + gap, ..link }, hint_font, MUTED, left_middle);
 }
 
 unsafe fn draw(hdc: isize, width: i32, height: i32) {
@@ -1426,6 +1641,10 @@ unsafe fn on_click(hwnd: isize, lparam: isize) {
             open_link(about::YOUTUBE_URL);
             return;
         }
+        Hit::Portfolio => {
+            open_link(about::PORTFOLIO_URL);
+            return;
+        }
         Hit::Caption | Hit::None => return,
     }
     refresh(hwnd);
@@ -1621,21 +1840,18 @@ pub fn run(map: LegacyMap, legacy_output: bool) {
 
         BG_BRUSH.store(CreateSolidBrush(BG), Relaxed);
         // Nirmala UI has Sinhala letters. Segoe UI is used for everything else.
-        FONT_TITLE.store(make_font(lay.scale(32), 700, "Segoe UI"), Relaxed);
-        FONT_TITLE_SI.store(make_font(lay.scale(30), 700, "Nirmala UI"), Relaxed);
         FONT_LABEL.store(make_font(lay.scale(16), 700, "Segoe UI"), Relaxed);
-        FONT_SMALL.store(make_font(lay.scale(14), 600, "Segoe UI"), Relaxed);
         FONT_SMALL_BOLD.store(make_font(lay.scale(14), 700, "Segoe UI"), Relaxed);
-        FONT_LOGO.store(make_font(lay.scale(34), 700, "Nirmala UI"), Relaxed);
         FONT_LOGO_SMALL.store(make_font(lay.scale(15), 700, "Nirmala UI"), Relaxed);
-        FONT_HEAD.store(make_font(lay.scale(22), 700, "Segoe UI"), Relaxed);
         FONT_HINT.store(make_font(lay.scale(13), 600, "Segoe UI"), Relaxed);
         FONT_HINT_SI.store(make_font(lay.scale(19), 700, "Nirmala UI"), Relaxed);
         FONT_NOTE.store(make_font(lay.scale(12), 600, "Nirmala UI"), Relaxed);
+        FONT_MONO.store(make_font(lay.scale(12), 700, "Consolas"), Relaxed);
+        FONT_SUB.store(make_font(lay.scale(13), 600, "Nirmala UI"), Relaxed);
         FONT_LOG.store(make_font(lay.scale(16), 400, "Nirmala UI"), Relaxed);
         // The smart quotes card: Nirmala UI draws both the Sinhala and the English words.
-        FONT_TIP.store(make_font(lay.scale(14), 700, "Nirmala UI"), Relaxed);
         FONT_TIP_SMALL.store(make_font(lay.scale(12), 700, "Nirmala UI"), Relaxed);
+        FONT_NOTE_SMALL.store(make_font(lay.scale(11), 600, "Nirmala UI"), Relaxed);
 
         make_icons();
         TASKBAR_CREATED.store(RegisterWindowMessageW(wide("TaskbarCreated").as_ptr()), Relaxed);
