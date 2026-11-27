@@ -157,13 +157,13 @@ The LIPI window has a card about this. Its **වැඩි විස්තර** b
 
 ## Settings
 
-Click the **gear** in the title bar to open the Settings page. Press Back or Esc to return.
+Click the **gear** in the title bar to open the Settings page. Click the back arrow at the left of the title bar, or press Esc, to return. The **Keys** page has the same back arrow.
 
 | Setting | What it does |
 | --- | --- |
-| **Run on startup** | LIPI starts when you sign in to Windows. It adds one entry to your own startup list (no administrator rights) and removes it when you turn the switch off. If you turned LIPI off in Task Manager, Startup apps, the switch shows OFF. |
-| **Start in tray** | LIPI starts hidden. Left click the tray icon to open the window. |
-| **Version and Check for updates** | Shows the version you have. The button opens the [latest release](https://github.com/sanjaya3d/LIPI/releases/latest) page in your browser, so you can compare the numbers. LIPI itself never goes online. |
+| **Run on Windows Startup** | LIPI starts when you sign in to Windows. It adds one entry to your own startup list (no administrator rights) and removes it when you turn the switch off. If you turned LIPI off in Task Manager, Startup apps, the switch shows OFF. |
+| **Start Minimized to Tray** | LIPI starts hidden. Left click the tray icon to open the window. |
+| **Check for Updates** | Shows the version you have in a chip. The **Check for updates** button opens the [latest release](https://github.com/sanjaya3d/LIPI/releases/latest) page in your browser, so you can compare the numbers. LIPI itself never goes online. |
 
 The two keys and the starting state are in `settings.txt`. It is in your AppData folder, which Explorer hides by default, so no settings file sits next to the exe. To open the folder, press **Win + R**, type `%APPDATA%\LIPI` and press Enter. The file `settings.txt` is created there the first time LIPI runs.
 
@@ -244,7 +244,7 @@ Yes. Edit `on_off_key` and `output_key` in `settings.txt`. See [Settings](#setti
 <details>
 <summary><b>How do I start LIPI when Windows starts?</b></summary>
 
-Click the gear in the title bar and turn on **Run on startup**. To start hidden in the tray, turn on **Start in tray** too. If the switch goes back to OFF after you move `lipi.exe` to another folder, turn it on again. It remembers the folder the exe was in.
+Click the gear in the title bar and turn on **Run on Windows Startup**. To start hidden in the tray, turn on **Start Minimized to Tray** too. If the switch goes back to OFF after you move `lipi.exe` to another folder, turn it on again. It remembers the folder the exe was in.
 </details>
 
 <details>
@@ -262,7 +262,7 @@ Right click the tray icon and choose **Exit**, or click the X in the window.
 <details>
 <summary><b>How do I remove LIPI?</b></summary>
 
-Turn off **Run on startup** in Settings if you turned it on. Then close LIPI, delete `lipi.exe` and delete the folder `%APPDATA%\LIPI`. Nothing else is installed.
+Turn off **Run on Windows Startup** in Settings if you turned it on. Then close LIPI, delete `lipi.exe` and delete the folder `%APPDATA%\LIPI`. Nothing else is installed.
 </details>
 
 <details>
@@ -280,7 +280,7 @@ No. LIPI is Windows only, because it uses the Windows keyboard hook.
 
 ## Privacy
 
-LIPI has no network code and sends nothing anywhere. The Show Logs window keeps its lines in memory only, and nothing is saved to a file. The only file the program writes is `settings.txt`. If you turn on **Run on startup**, it also adds one entry to your Windows startup list. The **Check for updates** button only opens a web page in your browser. LIPI itself never goes online.
+LIPI has no network code and sends nothing anywhere. The Show Logs window keeps its lines in memory only, and nothing is saved to a file. The only file the program writes is `settings.txt`. If you turn on **Run on Windows Startup**, it also adds one entry to your Windows startup list. The **Check for updates** button only opens a web page in your browser. LIPI itself never goes online.
 
 ## Is the download safe?
 
@@ -292,7 +292,7 @@ LIPI has no network code and sends nothing anywhere. The Show Logs window keeps 
 - **Scan it:** upload `lipi.exe` to [VirusTotal](https://www.virustotal.com) to see what many antivirus programs say. LIPI uses a keyboard hook, so some of them may flag it. See the [FAQ](#faq).
 - **If you decide to run it:** on the blue Windows window, click **More info**, then **Run anyway**.
 - **Privacy:** LIPI will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it. See [Privacy](#privacy).
-- **Changes to your system:** none by themselves. The only change is one startup entry, added when you turn on **Run on startup** in Settings and removed when you turn it off. There is no installer. To remove LIPI, see the [FAQ](#faq).
+- **Changes to your system:** none by themselves. The only change is one startup entry, added when you turn on **Run on Windows Startup** in Settings and removed when you turn it off. There is no installer. To remove LIPI, see the [FAQ](#faq).
 - **Problems:** if you think a release is wrong, or you find a security problem, [open an issue](https://github.com/sanjaya3d/LIPI/issues).
 
 ## Limits
@@ -358,4 +358,5 @@ Made by **SANJAYA3D**
   <a href="https://github.com/sanjaya3d"><img src="https://img.shields.io/badge/GITHUB-SANJAYA3D-BEF92C?style=for-the-badge&labelColor=2b3035&logo=github&logoColor=white" alt="GitHub: sanjaya3d"></a>
   <a href="https://facebook.com/sanjaya3d"><img src="https://img.shields.io/badge/FACEBOOK-SANJAYA3D-BEF92C?style=for-the-badge&labelColor=2b3035&logo=facebook&logoColor=white" alt="Facebook: sanjaya3d"></a>
   <a href="https://www.youtube.com/@SANJAYA3D/"><img src="https://img.shields.io/badge/YOUTUBE-%40SANJAYA3D-BEF92C?style=for-the-badge&labelColor=2b3035&logo=youtube&logoColor=white" alt="YouTube: SANJAYA3D"></a>
+  <a href="https://sanjaya3d.github.io/portfolio/"><img src="https://img.shields.io/badge/PORTFOLIO-SANJAYA3D-BEF92C?style=for-the-badge&labelColor=2b3035" alt="Portfolio: sanjaya3d.github.io/portfolio"></a>
 </p>
